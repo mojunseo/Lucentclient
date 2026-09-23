@@ -31,10 +31,14 @@
 	"cosmetic.lucentclient.cape.ocean": "Ocean",
 	"cosmetic.lucentclient.cape.galaxy": "Galaxy",
 	"cosmetic.lucentclient.wings.angel": "Angel",
-	"cosmetic.lucentclient.wings.demon": "Demon",
-	"cosmetic.lucentclient.wings.butterfly": "Butterfly",
+	"cosmetic.lucentclient.wings.demon": "Demon Dragon",
+	"cosmetic.lucentclient.wings.butterfly": "Morpho Butterfly",
 	"cosmetic.lucentclient.hat.top_hat": "Top Hat",
 	"cosmetic.lucentclient.hat.crown": "Crown",
 	"cosmetic.lucentclient.halo.gold": "Golden Halo",
-	"cosmetic.lucentclient.halo.ice": "Ice Halo"
+	"cosmetic.lucentclient.halo.ice": "Ice Halo",
+	"cosmetic.lucentclient.wings.phoenix": "Phoenix",
+	"cosmetic.lucentclient.wings.raven": "Raven",
+	"cosmetic.lucentclient.wings.void": "Void Dragon",
+	"cosmetic.lucentclient.wings.monarch": "Monarch Butterfly"
 }

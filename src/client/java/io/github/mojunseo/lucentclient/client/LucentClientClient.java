@@ -2,7 +2,10 @@ package io.github.mojunseo.lucentclient.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.LucentClient;
+import io.github.mojunseo.lucentclient.client.cosmetic.CosmeticType;
 import io.github.mojunseo.lucentclient.client.cosmetic.CosmeticsManager;
+import io.github.mojunseo.lucentclient.client.cosmetic.PlayerCosmetics;
+import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticRenderState;
 import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticLayer;
 import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticModels;
 import io.github.mojunseo.lucentclient.client.gui.HudEditScreen;
@@ -13,6 +16,7 @@ import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.KeyMapping;
@@ -32,6 +36,11 @@ public class LucentClientClient implements ClientModInitializer {
 			if (renderer instanceof AvatarRenderer<?> avatarRenderer) {
 				helper.register(new CosmeticLayer(avatarRenderer, context.getModelSet()));
 			}
+		});
+		// CosmeticLayer draws Lucent capes as cloth, so hide the vanilla box cape under them.
+		LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(state -> {
+			PlayerCosmetics cosmetics = state.getData(CosmeticRenderState.COSMETICS);
+			return cosmetics == null || cosmetics.get(CosmeticType.CAPE) == null;
 		});
 
 		KeyMapping menuKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(

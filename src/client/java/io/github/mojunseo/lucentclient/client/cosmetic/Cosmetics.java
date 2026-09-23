@@ -9,17 +9,21 @@ public final class Cosmetics {
 	private static final int WHITE = 0xFFFFFFFF;
 
 	public static final List<Cosmetic> ALL = List.of(
-			Cosmetic.of(CosmeticType.CAPE, "lucent", "lucent", WHITE),
-			Cosmetic.of(CosmeticType.CAPE, "flame", "flame", WHITE),
-			Cosmetic.of(CosmeticType.CAPE, "ocean", "ocean", WHITE),
-			Cosmetic.of(CosmeticType.CAPE, "galaxy", "galaxy", WHITE),
-			Cosmetic.of(CosmeticType.WINGS, "angel", "angel", WHITE),
-			Cosmetic.of(CosmeticType.WINGS, "demon", "demon", WHITE),
-			Cosmetic.of(CosmeticType.WINGS, "butterfly", "butterfly", WHITE),
-			Cosmetic.of(CosmeticType.HAT, "top_hat", "top_hat", WHITE),
-			Cosmetic.of(CosmeticType.HAT, "crown", "crown", WHITE),
-			Cosmetic.of(CosmeticType.HALO, "gold", "halo", 0xFFFFD86B),
-			Cosmetic.of(CosmeticType.HALO, "ice", "halo", 0xFF8FE3FF));
+			Cosmetic.of(CosmeticType.CAPE, "lucent", "cloth_cape", "lucent", WHITE),
+			Cosmetic.of(CosmeticType.CAPE, "flame", "cloth_cape", "flame", WHITE),
+			Cosmetic.of(CosmeticType.CAPE, "ocean", "cloth_cape", "ocean", WHITE),
+			Cosmetic.of(CosmeticType.CAPE, "galaxy", "cloth_cape", "galaxy", WHITE),
+			Cosmetic.of(CosmeticType.WINGS, "angel", "feathered_wings", "angel", WHITE),
+			Cosmetic.of(CosmeticType.WINGS, "phoenix", "feathered_wings", "phoenix", WHITE),
+			Cosmetic.of(CosmeticType.WINGS, "raven", "feathered_wings", "raven", WHITE),
+			Cosmetic.of(CosmeticType.WINGS, "demon", "dragon_wings", "demon", WHITE),
+			Cosmetic.of(CosmeticType.WINGS, "void", "dragon_wings", "void", WHITE),
+			Cosmetic.of(CosmeticType.WINGS, "butterfly", "butterfly_wings", "butterfly", WHITE),
+			Cosmetic.of(CosmeticType.WINGS, "monarch", "butterfly_wings", "monarch", WHITE),
+			Cosmetic.of(CosmeticType.HAT, "top_hat", "top_hat", "top_hat", WHITE),
+			Cosmetic.of(CosmeticType.HAT, "crown", "crown", "crown", WHITE),
+			Cosmetic.of(CosmeticType.HALO, "gold", "halo", "halo", 0xFFFFD86B),
+			Cosmetic.of(CosmeticType.HALO, "ice", "halo", "halo", 0xFF8FE3FF));
 
 	private Cosmetics() {
 	}

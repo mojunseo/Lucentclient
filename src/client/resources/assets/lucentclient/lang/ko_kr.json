@@ -31,10 +31,14 @@
 	"cosmetic.lucentclient.cape.ocean": "바다",
 	"cosmetic.lucentclient.cape.galaxy": "은하",
 	"cosmetic.lucentclient.wings.angel": "천사",
-	"cosmetic.lucentclient.wings.demon": "악마",
-	"cosmetic.lucentclient.wings.butterfly": "나비",
+	"cosmetic.lucentclient.wings.demon": "악마의 용",
+	"cosmetic.lucentclient.wings.butterfly": "모르포 나비",
 	"cosmetic.lucentclient.hat.top_hat": "실크햇",
 	"cosmetic.lucentclient.hat.crown": "왕관",
 	"cosmetic.lucentclient.halo.gold": "황금 헤일로",
-	"cosmetic.lucentclient.halo.ice": "얼음 헤일로"
+	"cosmetic.lucentclient.halo.ice": "얼음 헤일로",
+	"cosmetic.lucentclient.wings.phoenix": "불사조",
+	"cosmetic.lucentclient.wings.raven": "까마귀",
+	"cosmetic.lucentclient.wings.void": "공허의 용",
+	"cosmetic.lucentclient.wings.monarch": "제왕나비"
 }
