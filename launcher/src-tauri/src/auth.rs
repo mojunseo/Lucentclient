@@ -9,7 +9,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 /// (Accounts in any identity provider or organizational directory and personal Microsoft accounts,
 /// "Allow public client flows" on) and request Minecraft API access for it; until Mojang approves,
 /// the last step (login_with_xbox) is refused.
-pub const MS_CLIENT_ID: &str = "";
+pub const MS_CLIENT_ID: &str = "315fd1a0-4dc8-4c0c-9abb-b7fc4764cd20";
 const SCOPE: &str = "XboxLive.signin offline_access";
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
