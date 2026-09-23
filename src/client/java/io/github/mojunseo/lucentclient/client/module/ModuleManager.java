@@ -29,9 +29,10 @@ public final class ModuleManager {
 	public static final ToggleSprintModule TOGGLE_SPRINT = new ToggleSprintModule();
 	public static final ZoomModule ZOOM = new ZoomModule();
 	public static final FullbrightModule FULLBRIGHT = new FullbrightModule();
+	public static final DiscordModule DISCORD = new DiscordModule();
 
 	private static final List<Module> MODULES = List.of(
-			FPS, COORDINATES, KEYSTROKES, ARMOR, POTIONS, PING, CLOCK, TOGGLE_SPRINT, ZOOM, FULLBRIGHT);
+			FPS, COORDINATES, KEYSTROKES, ARMOR, POTIONS, PING, CLOCK, TOGGLE_SPRINT, ZOOM, FULLBRIGHT, DISCORD);
 
 	private ModuleManager() {
 	}

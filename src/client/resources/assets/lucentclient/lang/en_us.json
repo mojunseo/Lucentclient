@@ -101,5 +101,17 @@
 	"setting.lucentclient.toggle_sneak": "Toggle sneak",
 	"setting.lucentclient.show_status": "Show on HUD",
 	"hud.lucentclient.sprinting_toggled": "Sprinting (toggled)",
-	"hud.lucentclient.sneaking_toggled": "Sneaking (toggled)"
+	"hud.lucentclient.sneaking_toggled": "Sneaking (toggled)",
+	"module.lucentclient.discord": "Discord",
+	"module.lucentclient.discord.desc": "Show what you're playing on your profile",
+	"setting.lucentclient.show_server": "Show server address",
+	"setting.lucentclient.show_world": "Show world name",
+	"setting.lucentclient.show_dimension": "Show dimension",
+	"setting.lucentclient.show_elapsed": "Show time played",
+	"discord.lucentclient.menu": "In the menus",
+	"discord.lucentclient.singleplayer": "Playing singleplayer",
+	"discord.lucentclient.multiplayer": "Playing multiplayer",
+	"discord.lucentclient.dimension.minecraft.overworld": "Overworld",
+	"discord.lucentclient.dimension.minecraft.the_nether": "The Nether",
+	"discord.lucentclient.dimension.minecraft.the_end": "The End"
 }

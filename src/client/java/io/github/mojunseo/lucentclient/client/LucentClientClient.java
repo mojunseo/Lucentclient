@@ -14,6 +14,7 @@ import io.github.mojunseo.lucentclient.client.module.HudModule;
 import io.github.mojunseo.lucentclient.client.module.Module;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
@@ -56,6 +57,8 @@ public class LucentClientClient implements ClientModInitializer {
 				if (module.isEnabled()) module.tick(minecraft);
 			}
 		});
+
+		ClientLifecycleEvents.CLIENT_STOPPING.register(minecraft -> ModuleManager.DISCORD.shutdown());
 
 		HudElementRegistry.addLast(LucentClient.id("hud"), (graphics, deltaTracker) -> {
 			Minecraft minecraft = Minecraft.getInstance();
