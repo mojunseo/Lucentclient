@@ -5,5 +5,17 @@
 	"screen.lucentclient.modules": "Lucent Client 모듈",
 	"module.lucentclient.fps": "FPS",
 	"module.lucentclient.keystrokes": "키 입력 표시",
-	"module.lucentclient.zoom": "줌"
+	"module.lucentclient.zoom": "줌",
+	"module.lucentclient.coordinates": "좌표",
+	"module.lucentclient.fullbright": "풀브라이트",
+	"screen.lucentclient.hud_edit": "HUD 위치 편집",
+	"screen.lucentclient.hud_edit.hint": "HUD 요소를 드래그해서 옮기세요. 다 되면 Esc를 누르세요.",
+	"hud.lucentclient.facing": "방향: %s (%s)",
+	"hud.lucentclient.biome": "바이옴: %s",
+	"hud.lucentclient.direction.north": "북쪽",
+	"hud.lucentclient.direction.south": "남쪽",
+	"hud.lucentclient.direction.east": "동쪽",
+	"hud.lucentclient.direction.west": "서쪽",
+	"hud.lucentclient.direction.up": "위",
+	"hud.lucentclient.direction.down": "아래"
 }

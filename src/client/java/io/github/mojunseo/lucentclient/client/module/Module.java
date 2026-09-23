@@ -1,8 +1,7 @@
 package io.github.mojunseo.lucentclient.client.module;
 
-import net.minecraft.client.DeltaTracker;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 public abstract class Module {
@@ -38,7 +37,11 @@ public abstract class Module {
 	public void tick(Minecraft minecraft) {
 	}
 
-	/** Called every frame while the module is enabled and the HUD is visible. */
-	public void extractHud(Minecraft minecraft, GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+	public void read(JsonObject json) {
+		if (json.has("enabled")) setEnabled(json.get("enabled").getAsBoolean());
+	}
+
+	public void write(JsonObject json) {
+		json.addProperty("enabled", enabled);
 	}
 }

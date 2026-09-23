@@ -5,5 +5,17 @@
 	"screen.lucentclient.modules": "Lucent Client Modules",
 	"module.lucentclient.fps": "FPS",
 	"module.lucentclient.keystrokes": "Keystrokes",
-	"module.lucentclient.zoom": "Zoom"
+	"module.lucentclient.zoom": "Zoom",
+	"module.lucentclient.coordinates": "Coordinates",
+	"module.lucentclient.fullbright": "Fullbright",
+	"screen.lucentclient.hud_edit": "Edit HUD Layout",
+	"screen.lucentclient.hud_edit.hint": "Drag HUD elements to move them. Press Esc when done.",
+	"hud.lucentclient.facing": "Facing: %s (%s)",
+	"hud.lucentclient.biome": "Biome: %s",
+	"hud.lucentclient.direction.north": "North",
+	"hud.lucentclient.direction.south": "South",
+	"hud.lucentclient.direction.east": "East",
+	"hud.lucentclient.direction.west": "West",
+	"hud.lucentclient.direction.up": "Up",
+	"hud.lucentclient.direction.down": "Down"
 }

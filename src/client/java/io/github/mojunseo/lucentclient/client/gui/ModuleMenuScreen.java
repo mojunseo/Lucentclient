@@ -16,10 +16,15 @@ public class ModuleMenuScreen extends Screen {
 		super(Component.translatable("screen.lucentclient.modules"));
 	}
 
+	private int top() {
+		int rows = ModuleManager.modules().size() + 2;
+		return (height - rows * ROW_HEIGHT) / 2 + 8;
+	}
+
 	@Override
 	protected void init() {
 		int x = (width - BUTTON_WIDTH) / 2;
-		int y = height / 4;
+		int y = top();
 		for (Module module : ModuleManager.modules()) {
 			addRenderableWidget(Button.builder(label(module), button -> {
 				module.setEnabled(!module.isEnabled());
@@ -27,8 +32,12 @@ public class ModuleMenuScreen extends Screen {
 			}).bounds(x, y, BUTTON_WIDTH, 20).build());
 			y += ROW_HEIGHT;
 		}
+		y += ROW_HEIGHT / 2;
+		addRenderableWidget(Button.builder(Component.translatable("screen.lucentclient.hud_edit"),
+				button -> minecraft.gui.setScreen(new HudEditScreen(this))).bounds(x, y, BUTTON_WIDTH, 20).build());
+		y += ROW_HEIGHT;
 		addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
-				.bounds(x, y + ROW_HEIGHT / 2, BUTTON_WIDTH, 20).build());
+				.bounds(x, y, BUTTON_WIDTH, 20).build());
 	}
 
 	private static Component label(Module module) {
@@ -38,7 +47,7 @@ public class ModuleMenuScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
-		graphics.centeredText(font, title, width / 2, height / 4 - 20, 0xFFFFFFFF);
+		graphics.centeredText(font, title, width / 2, top() - 20, 0xFFFFFFFF);
 	}
 
 	@Override

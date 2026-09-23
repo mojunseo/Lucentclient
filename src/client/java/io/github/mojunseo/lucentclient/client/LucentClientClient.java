@@ -2,7 +2,9 @@ package io.github.mojunseo.lucentclient.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.LucentClient;
+import io.github.mojunseo.lucentclient.client.gui.HudEditScreen;
 import io.github.mojunseo.lucentclient.client.gui.ModuleMenuScreen;
+import io.github.mojunseo.lucentclient.client.module.HudModule;
 import io.github.mojunseo.lucentclient.client.module.Module;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,8 +37,10 @@ public class LucentClientClient implements ClientModInitializer {
 
 		HudElementRegistry.addLast(LucentClient.id("hud"), (graphics, deltaTracker) -> {
 			Minecraft minecraft = Minecraft.getInstance();
+			// The edit screen draws the HUD modules itself.
+			if (minecraft.gui.screen() instanceof HudEditScreen) return;
 			for (Module module : ModuleManager.modules()) {
-				if (module.isEnabled()) module.extractHud(minecraft, graphics, deltaTracker);
+				if (module instanceof HudModule hudModule && module.isEnabled()) hudModule.extract(minecraft, graphics);
 			}
 		});
 
