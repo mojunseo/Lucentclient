@@ -20,7 +20,7 @@ type Info = {
 type Progress = { stage: "metadata" | "libraries" | "assets" | "java" | "mods"; done: number; total: number };
 type DeviceCode = { user_code: string; verification_uri: string };
 type SearchHit = { projectId: string; title: string; author: string; description: string; downloads: number; iconUrl: string | null };
-type InstalledMod = { projectId: string; title: string; filename: string; iconUrl: string | null; dependency: boolean; enabled: boolean };
+type InstalledMod = { projectId: string; title: string; iconUrl: string | null; enabled: boolean; missing: boolean };
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 let info: Info;
@@ -175,6 +175,7 @@ function setPlaying(state: "idle" | "preparing" | "running") {
 
 $("play").addEventListener("click", async () => {
   $("play-error").hidden = true;
+  $("play-note").hidden = true;
   $("log").replaceChildren();
   setPlaying("preparing");
   $<HTMLElement>("progress-fill").style.width = "0";
@@ -201,6 +202,18 @@ listen<number | null>("game-exit", ({ payload }) => {
   }
 });
 listen<string>("play-error", ({ payload }) => showPlayError(payload));
+listen<string[]>("mods-skipped", ({ payload }) => {
+  showPlayNote(`${info.version}용 파일이 없어서 빼고 실행한 모드: ${payload.join(", ")}`);
+});
+listen<string>("mods-warning", () => {
+  showPlayNote("모드를 최신으로 맞추지 못해서, 이미 받아 둔 모드로 실행했어요. 인터넷 연결을 확인하세요.");
+});
+
+function showPlayNote(message: string) {
+  const note = $("play-note");
+  note.hidden = false;
+  note.textContent = message;
+}
 
 function showPlayError(message: string) {
   setPlaying("idle");
@@ -374,25 +387,41 @@ async function renderInstalled() {
     list.append(empty);
   }
   for (const mod of installed) {
-    const { row, control } = modRow(mod.iconUrl, mod.title, mod.filename, mod.dependency ? "다른 모드에 필요" : undefined);
+    const status = mod.missing ? `${info.version}용 파일이 없어서 이 버전에서는 빠져요` : mod.enabled ? "켜짐" : "꺼짐";
+    const { row, control } = modRow(mod.iconUrl, mod.title, status);
+    if (mod.missing) {
+      const tag = document.createElement("span");
+      tag.className = "missing";
+      tag.textContent = "이 버전용 없음";
+      row.querySelector(".mod-text strong")!.after(tag);
+    }
     const remove = document.createElement("button");
     remove.className = "button quiet";
     remove.textContent = "삭제";
-    remove.addEventListener("click", async () => {
-      await invoke("remove_mod", { projectId: mod.projectId });
-      await renderInstalled();
-      renderResults();
-    });
+    remove.addEventListener("click", () => changeMods(() => invoke("remove_mod", { projectId: mod.projectId })));
     const lamp = document.createElement("span");
     lamp.className = "lamp" + (mod.enabled ? " on" : "");
     lamp.title = mod.enabled ? "켜짐" : "꺼짐";
-    lamp.addEventListener("click", async () => {
-      await invoke("set_mod_enabled", { filename: mod.filename, enabled: !mod.enabled });
-      await renderInstalled();
-    });
+    lamp.addEventListener("click", () =>
+      changeMods(() => invoke("set_mod_enabled", { projectId: mod.projectId, enabled: !mod.enabled })),
+    );
     control.append(remove, lamp);
     list.append(row);
   }
+}
+
+/** Runs a change to the mod list (which also syncs the selected version) and redraws. */
+async function changeMods(change: () => Promise<unknown>) {
+  $("mods-error").hidden = true;
+  try {
+    await change();
+  } catch (error) {
+    const message = $("mods-error");
+    message.hidden = false;
+    message.textContent = String(error);
+  }
+  await renderInstalled();
+  renderResults();
 }
 
 let results: SearchHit[] = [];
@@ -455,7 +484,7 @@ async function searchMods(reset: boolean) {
 }
 
 async function openMods() {
-  $("mods-title").textContent = `${info.version}용 모드`;
+  $("mods-search-title").textContent = `Modrinth에서 ${info.version}용 모드 찾기`;
   $<HTMLSelectElement>("mod-sort").value = modSort;
   renderCategories();
   await renderInstalled();

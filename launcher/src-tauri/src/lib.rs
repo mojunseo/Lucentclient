@@ -32,8 +32,19 @@ impl App {
         self.settings.lock().unwrap().version.clone().unwrap_or_else(|| versions::minecraft().to_string())
     }
 
-    fn instance(&self) -> modrinth::Instance {
-        modrinth::Instance { dir: self.layout.instance(&self.version()) }
+    fn instance_dir(&self) -> PathBuf {
+        self.layout.instance(&self.version())
+    }
+
+    /// Brings the selected version's mods folder in line with the shared mod list.
+    async fn sync_mods(&self) -> anyhow::Result<modrinth::SyncReport> {
+        modrinth::sync(&self.client, &self.layout.root, &self.instance_dir(), &self.version()).await
+    }
+
+    fn update_wanted(&self, change: impl FnOnce(&mut Vec<modrinth::WantedMod>)) -> Result<(), String> {
+        let mut wanted = modrinth::load_wanted(&self.layout.root);
+        change(&mut wanted);
+        modrinth::save_wanted(&self.layout.root, &wanted).map_err(|e| e.to_string())
     }
 
     fn settings_path(&self) -> PathBuf {
@@ -160,24 +171,54 @@ async fn search_mods(
     modrinth::search(&app.client, &query, &app.version(), offset, &sort, &categories).await.map_err(|e| e.to_string())
 }
 
-#[tauri::command]
-fn installed_mods(app: State<'_, Arc<App>>) -> Vec<modrinth::InstalledView> {
-    app.instance().list()
+/// A mod in the shared list, as the UI shows it for the selected version.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ModView {
+    project_id: String,
+    title: String,
+    icon_url: Option<String>,
+    enabled: bool,
+    /// No file for the selected version, so it is left out when playing it.
+    missing: bool,
 }
 
 #[tauri::command]
-async fn install_mod(app: State<'_, Arc<App>>, project_id: String) -> Result<(), String> {
-    app.instance().install(&app.client, &project_id, &app.version()).await.map_err(|e| format!("{e:#}"))
+fn installed_mods(app: State<'_, Arc<App>>) -> Vec<ModView> {
+    let record = modrinth::load_record(&app.instance_dir());
+    modrinth::load_wanted(&app.layout.root)
+        .into_iter()
+        .map(|w| ModView {
+            missing: record.missing.contains(&w.project_id),
+            project_id: w.project_id,
+            title: w.title,
+            icon_url: w.icon_url,
+            enabled: w.enabled,
+        })
+        .collect()
+}
+
+/// Adds a mod to the shared list and installs it (with what it needs) for the selected version.
+#[tauri::command]
+async fn install_mod(app: State<'_, Arc<App>>, project_id: String) -> Result<modrinth::SyncReport, String> {
+    modrinth::add(&app.client, &app.layout.root, &project_id).await.map_err(|e| format!("{e:#}"))?;
+    app.sync_mods().await.map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
-fn remove_mod(app: State<'_, Arc<App>>, project_id: String) -> Result<(), String> {
-    app.instance().remove(&project_id).map_err(|e| e.to_string())
+async fn remove_mod(app: State<'_, Arc<App>>, project_id: String) -> Result<modrinth::SyncReport, String> {
+    app.update_wanted(|wanted| wanted.retain(|w| w.project_id != project_id))?;
+    app.sync_mods().await.map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
-fn set_mod_enabled(app: State<'_, Arc<App>>, filename: String, enabled: bool) -> Result<(), String> {
-    app.instance().set_enabled(&filename, enabled).map_err(|e| e.to_string())
+async fn set_mod_enabled(app: State<'_, Arc<App>>, project_id: String, enabled: bool) -> Result<modrinth::SyncReport, String> {
+    app.update_wanted(|wanted| {
+        if let Some(w) = wanted.iter_mut().find(|w| w.project_id == project_id) {
+            w.enabled = enabled;
+        }
+    })?;
+    app.sync_mods().await.map_err(|e| format!("{e:#}"))
 }
 
 #[tauri::command]
@@ -260,6 +301,17 @@ async fn run_game(handle: &AppHandle, app: &Arc<App>) -> anyhow::Result<()> {
     })
     .await?;
 
+    // Fetch the player's mods for this version; without a connection, play with what is there.
+    match app.sync_mods().await {
+        Ok(report) if !report.missing.is_empty() => {
+            handle.emit("mods-skipped", report.missing).ok();
+        }
+        Ok(_) => {}
+        Err(error) => {
+            handle.emit("mods-warning", format!("{error:#}")).ok();
+        }
+    }
+
     let settings = app.settings.lock().unwrap().clone();
     let mut child = launch::command(&app.layout, &installed, &account, &settings).spawn()?;
     handle.emit("game-started", ()).ok();
@@ -309,6 +361,8 @@ pub fn run() {
                 std::fs::create_dir_all(instance.parent().unwrap())?;
                 std::fs::rename(&legacy, &instance)?;
             }
+            // Mods used to be installed per version; they now share one list.
+            modrinth::migrate(&layout.root, &layout.root.join("instances"))?;
             let settings: Settings = state::load(&layout.root.join("settings.json"));
             let accounts: Accounts = state::load(&layout.root.join("accounts.json"));
             tauri_app.manage(Arc::new(App {
@@ -366,17 +420,20 @@ mod tests {
         println!("{:?}", command.as_std());
     }
 
-    /// Installs a mod with its dependencies from Modrinth into LUCENT_TEST_DIR/instances/<version>.
+    /// Adds a mod to the shared list in LUCENT_TEST_DIR and syncs it into one version's instance.
     #[tokio::test]
     #[ignore]
-    async fn install_modrinth_mod() {
+    async fn sync_modrinth_mod() {
         let root = PathBuf::from(std::env::var("LUCENT_TEST_DIR").expect("set LUCENT_TEST_DIR"));
         let version = std::env::var("LUCENT_TEST_VERSION").unwrap_or_else(|_| versions::minecraft().to_string());
         let project = std::env::var("LUCENT_TEST_MOD").unwrap_or_else(|_| "AANobbMI".into());
-        let instance = modrinth::Instance { dir: Layout { root }.instance(&version) };
-        instance.install(&download::client(), &project, &version).await.expect("install");
-        for installed in instance.list() {
-            println!("{} {} enabled={} dependency={}", installed.installed.title, installed.installed.filename, installed.enabled, installed.installed.dependency);
+        let client = download::client();
+        modrinth::add(&client, &root, &project).await.expect("add");
+        let instance = Layout { root: root.clone() }.instance(&version);
+        let report = modrinth::sync(&client, &root, &instance, &version).await.expect("sync");
+        println!("missing for {version}: {:?}", report.missing);
+        for file in modrinth::load_record(&instance).files {
+            println!("{version}: {} dependency={}", file.filename, file.dependency);
         }
     }
 }

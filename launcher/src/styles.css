@@ -241,3 +241,5 @@ h2 { font-size: 15px; font-weight: 600; color: var(--tuff); margin: 28px 0 10px;
 .category:hover { color: var(--calcite); }
 .category.active { color: var(--calcite); border-bottom-color: var(--calcite); }
 .result-count { margin: 4px 0 8px; }
+.list-note { margin: -4px 0 10px; }
+.missing { color: var(--lamp-on); font-size: 12px; margin-left: 6px; }

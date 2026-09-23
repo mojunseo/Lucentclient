@@ -36,15 +36,17 @@
               <div class="bar"><div class="fill" id="progress-fill"></div></div>
               <p class="progress-text" id="progress-text"></p>
             </div>
+            <p class="note" id="play-note" hidden></p>
             <p class="error" id="play-error" hidden></p>
           </div>
         </section>
 
         <section class="view" id="view-mods" hidden>
-          <h1 id="mods-title">모드</h1>
-          <h2>설치한 모드</h2>
+          <h1>모드</h1>
+          <h2>내 모드</h2>
+          <p class="note list-note">모든 버전이 함께 쓰는 목록이에요. 플레이할 때 고른 버전에 맞는 파일을 자동으로 받아 넣습니다.</p>
           <ul class="rows" id="installed-mods"></ul>
-          <h2>Modrinth에서 찾기</h2>
+          <h2 id="mods-search-title">Modrinth에서 찾기</h2>
           <form class="inline search" id="mod-search">
             <input id="mod-query" placeholder="모드 이름" autocomplete="off" />
             <select id="mod-sort" aria-label="정렬">
