@@ -3,7 +3,8 @@ plugins {
     id("maven-publish")
 }
 
-version = "${property("mod.version")}+${sc.current.version}"
+val modVersion = property("mod.version") as String
+version = "$modVersion+${sc.current.version}"
 base.archivesName = property("mod.id") as String
 
 val requiredJava: JavaVersion = when {
@@ -60,6 +61,6 @@ tasks {
         group = "build"
         description = "Builds the jar for this version and copies it to build/libs/<mod version>/"
         from(loomx.modJar.flatMap { it.archiveFile })
-        into(rootProject.layout.buildDirectory.dir("libs/${property("mod.version")}"))
+        into(rootProject.layout.buildDirectory.dir("libs/$modVersion"))
     }
 }
