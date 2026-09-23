@@ -38,6 +38,8 @@ final class DiscordIpc implements Closeable {
 	private final Transport transport;
 	private final Thread reader;
 	private volatile boolean open = true;
+	/** Discord ignores commands sent before it answers the handshake with READY. */
+	private volatile boolean ready;
 
 	private DiscordIpc(Transport transport, String clientId) throws IOException {
 		this.transport = transport;
@@ -91,6 +93,10 @@ final class DiscordIpc implements Closeable {
 		return open;
 	}
 
+	boolean isReady() {
+		return open && ready;
+	}
+
 	/** Sets the presence; a null activity clears it. */
 	void setActivity(@Nullable JsonObject activity) throws IOException {
 		JsonObject args = new JsonObject();
@@ -134,7 +140,10 @@ final class DiscordIpc implements Closeable {
 					}
 					default -> {
 						JsonObject message = JsonParser.parseString(json).getAsJsonObject();
-						if ("ERROR".equals(message.has("evt") && !message.get("evt").isJsonNull() ? message.get("evt").getAsString() : null)) {
+						String event = message.has("evt") && !message.get("evt").isJsonNull() ? message.get("evt").getAsString() : null;
+						if ("READY".equals(event)) {
+							ready = true;
+						} else if ("ERROR".equals(event)) {
 							LucentClient.LOGGER.warn("Discord RPC error: {}", json);
 						}
 					}

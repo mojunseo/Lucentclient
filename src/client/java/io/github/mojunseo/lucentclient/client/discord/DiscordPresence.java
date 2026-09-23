@@ -15,6 +15,7 @@ import java.util.Objects;
  */
 public final class DiscordPresence {
 	private static final long MIN_UPDATE_INTERVAL_MS = 4_000;
+	private static final long POLL_MS = 250;
 	private static final long RECONNECT_INTERVAL_MS = 20_000;
 
 	private final String clientId;
@@ -41,8 +42,10 @@ public final class DiscordPresence {
 
 	private void run() {
 		DiscordIpc ipc = null;
+		boolean announced = false;
 		JsonObject sent = null;
 		long lastAttempt = 0;
+		long lastUpdate = 0;
 		try {
 			while (running) {
 				long now = System.currentTimeMillis();
@@ -52,19 +55,24 @@ public final class DiscordPresence {
 					if (now - lastAttempt >= RECONNECT_INTERVAL_MS) {
 						lastAttempt = now;
 						ipc = DiscordIpc.connect(clientId);
-						if (ipc != null) LucentClient.LOGGER.info("Connected to Discord");
+						announced = false;
 					}
 				}
+				if (ipc != null && ipc.isReady() && !announced) {
+					LucentClient.LOGGER.info("Connected to Discord");
+					announced = true;
+				}
 				JsonObject target = wanted;
-				if (ipc != null && ipc.isOpen() && !Objects.equals(target, sent)) {
+				if (ipc != null && ipc.isReady() && !Objects.equals(target, sent) && now - lastUpdate >= MIN_UPDATE_INTERVAL_MS) {
 					try {
 						ipc.setActivity(target);
 						sent = target;
+						lastUpdate = now;
 					} catch (IOException e) {
 						LucentClient.LOGGER.debug("Failed to update Discord presence", e);
 					}
 				}
-				Thread.sleep(MIN_UPDATE_INTERVAL_MS);
+				Thread.sleep(POLL_MS);
 			}
 		} catch (InterruptedException ignored) {
 			// Stopping.
