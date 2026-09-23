@@ -1,7 +1,10 @@
 package io.github.mojunseo.lucentclient.client.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.client.module.HudModule;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.client.module.Module;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -59,7 +62,7 @@ public class HudEditScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() == 0) {
+		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			List<HudModule> hud = hudModules();
 			for (int i = hud.size() - 1; i >= 0; i--) {
 				HudModule module = hud.get(i);

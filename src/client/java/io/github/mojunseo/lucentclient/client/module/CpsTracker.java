@@ -1,13 +1,14 @@
 package io.github.mojunseo.lucentclient.client.module;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.util.Util;
 
 import java.util.ArrayDeque;
 
 /** Counts mouse clicks over the last second. */
 public final class CpsTracker {
-	public static final int LEFT = 0;
-	public static final int RIGHT = 1;
+	public static final int LEFT = InputConstants.MOUSE_BUTTON_LEFT;
+	public static final int RIGHT = InputConstants.MOUSE_BUTTON_RIGHT;
 
 	private static final ArrayDeque<Long> LEFT_CLICKS = new ArrayDeque<>();
 	private static final ArrayDeque<Long> RIGHT_CLICKS = new ArrayDeque<>();

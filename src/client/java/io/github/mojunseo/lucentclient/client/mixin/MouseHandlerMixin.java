@@ -1,5 +1,6 @@
 package io.github.mojunseo.lucentclient.client.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.client.module.CpsTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -13,14 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
-	private static final int PRESS = 1;
-
 	@Shadow
 	@Final
 	private Minecraft minecraft;
 
 	@Inject(method = "onButton", at = @At("HEAD"))
 	private void lucentclient$countClick(long window, MouseButtonInfo info, int action, CallbackInfo ci) {
-		if (action == PRESS && minecraft.gui.screen() == null) CpsTracker.click(info.button());
+		if (action == InputConstants.PRESS && minecraft.gui.screen() == null) CpsTracker.click(info.button());
 	}
 }
