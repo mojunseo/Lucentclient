@@ -17,12 +17,14 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.world.InteractionResult;
 
 public class LucentClientClient implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(LucentClient.id("main"));
@@ -58,6 +60,10 @@ public class LucentClientClient implements ClientModInitializer {
 			}
 		});
 
+		AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+			if (level.isClientSide() && player == Minecraft.getInstance().player) ModuleManager.REACH.onAttack(player, entity, hit);
+			return InteractionResult.PASS;
+		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(minecraft -> ModuleManager.DISCORD.shutdown());
 
 		HudElementRegistry.addLast(LucentClient.id("hud"), (graphics, deltaTracker) -> {

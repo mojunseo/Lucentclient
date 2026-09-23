@@ -113,5 +113,19 @@
 	"discord.lucentclient.multiplayer": "Playing multiplayer",
 	"discord.lucentclient.dimension.minecraft.overworld": "Overworld",
 	"discord.lucentclient.dimension.minecraft.the_nether": "The Nether",
-	"discord.lucentclient.dimension.minecraft.the_end": "The End"
+	"discord.lucentclient.dimension.minecraft.the_end": "The End",
+	"module.lucentclient.reach": "Reach",
+	"module.lucentclient.reach.desc": "How far away your last hit landed",
+	"module.lucentclient.fov": "FOV Changer",
+	"module.lucentclient.fov.desc": "Set how much sprinting and effects widen your view",
+	"setting.lucentclient.show_for": "Show for",
+	"setting.lucentclient.players_only": "Players only",
+	"setting.lucentclient.color_by_reach": "Color by distance",
+	"setting.lucentclient.fov_walk": "Walking",
+	"setting.lucentclient.fov_sprint": "Sprinting",
+	"setting.lucentclient.fov_speed": "Speed (per level)",
+	"setting.lucentclient.fov_slowness": "Slowness (per level)",
+	"setting.lucentclient.fov_flying": "Flying",
+	"setting.lucentclient.fov_bow": "Bow zoom",
+	"hud.lucentclient.reach": "%s blocks"
 }

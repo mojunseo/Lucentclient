@@ -26,13 +26,15 @@ public final class ModuleManager {
 	public static final PotionsModule POTIONS = new PotionsModule();
 	public static final PingModule PING = new PingModule();
 	public static final ClockModule CLOCK = new ClockModule();
+	public static final ReachModule REACH = new ReachModule();
 	public static final ToggleSprintModule TOGGLE_SPRINT = new ToggleSprintModule();
 	public static final ZoomModule ZOOM = new ZoomModule();
+	public static final FovModule FOV = new FovModule();
 	public static final FullbrightModule FULLBRIGHT = new FullbrightModule();
 	public static final DiscordModule DISCORD = new DiscordModule();
 
 	private static final List<Module> MODULES = List.of(
-			FPS, COORDINATES, KEYSTROKES, ARMOR, POTIONS, PING, CLOCK, TOGGLE_SPRINT, ZOOM, FULLBRIGHT, DISCORD);
+			FPS, COORDINATES, KEYSTROKES, ARMOR, POTIONS, PING, CLOCK, REACH, TOGGLE_SPRINT, ZOOM, FOV, FULLBRIGHT, DISCORD);
 
 	private ModuleManager() {
 	}

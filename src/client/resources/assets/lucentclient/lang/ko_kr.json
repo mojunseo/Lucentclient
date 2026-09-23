@@ -113,5 +113,19 @@
 	"discord.lucentclient.multiplayer": "멀티플레이 중",
 	"discord.lucentclient.dimension.minecraft.overworld": "오버월드",
 	"discord.lucentclient.dimension.minecraft.the_nether": "네더",
-	"discord.lucentclient.dimension.minecraft.the_end": "엔드"
+	"discord.lucentclient.dimension.minecraft.the_end": "엔드",
+	"module.lucentclient.reach": "리치",
+	"module.lucentclient.reach.desc": "마지막으로 때린 거리 표시",
+	"module.lucentclient.fov": "FOV 체인저",
+	"module.lucentclient.fov.desc": "달리기와 효과에 따른 시야 변화 조절",
+	"setting.lucentclient.show_for": "표시 시간",
+	"setting.lucentclient.players_only": "플레이어만",
+	"setting.lucentclient.color_by_reach": "거리에 따라 색 바꾸기",
+	"setting.lucentclient.fov_walk": "걷기",
+	"setting.lucentclient.fov_sprint": "달리기",
+	"setting.lucentclient.fov_speed": "신속 (레벨당)",
+	"setting.lucentclient.fov_slowness": "구속 (레벨당)",
+	"setting.lucentclient.fov_flying": "비행",
+	"setting.lucentclient.fov_bow": "활 당길 때 확대",
+	"hud.lucentclient.reach": "%s칸"
 }
