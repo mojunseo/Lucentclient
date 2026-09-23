@@ -18,7 +18,7 @@ public class DiscordModule extends Module {
 	 * https://discord.com/developers/applications; its name is what Discord shows as the game, and
 	 * the image uploaded as the Rich Presence art asset "logo" is used as the large picture.
 	 */
-	private static final String CLIENT_ID = "";
+	private static final String CLIENT_ID = "1552326954865139783";
 	private static final String LOGO_ASSET = "logo";
 
 	private final BooleanSetting showServer = setting(new BooleanSetting("show_server", false));
