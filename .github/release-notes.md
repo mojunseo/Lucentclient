@@ -1,6 +1,6 @@
 **English** · [한국어](#한국어) · [日本語](#日本語)
 
-Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop launcher. See the [README](https://github.com/mojunseo/Lucentclient#readme) for features.
+Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop launcher. See the [README](https://github.com/mojunseo/Lucentclient/blob/main/README.en.md) for features.
 
 ### Mod
 Supports Minecraft 26.1 to 26.3. Install Fabric Loader 0.19.5 or newer and Fabric API, then put the jar for your version into `mods`. Press Right Shift in game to open the menu.
@@ -20,7 +20,7 @@ This is a pre-release. Microsoft sign-in is waiting for Mojang to approve the la
 
 ### 한국어
 
-Lucent Client는 Minecraft: Java Edition용 Fabric 클라이언트 모드와 데스크톱 런처입니다. 기능은 [README](https://github.com/mojunseo/Lucentclient/blob/main/README.ko.md)를 참고하세요.
+Lucent Client는 Minecraft: Java Edition용 Fabric 클라이언트 모드와 데스크톱 런처입니다. 기능은 [README](https://github.com/mojunseo/Lucentclient#readme)를 참고하세요.
 
 **모드**: Minecraft 26.1 ~ 26.3을 지원합니다. Fabric Loader 0.19.5 이상과 Fabric API를 설치하고, 버전에 맞는 jar를 `mods` 폴더에 넣으세요. 게임에서 오른쪽 Shift를 누르면 메뉴가 열립니다. 파일은 위 표를 참고하세요.
 

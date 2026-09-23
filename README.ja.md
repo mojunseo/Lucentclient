@@ -2,7 +2,7 @@
 
 # Lucent Client
 
-[English](README.md) | [한국어](README.ko.md) | **日本語**
+[English](README.en.md) | [한국어](README.md) | **日本語**
 
 Minecraft: Java Edition 向けの Fabric クライアント MOD と、専用のデスクトップランチャーです。
 
