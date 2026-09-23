@@ -1,5 +1,6 @@
 package io.github.mojunseo.lucentclient.client.gui;
 
+import io.github.mojunseo.lucentclient.client.compat.Mc;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.LucentClient;
 import io.github.mojunseo.lucentclient.client.cosmetic.Cosmetic;
@@ -167,7 +168,7 @@ public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 		y = sidebarItem(graphics, mouseX, mouseY, px, y, Component.translatable("screen.lucentclient.tab.cosmetics"),
 				tab == Tab.COSMETICS, () -> setTab(Tab.COSMETICS));
 		sidebarItem(graphics, mouseX, mouseY, px, y, Component.translatable("screen.lucentclient.hud_edit"),
-				false, () -> minecraft.gui.setScreen(new HudEditScreen(this)));
+				false, () -> Mc.setScreen(minecraft, new HudEditScreen(this)));
 
 		graphics.text(font, version, px + PAD, py + ph - PAD - 8, color(Theme.SEAM), false);
 	}

@@ -16,11 +16,24 @@ public class BlockEntityRenderDispatcherMixin {
 	@Shadow
 	private Vec3 cameraPos;
 
+	//? if >=26.2 {
 	@Inject(method = "tryExtractRenderState", at = @At("HEAD"), cancellable = true)
 	private void lucentclient$cull(BlockEntity blockEntity, float partialTicks, ModelFeatureRenderer.CrumblingOverlay breakProgress,
 			boolean isGloballyRendered, CallbackInfoReturnable<Object> cir) {
 		// Globally rendered block entities (beacon beams, ...) are meant to be seen from afar.
-		if (!isGloballyRendered && cameraPos != null && ModuleManager.ENTITY_CULLING.cullsBlockEntity(blockEntity.getBlockPos(), cameraPos)) {
+		if (!isGloballyRendered) cull(blockEntity, cir);
+	}
+	//?} else {
+	/*@Inject(method = "tryExtractRenderState", at = @At("HEAD"), cancellable = true)
+	private void lucentclient$cull(BlockEntity blockEntity, float partialTicks, ModelFeatureRenderer.CrumblingOverlay breakProgress,
+			CallbackInfoReturnable<Object> cir) {
+		// Beacon beams are meant to be seen from afar.
+		if (!(blockEntity instanceof net.minecraft.world.level.block.entity.BeaconBlockEntity)) cull(blockEntity, cir);
+	}
+	*///?}
+
+	private void cull(BlockEntity blockEntity, CallbackInfoReturnable<Object> cir) {
+		if (cameraPos != null && ModuleManager.ENTITY_CULLING.cullsBlockEntity(blockEntity.getBlockPos(), cameraPos)) {
 			cir.setReturnValue(null);
 		}
 	}

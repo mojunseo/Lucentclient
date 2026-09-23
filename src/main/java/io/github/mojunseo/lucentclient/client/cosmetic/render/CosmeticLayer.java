@@ -1,5 +1,6 @@
 package io.github.mojunseo.lucentclient.client.cosmetic.render;
 
+import io.github.mojunseo.lucentclient.client.compat.Mc;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.mojunseo.lucentclient.client.cosmetic.Cosmetic;
 import io.github.mojunseo.lucentclient.client.cosmetic.CosmeticType;
@@ -70,7 +71,7 @@ public class CosmeticLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 			RenderType renderType, int light, int overlay) {
 		CosmeticModel model = models.get(cosmetic.model());
 		if (model == null) return;
-		collector.submitModel(model, state, poseStack, renderType, light, overlay, cosmetic.tint(), null, state.outlineColor);
+		Mc.submitModel(collector, model, state, poseStack, renderType, light, overlay, cosmetic.tint(), state.outlineColor);
 	}
 
 	private void submitCape(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, AvatarRenderState state, Cosmetic cape) {

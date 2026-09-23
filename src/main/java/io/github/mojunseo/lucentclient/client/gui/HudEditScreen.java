@@ -1,5 +1,6 @@
 package io.github.mojunseo.lucentclient.client.gui;
 
+import io.github.mojunseo.lucentclient.client.compat.Mc;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.client.module.HudModule;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -94,7 +95,7 @@ public class HudEditScreen extends Screen implements HudPreviewScreen {
 
 	@Override
 	public void onClose() {
-		minecraft.gui.setScreen(parent);
+		Mc.setScreen(minecraft, parent);
 	}
 
 	@Override

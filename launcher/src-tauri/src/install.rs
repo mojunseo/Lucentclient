@@ -170,10 +170,10 @@ struct LoaderVersion {
     stable: bool,
 }
 
-/// The Fabric Loader to use: the one the mod was built with for its own version, otherwise the
+/// The Fabric Loader to use: the one the mod was built with on versions it supports, otherwise the
 /// newest stable loader for that Minecraft version.
 async fn fabric_loader(client: &reqwest::Client, minecraft: &str) -> Result<String> {
-    if minecraft == versions::minecraft() {
+    if versions::build_for(minecraft).is_some() {
         return Ok(versions::fabric_loader().to_string());
     }
     let loaders: Vec<LoaderEntry> =
@@ -239,21 +239,21 @@ async fn install_mods(client: &reqwest::Client, game_dir: &Path, minecraft: &str
     download::fetch(client, &modrinth::file_download(file, &mods)).await?;
     remove_stale(&mods, "fabric-api-", &file.filename)?;
 
-    if minecraft == versions::minecraft() {
-        let lucent = install_lucent(client, &mods).await?;
+    if let Some(build) = versions::build_for(minecraft) {
+        let lucent = install_lucent(client, &mods, build).await?;
         remove_stale(&mods, "lucentclient-", &lucent)?;
     } else {
-        // Lucent Client is built for one Minecraft version only.
+        // No Lucent Client build for this version.
         remove_stale(&mods, "lucentclient-", "")?;
     }
     Ok(())
 }
 
 /// Development builds use the jar built next to the launcher; releases download the latest GitHub release.
-async fn install_lucent(client: &reqwest::Client, mods: &Path) -> Result<String> {
-    let name = format!("lucentclient-{}.jar", versions::mod_version());
+async fn install_lucent(client: &reqwest::Client, mods: &Path, build: &str) -> Result<String> {
+    let name = format!("lucentclient-{}+{build}.jar", versions::mod_version());
     if cfg!(debug_assertions) {
-        let local = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../build/libs").join(&name);
+        let local = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../versions").join(build).join("build/libs").join(&name);
         if local.exists() {
             tokio::fs::copy(&local, mods.join(&name)).await.context("copying the locally built mod")?;
             return Ok(name);
@@ -267,8 +267,8 @@ async fn install_lucent(client: &reqwest::Client, mods: &Path) -> Result<String>
     let asset = release
         .assets
         .into_iter()
-        .find(|a| a.name.starts_with("lucentclient-") && a.name.ends_with(".jar") && !a.name.contains("sources"))
-        .context("The latest release has no Lucent Client jar")?;
+        .find(|a| a.name == name)
+        .with_context(|| format!("The latest release has no Lucent Client jar for Minecraft {build}"))?;
     download::fetch(
         client,
         &Download { url: asset.browser_download_url, path: mods.join(&asset.name), sha1: None, size: Some(asset.size), executable: false },

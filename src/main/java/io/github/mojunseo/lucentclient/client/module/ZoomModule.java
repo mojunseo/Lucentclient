@@ -1,5 +1,6 @@
 package io.github.mojunseo.lucentclient.client.module;
 
+import io.github.mojunseo.lucentclient.client.compat.Mc;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
 import net.minecraft.client.KeyMapping;
@@ -27,7 +28,7 @@ public class ZoomModule extends Module {
 
 	@Override
 	public void tick(Minecraft minecraft) {
-		setZooming(minecraft, key != null && key.isDown() && minecraft.gui.screen() == null);
+		setZooming(minecraft, key != null && key.isDown() && Mc.screen(minecraft) == null);
 	}
 
 	@Override

@@ -5,7 +5,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 type Settings = { memoryMb: number; jvmArgs: string; hideOnLaunch: boolean };
 type AccountView = { kind: "microsoft" | "offline"; name: string; uuid: string };
 type Info = {
-  minecraft: string;
+  lucentVersions: string[];
   version: string;
   fabricLoader: string;
   modVersion: string;
@@ -269,13 +269,13 @@ $("open-folder").addEventListener("click", () => invoke("open_game_directory"));
 
 async function loadVersions() {
   const select = $<HTMLSelectElement>("version");
-  const versions = await invoke<string[]>("list_versions").catch(() => [info.minecraft]);
+  const versions = await invoke<string[]>("list_versions").catch(() => [...info.lucentVersions].reverse());
   if (!versions.includes(info.version)) versions.unshift(info.version);
   select.replaceChildren(
     ...versions.map((version) => {
       const option = document.createElement("option");
       option.value = version;
-      option.textContent = version === info.minecraft ? `${version} (Lucent Client)` : version;
+      option.textContent = info.lucentVersions.includes(version) ? `${version} (Lucent Client)` : version;
       return option;
     }),
   );
@@ -511,10 +511,9 @@ $("more-mods").addEventListener("click", () => searchMods(false));
 
 async function refresh() {
   info = await invoke<Info>("get_info");
-  const lucent = info.version === info.minecraft;
-  $("stack").textContent = lucent
-    ? `Fabric ${info.fabricLoader}와 Lucent Client ${info.modVersion}로 실행합니다.`
-    : `Lucent Client는 ${info.minecraft} 전용이라, 이 버전은 Fabric과 설치한 모드로만 실행합니다.`;
+  $("stack").textContent = info.lucentVersions.includes(info.version)
+    ? `Fabric과 Lucent Client ${info.modVersion}로 실행합니다.`
+    : "Lucent Client가 아직 이 버전을 지원하지 않아서, Fabric과 설치한 모드로만 실행합니다.";
   // Search results depend on the version; start over when it changes.
   results = [];
   $("launcher-version").textContent = `런처 ${info.launcherVersion}`;

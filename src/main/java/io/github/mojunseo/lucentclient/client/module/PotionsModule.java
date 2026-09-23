@@ -1,9 +1,9 @@
 package io.github.mojunseo.lucentclient.client.module;
 
+import io.github.mojunseo.lucentclient.client.compat.Mc;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.Hud;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -76,7 +76,7 @@ public class PotionsModule extends HudModule {
 			MobEffectInstance effect = effects.get(i);
 			int y = 2 + i * ROW;
 			if (showIcons.enabled()) {
-				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, Hud.getMobEffectSprite(effect.getEffect()), 2, y, ICON, ICON);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, Mc.mobEffectSprite(effect.getEffect()), 2, y, ICON, ICON);
 			}
 			text(minecraft, graphics, name(effect), textLeft(), y);
 			// Time left in a dimmer shade of the text color.

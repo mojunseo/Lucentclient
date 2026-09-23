@@ -29,7 +29,7 @@ struct App {
 impl App {
     /// The Minecraft version to play.
     fn version(&self) -> String {
-        self.settings.lock().unwrap().version.clone().unwrap_or_else(|| versions::minecraft().to_string())
+        self.settings.lock().unwrap().version.clone().unwrap_or_else(|| versions::default_minecraft().to_string())
     }
 
     fn instance_dir(&self) -> PathBuf {
@@ -64,8 +64,8 @@ impl App {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Info {
-    /// The version Lucent Client is built for.
-    minecraft: &'static str,
+    /// Every Minecraft release Lucent Client is built for.
+    lucent_versions: Vec<&'static str>,
     /// The version selected to play.
     version: String,
     fabric_loader: &'static str,
@@ -105,7 +105,7 @@ struct LogLine {
 fn get_info(app: State<'_, Arc<App>>) -> Info {
     let accounts = app.accounts.lock().unwrap();
     Info {
-        minecraft: versions::minecraft(),
+        lucent_versions: versions::supported(),
         version: app.version(),
         fabric_loader: versions::fabric_loader(),
         mod_version: versions::mod_version(),
@@ -156,7 +156,7 @@ async fn list_versions(app: State<'_, Arc<App>>) -> Result<Vec<String>, String> 
 #[tauri::command]
 fn set_version(app: State<'_, Arc<App>>, version: String) -> Result<(), String> {
     let mut settings = app.settings.lock().unwrap();
-    settings.version = if version == versions::minecraft() { None } else { Some(version) };
+    settings.version = if version == versions::default_minecraft() { None } else { Some(version) };
     state::save(&app.settings_path(), &*settings, false).map_err(|e| e.to_string())
 }
 
@@ -356,7 +356,7 @@ pub fn run() {
             // Before per-version instances, the game directory was data/game; it belongs to the
             // version Lucent Client was built for.
             let legacy = layout.root.join("game");
-            let instance = layout.instance(versions::minecraft());
+            let instance = layout.instance(versions::default_minecraft());
             if legacy.exists() && !instance.exists() {
                 std::fs::create_dir_all(instance.parent().unwrap())?;
                 std::fs::rename(&legacy, &instance)?;
@@ -407,7 +407,7 @@ mod tests {
         let root = PathBuf::from(std::env::var("LUCENT_TEST_DIR").expect("set LUCENT_TEST_DIR"));
         let layout = Layout { root };
         let client = download::client();
-        let version = std::env::var("LUCENT_TEST_VERSION").unwrap_or_else(|_| versions::minecraft().to_string());
+        let version = std::env::var("LUCENT_TEST_VERSION").unwrap_or_else(|_| versions::default_minecraft().to_string());
         let installed = install::install(&client, &layout, &version, |p| {
             if p.done == p.total {
                 println!("{} {}/{}", p.stage, p.done, p.total);
@@ -425,7 +425,7 @@ mod tests {
     #[ignore]
     async fn sync_modrinth_mod() {
         let root = PathBuf::from(std::env::var("LUCENT_TEST_DIR").expect("set LUCENT_TEST_DIR"));
-        let version = std::env::var("LUCENT_TEST_VERSION").unwrap_or_else(|_| versions::minecraft().to_string());
+        let version = std::env::var("LUCENT_TEST_VERSION").unwrap_or_else(|_| versions::default_minecraft().to_string());
         let project = std::env::var("LUCENT_TEST_MOD").unwrap_or_else(|_| "AANobbMI".into());
         let client = download::client();
         modrinth::add(&client, &root, &project).await.expect("add");
