@@ -1,0 +1,9 @@
+{
+	"key.category.lucentclient.main": "Lucent Client",
+	"key.lucentclient.menu": "모듈 메뉴 열기",
+	"key.lucentclient.zoom": "줌",
+	"screen.lucentclient.modules": "Lucent Client 모듈",
+	"module.lucentclient.fps": "FPS",
+	"module.lucentclient.keystrokes": "키 입력 표시",
+	"module.lucentclient.zoom": "줌"
+}

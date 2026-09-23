@@ -1,11 +1,45 @@
 package io.github.mojunseo.lucentclient.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.LucentClient;
+import io.github.mojunseo.lucentclient.client.gui.ModuleMenuScreen;
+import io.github.mojunseo.lucentclient.client.module.Module;
+import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 
 public class LucentClientClient implements ClientModInitializer {
+	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(LucentClient.id("main"));
+
 	@Override
 	public void onInitializeClient() {
+		ModuleManager.load();
+
+		KeyMapping menuKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+				"key.lucentclient.menu", InputConstants.KEY_RSHIFT, CATEGORY));
+		ModuleManager.ZOOM.setKey(KeyMappingHelper.registerKeyMapping(new KeyMapping(
+				"key.lucentclient.zoom", InputConstants.KEY_C, CATEGORY)));
+
+		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
+			while (menuKey.consumeClick()) {
+				if (minecraft.gui.screen() == null) minecraft.gui.setScreen(new ModuleMenuScreen());
+			}
+			for (Module module : ModuleManager.modules()) {
+				if (module.isEnabled()) module.tick(minecraft);
+			}
+		});
+
+		HudElementRegistry.addLast(LucentClient.id("hud"), (graphics, deltaTracker) -> {
+			Minecraft minecraft = Minecraft.getInstance();
+			for (Module module : ModuleManager.modules()) {
+				if (module.isEnabled()) module.extractHud(minecraft, graphics, deltaTracker);
+			}
+		});
+
 		LucentClient.LOGGER.info("Lucent Client initialized");
 	}
 }
