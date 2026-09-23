@@ -10,8 +10,14 @@ import io.github.mojunseo.lucentclient.client.gui.ui.Animations;
 import io.github.mojunseo.lucentclient.client.gui.ui.PlayerPreview;
 import io.github.mojunseo.lucentclient.client.gui.ui.Theme;
 import io.github.mojunseo.lucentclient.client.gui.ui.Ui;
+import io.github.mojunseo.lucentclient.client.module.HudModule;
 import io.github.mojunseo.lucentclient.client.module.Module;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
+import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
+import io.github.mojunseo.lucentclient.client.module.setting.ChoiceSetting;
+import io.github.mojunseo.lucentclient.client.module.setting.ColorSetting;
+import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
+import io.github.mojunseo.lucentclient.client.module.setting.Setting;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -54,6 +60,12 @@ public class LucentMenuScreen extends Screen {
 			.map(mod -> mod.getMetadata().getVersion().getFriendlyString()).orElse("");
 
 	private Tab tab = Tab.MODULES;
+	/** The module whose settings are open, or null for the module list. */
+	private @Nullable Module settingsModule;
+	private @Nullable NumberSetting draggingSlider;
+	private int sliderX, sliderW;
+	/** Mouse x of the click being handled, for controls that care where they were clicked. */
+	private double clickX;
 	private CosmeticType cosmeticType = CosmeticType.CAPE;
 	private float scroll;
 	private float scrollTarget;
@@ -97,8 +109,14 @@ public class LucentMenuScreen extends Screen {
 	}
 
 	private void setTab(Tab tab) {
+		settingsModule = null;
 		if (this.tab == tab) return;
 		this.tab = tab;
+		scroll = scrollTarget = 0;
+	}
+
+	private void openSettings(@Nullable Module module) {
+		settingsModule = module;
 		scroll = scrollTarget = 0;
 	}
 
@@ -127,7 +145,13 @@ public class LucentMenuScreen extends Screen {
 		int cx = px + SIDEBAR_WIDTH + PAD;
 		int cw = pw - SIDEBAR_WIDTH - PAD * 2;
 		switch (tab) {
-			case MODULES -> extractModules(graphics, mouseX, mouseY, cx, py, cw, ph);
+			case MODULES -> {
+				if (settingsModule != null) {
+					extractSettings(graphics, mouseX, mouseY, settingsModule, cx, py, cw, ph);
+				} else {
+					extractModules(graphics, mouseX, mouseY, cx, py, cw, ph);
+				}
+			}
 			case COSMETICS -> extractCosmetics(graphics, mouseX, mouseY, cx, py, cw, ph);
 		}
 	}
@@ -213,16 +237,130 @@ public class LucentMenuScreen extends Screen {
 			int textY = y + (ROW_HEIGHT - 8) / 2;
 			graphics.text(font, module.name(), cx, textY, color(Theme.CALCITE), false);
 			String description = Component.translatable("module.lucentclient." + module.id() + ".desc").getString();
-			int descriptionWidth = cw - nameColumn - Ui.LAMP_SIZE - 12;
+			int descriptionWidth = cw - nameColumn - Ui.LAMP_SIZE - 24;
 			graphics.text(font, Ui.ellipsize(font, description, descriptionWidth), cx + nameColumn, textY, color(Theme.TUFF), false);
-			Ui.lamp(graphics, cx + cw - Ui.LAMP_SIZE, y + (ROW_HEIGHT - Ui.LAMP_SIZE) / 2, lamp(module.id(), module.isEnabled(), i), alpha);
+			// "›" marks that the row opens the module's settings.
+			graphics.text(font, "›", cx + cw - Ui.LAMP_SIZE - 12, textY, color(hovered ? Theme.CALCITE : Theme.SEAM), false);
+			int lampX = cx + cw - Ui.LAMP_SIZE;
+			Ui.lamp(graphics, lampX, y + (ROW_HEIGHT - Ui.LAMP_SIZE) / 2, lamp(module.id(), module.isEnabled(), i), alpha);
 
-			scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, () -> {
+			scrolledHit(lampX - 5, y, Ui.LAMP_SIZE + 11, ROW_HEIGHT, () -> {
 				module.setEnabled(!module.isEnabled());
 				ModuleManager.save();
 			});
+			scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, () -> openSettings(module));
 		}
 		endScroll(graphics, modules.size() * ROW_HEIGHT);
+	}
+
+
+	// --- Module settings ----------------------------------------------------------------------
+
+	private static final int SLIDER_WIDTH = 110;
+	private static final int PREVIEW_HEIGHT = 58;
+
+	private void extractSettings(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Module module, int cx, int py, int cw, int ph) {
+		Ui.text(graphics, font, module.name().getString(), cx, py + PAD, color(Theme.CALCITE), 2);
+		Component back = Component.translatable("screen.lucentclient.settings.back");
+		int backY = py + PAD + 22;
+		boolean backHovered = Ui.inside(mouseX, mouseY, cx - 2, backY - 3, font.width(back) + 4, 14);
+		graphics.text(font, back, cx, backY, color(backHovered ? Theme.CALCITE : Theme.TUFF), false);
+		hit(cx - 2, backY - 3, font.width(back) + 4, 14, () -> openSettings(null));
+
+		// The module's own lamp, top right.
+		int lampX = cx + cw - Ui.LAMP_SIZE;
+		Ui.lamp(graphics, lampX, py + PAD + 3, lamp(module.id(), module.isEnabled(), 0), alpha);
+		hit(lampX - 4, py + PAD - 1, Ui.LAMP_SIZE + 8, Ui.LAMP_SIZE + 8, () -> {
+			module.setEnabled(!module.isEnabled());
+			ModuleManager.save();
+		});
+
+		int top = py + 56;
+		graphics.fill(cx, top - 1, cx + cw, top, color(Theme.SEAM));
+		if (module instanceof HudModule hud) {
+			// Live preview of the HUD element with the current settings.
+			graphics.fill(cx, top, cx + cw, top + PREVIEW_HEIGHT, color(Theme.DEEPSLATE));
+			graphics.enableScissor(cx, top, cx + cw, top + PREVIEW_HEIGHT);
+			if (alpha >= 1.0F) {
+				hud.extractAt(minecraft, graphics, cx + (cw - hud.scaledWidth(minecraft)) / 2,
+						top + (PREVIEW_HEIGHT - hud.scaledHeight(minecraft)) / 2);
+			}
+			graphics.disableScissor();
+			top += PREVIEW_HEIGHT + 4;
+		}
+
+		List<Setting<?>> settings = module.settings();
+		int y0 = beginScroll(graphics, cx - 6, top, cw + 12, py + ph - PAD - top);
+		for (int i = 0; i < settings.size(); i++) {
+			extractSettingRow(graphics, mouseX, mouseY, settings.get(i), cx, y0 + i * ROW_HEIGHT, cw, i);
+		}
+		// Reset, after the last setting.
+		int resetY = y0 + settings.size() * ROW_HEIGHT + 6;
+		Component reset = Component.translatable("screen.lucentclient.settings.reset");
+		boolean resetHovered = hovered(mouseX, mouseY, cx - 2, resetY, font.width(reset) + 4, 14);
+		graphics.text(font, reset, cx, resetY + 3, color(resetHovered ? Theme.CALCITE : Theme.TUFF), false);
+		scrolledHit(cx - 2, resetY, font.width(reset) + 4, 14, () -> {
+			for (Setting<?> setting : module.settings()) setting.reset();
+			ModuleManager.save();
+		});
+		endScroll(graphics, settings.size() * ROW_HEIGHT + 26);
+	}
+
+	private void extractSettingRow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Setting<?> setting, int cx, int y, int cw, int order) {
+		boolean hovered = hovered(mouseX, mouseY, cx - 6, y, cw + 12, ROW_HEIGHT);
+		if (hovered) graphics.fill(cx - 6, y, cx + cw + 6, y + ROW_HEIGHT, color(Theme.SEAM));
+		int textY = y + (ROW_HEIGHT - 8) / 2;
+		graphics.text(font, setting.name(), cx, textY, color(Theme.CALCITE), false);
+		int right = cx + cw;
+
+		switch (setting) {
+			case BooleanSetting toggle -> {
+				Ui.lamp(graphics, right - Ui.LAMP_SIZE, y + (ROW_HEIGHT - Ui.LAMP_SIZE) / 2,
+						lamp(settingsModule.id() + "_" + toggle.id(), toggle.enabled(), order), alpha);
+				scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, toggle::toggle);
+			}
+			case NumberSetting number -> {
+				String value = number.display();
+				int valueW = 34;
+				graphics.text(font, value, right - font.width(value), textY, color(Theme.TUFF), false);
+				int trackX = right - valueW - SLIDER_WIDTH;
+				int trackY = y + ROW_HEIGHT / 2;
+				int knobX = trackX + (int) Math.round(number.fraction() * (SLIDER_WIDTH - 4));
+				graphics.fill(trackX, trackY - 1, trackX + SLIDER_WIDTH, trackY + 1, color(Theme.DEEPSLATE));
+				graphics.fill(trackX, trackY - 1, knobX + 2, trackY + 1, color(Theme.TUFF));
+				graphics.fill(knobX, trackY - 5, knobX + 4, trackY + 5, color(Theme.CALCITE));
+				scrolledHit(trackX - 4, y, SLIDER_WIDTH + 8, ROW_HEIGHT, () -> {
+					draggingSlider = number;
+					sliderX = trackX;
+					sliderW = SLIDER_WIDTH;
+					number.setFraction((clickX - trackX) / SLIDER_WIDTH);
+				});
+			}
+			case ChoiceSetting choice -> {
+				String value = choice.display().getString();
+				int valueX = right - font.width(value) - 10;
+				graphics.text(font, "‹", valueX - 10, textY, color(Theme.TUFF), false);
+				graphics.text(font, value, valueX, textY, color(Theme.CALCITE), false);
+				graphics.text(font, "›", right - 4, textY, color(Theme.TUFF), false);
+				scrolledHit(valueX - 14, y, 14, ROW_HEIGHT, () -> choice.cycle(-1));
+				scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, () -> choice.cycle(1));
+			}
+			case ColorSetting colorSetting -> {
+				int swatch = 7;
+				int step = swatch + 2;
+				int x0 = right - ColorSetting.DYES.length * step + 2;
+				int sy = y + (ROW_HEIGHT - swatch) / 2;
+				for (int i = 0; i < ColorSetting.DYES.length; i++) {
+					int dye = ColorSetting.DYES[i];
+					int sx = x0 + i * step;
+					if (dye == colorSetting.argb()) graphics.outline(sx - 1, sy - 1, swatch + 2, swatch + 2, color(Theme.CALCITE));
+					graphics.fill(sx, sy, sx + swatch, sy + swatch, color(dye));
+					scrolledHit(sx - 1, y, step, ROW_HEIGHT, () -> colorSetting.set(dye));
+				}
+			}
+			default -> {
+			}
+		}
 	}
 
 	// --- Cosmetics ----------------------------------------------------------------------------
@@ -309,6 +447,7 @@ public class LucentMenuScreen extends Screen {
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) return super.mouseClicked(event, doubleClick);
+		clickX = event.x();
 		for (Hit hit : List.copyOf(hits)) {
 			if (Ui.inside(event.x(), event.y(), hit.x, hit.y, hit.w, hit.h)) {
 				hit.action.run();
@@ -324,6 +463,10 @@ public class LucentMenuScreen extends Screen {
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+		if (draggingSlider != null) {
+			draggingSlider.setFraction((event.x() - sliderX) / sliderW);
+			return true;
+		}
 		if (draggingPreview) {
 			previewYaw += (float) dragX * 2.0F;
 			return true;
@@ -334,6 +477,10 @@ public class LucentMenuScreen extends Screen {
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
 		draggingPreview = false;
+		if (draggingSlider != null) {
+			draggingSlider = null;
+			ModuleManager.save();
+		}
 		return super.mouseReleased(event);
 	}
 
@@ -341,6 +488,16 @@ public class LucentMenuScreen extends Screen {
 	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
 		scrollTarget = Mth.clamp(scrollTarget - (float) scrollY * 20.0F, 0, maxScroll);
 		return true;
+	}
+
+	@Override
+	public void onClose() {
+		// Esc steps back out of a module's settings before closing the menu.
+		if (settingsModule != null) {
+			openSettings(null);
+		} else {
+			super.onClose();
+		}
 	}
 
 	@Override

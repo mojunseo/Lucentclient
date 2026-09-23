@@ -37,7 +37,7 @@ public class HudEditScreen extends Screen {
 	private boolean contains(HudModule module, double mouseX, double mouseY) {
 		int x = module.screenX(minecraft, width);
 		int y = module.screenY(minecraft, height);
-		return mouseX >= x && mouseX < x + module.width(minecraft) && mouseY >= y && mouseY < y + module.height(minecraft);
+		return mouseX >= x && mouseX < x + module.scaledWidth(minecraft) && mouseY >= y && mouseY < y + module.scaledHeight(minecraft);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class HudEditScreen extends Screen {
 			int x = module.screenX(minecraft, width);
 			int y = module.screenY(minecraft, height);
 			boolean active = module == dragging || (dragging == null && contains(module, mouseX, mouseY));
-			graphics.outline(x - 1, y - 1, module.width(minecraft) + 2, module.height(minecraft) + 2,
+			graphics.outline(x - 1, y - 1, module.scaledWidth(minecraft) + 2, module.scaledHeight(minecraft) + 2,
 					active ? 0xFFFFFF55 : 0x80FFFFFF);
 		}
 		graphics.centeredText(font, Component.translatable("screen.lucentclient.hud_edit.hint"),

@@ -2,6 +2,7 @@ package io.github.mojunseo.lucentclient.client.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.client.module.CpsTracker;
+import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -17,6 +18,11 @@ public class MouseHandlerMixin {
 	@Shadow
 	@Final
 	private Minecraft minecraft;
+
+	@Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
+	private void lucentclient$zoomScroll(long window, double scrollX, double scrollY, CallbackInfo ci) {
+		if (minecraft.gui.screen() == null && ModuleManager.ZOOM.isEnabled() && ModuleManager.ZOOM.onScroll(scrollY)) ci.cancel();
+	}
 
 	@Inject(method = "onButton", at = @At("HEAD"))
 	private void lucentclient$countClick(long window, MouseButtonInfo info, int action, CallbackInfo ci) {

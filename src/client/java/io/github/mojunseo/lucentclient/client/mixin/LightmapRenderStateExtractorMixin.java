@@ -14,7 +14,7 @@ public class LightmapRenderStateExtractorMixin {
 	@Inject(method = "extract", at = @At("RETURN"))
 	private void lucentclient$fullbright(LightmapRenderState state, float partialTick, CallbackInfo ci) {
 		if (!ModuleManager.FULLBRIGHT.isEnabled()) return;
-		state.nightVisionEffectIntensity = 1.0F;
+		state.nightVisionEffectIntensity = Math.max(state.nightVisionEffectIntensity, ModuleManager.FULLBRIGHT.strength());
 		state.nightVisionColor = LightmapRenderStateExtractor.WHITE;
 		state.darknessEffectScale = 0.0F;
 	}
