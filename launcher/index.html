@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lucent Launcher</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <div class="app">
+      <nav class="sidebar">
+        <div class="wordmark">Lucent</div>
+        <button class="nav" data-view="play">플레이</button>
+        <button class="nav" data-view="accounts">계정</button>
+        <button class="nav" data-view="settings">설정</button>
+        <button class="nav" data-view="logs">게임 로그</button>
+        <div class="account-chip" id="account-chip"></div>
+        <div class="version" id="launcher-version"></div>
+      </nav>
+
+      <main>
+        <section class="view" id="view-play">
+          <div class="stage">
+            <p class="stack" id="stack"></p>
+            <button class="play" id="play">
+              <span class="lamp" aria-hidden="true"></span>
+              <span class="play-label" id="play-label">플레이</span>
+            </button>
+            <div class="progress" id="progress" hidden>
+              <div class="bar"><div class="fill" id="progress-fill"></div></div>
+              <p class="progress-text" id="progress-text"></p>
+            </div>
+            <p class="error" id="play-error" hidden></p>
+          </div>
+        </section>
+
+        <section class="view" id="view-accounts" hidden>
+          <h1>계정</h1>
+          <ul class="rows" id="account-list"></ul>
+          <div class="actions">
+            <button class="button" id="sign-in">Microsoft 계정으로 로그인</button>
+          </div>
+          <p class="note" id="sign-in-note" hidden></p>
+          <form class="offline" id="offline-form" hidden>
+            <label for="offline-name">개발용 오프라인 계정</label>
+            <div class="inline">
+              <input id="offline-name" maxlength="16" placeholder="닉네임" autocomplete="off" />
+              <button class="button quiet" type="submit">추가</button>
+            </div>
+            <p class="note">개발 빌드에서만 보입니다. 싱글플레이와 오프라인 서버에서만 쓸 수 있어요.</p>
+          </form>
+        </section>
+
+        <section class="view" id="view-settings" hidden>
+          <h1>설정</h1>
+          <ul class="rows">
+            <li class="row">
+              <label for="memory">메모리</label>
+              <div class="control">
+                <input type="range" id="memory" min="1024" max="16384" step="512" />
+                <output id="memory-value"></output>
+              </div>
+            </li>
+            <li class="row">
+              <label for="jvm-args">추가 JVM 인자</label>
+              <div class="control"><input id="jvm-args" placeholder="-XX:+UseZGC" autocomplete="off" /></div>
+            </li>
+            <li class="row toggle-row" id="hide-row">
+              <span>게임 중에는 런처 숨기기</span>
+              <span class="lamp" id="hide-lamp" aria-hidden="true"></span>
+            </li>
+          </ul>
+          <div class="actions">
+            <button class="button quiet" id="open-folder">게임 폴더 열기</button>
+          </div>
+        </section>
+
+        <section class="view" id="view-logs" hidden>
+          <h1>게임 로그</h1>
+          <pre class="log" id="log"></pre>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="code-dialog">
+      <p>브라우저에서 아래 코드를 입력하세요.</p>
+      <p class="code" id="device-code"></p>
+      <p class="note" id="device-url"></p>
+      <div class="actions">
+        <button class="button" id="copy-open">코드 복사하고 페이지 열기</button>
+        <button class="button quiet" id="close-dialog">닫기</button>
+      </div>
+      <p class="note" id="dialog-status">로그인을 기다리는 중…</p>
+    </dialog>
+  </body>
+</html>

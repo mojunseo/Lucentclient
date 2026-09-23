@@ -1,0 +1,209 @@
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+
+/* Minecraft materials, same as the in-game menu: deepslate, tuff, calcite and a redstone lamp. */
+:root {
+  --slate: #2b2d33;
+  --deepslate: #1f2025;
+  --seam: #3a3d45;
+  --calcite: #e4e2da;
+  --tuff: #8e9089;
+  --lamp-on: #f6c768;
+  --lamp-core: #ffebb0;
+  --lamp-off: #4a3326;
+  --lamp-grid: #2e2019;
+  --danger: #e0685a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--slate);
+  color: var(--calcite);
+  font: 15px/1.5 "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--lamp-on); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: 200px 1fr; height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+  background: var(--deepslate);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0 20px;
+}
+.wordmark {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  padding: 0 24px 28px;
+}
+.nav {
+  background: none;
+  border: 0;
+  text-align: left;
+  padding: 9px 24px;
+  color: var(--tuff);
+}
+.nav:hover { color: var(--calcite); background: #26272d; }
+.nav.active { color: var(--calcite); background: var(--slate); }
+.account-chip {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  color: var(--calcite);
+  cursor: pointer;
+}
+.account-chip:hover { background: #26272d; }
+.account-chip img { width: 28px; height: 28px; image-rendering: pixelated; }
+.account-chip small { display: block; color: var(--tuff); font-size: 12px; }
+.version { color: var(--seam); font-size: 12px; padding: 8px 24px 0; }
+
+main { overflow: auto; padding: 36px 44px; }
+h1 { font-size: 26px; font-weight: 700; margin: 0 0 20px; letter-spacing: -0.01em; }
+
+/* Play */
+#view-play { height: 100%; display: flex; }
+.stage { margin-top: auto; width: min(520px, 100%); }
+.stack { color: var(--tuff); margin: 0 0 14px; }
+.play {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 22px 26px;
+  background: var(--deepslate);
+  border: 1px solid var(--seam);
+  font-size: 26px;
+  font-weight: 700;
+  text-align: left;
+}
+.play:hover:not(:disabled) { border-color: var(--tuff); }
+.play:disabled { cursor: default; }
+.play .lamp { width: 26px; height: 26px; }
+.progress { margin-top: 16px; }
+.bar { height: 4px; background: var(--deepslate); }
+.fill { height: 100%; width: 0; background: var(--calcite); transition: width 120ms linear; }
+.progress-text { color: var(--tuff); margin: 8px 0 0; font-variant-numeric: tabular-nums; }
+.error { color: var(--danger); margin: 14px 0 0; user-select: text; white-space: pre-wrap; }
+
+/* The redstone lamp: dark with a brown grid when off, glowing when lit. */
+.lamp {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  background: var(--lamp-off);
+  border: 2px solid var(--lamp-grid);
+  transition: background 160ms, border-color 160ms, box-shadow 160ms;
+}
+.lamp::before, .lamp::after {
+  content: "";
+  position: absolute;
+  background: var(--lamp-grid);
+  transition: background 160ms;
+}
+.lamp::before { left: calc(50% - 1px); top: 1px; bottom: 1px; width: 2px; }
+.lamp::after { top: calc(50% - 1px); left: 1px; right: 1px; height: 2px; }
+.lamp.on {
+  background: var(--lamp-on);
+  border-color: #c98f2e;
+  box-shadow: 0 0 0 3px rgba(246, 199, 104, 0.18), 0 0 14px rgba(246, 199, 104, 0.35);
+}
+.lamp.on::before, .lamp.on::after { background: var(--lamp-core); }
+
+/* Rows, buttons, inputs */
+.rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--seam); max-width: 620px; }
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--seam);
+  padding: 6px 0;
+}
+.toggle-row, .account-row { cursor: pointer; }
+.toggle-row:hover, .account-row:hover { background: rgba(58, 61, 69, 0.4); }
+.account-row img { width: 24px; height: 24px; image-rendering: pixelated; }
+.account-row .who { display: flex; align-items: center; gap: 12px; }
+.account-row small { color: var(--tuff); margin-left: 6px; }
+.account-row .remove {
+  background: none;
+  border: 0;
+  color: var(--tuff);
+  padding: 4px 8px;
+}
+.account-row .remove:hover { color: var(--danger); }
+.control { display: flex; align-items: center; gap: 12px; }
+.control output { color: var(--tuff); min-width: 56px; text-align: right; font-variant-numeric: tabular-nums; }
+input[type="range"] { accent-color: var(--calcite); width: 220px; }
+input:not([type]), input[type="text"] {
+  background: var(--deepslate);
+  border: 1px solid var(--seam);
+  padding: 8px 10px;
+  width: 280px;
+  user-select: text;
+}
+.actions { display: flex; gap: 10px; margin-top: 20px; }
+.button {
+  background: var(--calcite);
+  color: var(--deepslate);
+  border: 0;
+  padding: 9px 16px;
+  font-weight: 600;
+}
+.button:hover { background: #fff; }
+.button.quiet { background: var(--deepslate); color: var(--calcite); border: 1px solid var(--seam); }
+.button.quiet:hover { border-color: var(--tuff); }
+.button:disabled { opacity: 0.5; cursor: default; }
+.note { color: var(--tuff); font-size: 13px; margin: 10px 0 0; max-width: 560px; }
+.offline { margin-top: 32px; }
+.offline label { display: block; margin-bottom: 8px; }
+.inline { display: flex; gap: 8px; }
+.empty { color: var(--tuff); padding: 14px 0; border-bottom: 1px solid var(--seam); }
+
+.log {
+  background: var(--deepslate);
+  margin: 0;
+  padding: 14px;
+  height: calc(100vh - 150px);
+  overflow: auto;
+  font: 12px/1.5 ui-monospace, "JetBrains Mono", monospace;
+  color: var(--tuff);
+  user-select: text;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.log .err { color: var(--danger); }
+
+dialog {
+  background: var(--deepslate);
+  color: var(--calcite);
+  border: 1px solid var(--seam);
+  padding: 28px 32px;
+  width: 420px;
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
+.code {
+  font: 700 34px/1.2 ui-monospace, "JetBrains Mono", monospace;
+  letter-spacing: 0.12em;
+  margin: 14px 0 4px;
+  user-select: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
