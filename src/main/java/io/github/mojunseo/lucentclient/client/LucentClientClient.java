@@ -76,6 +76,11 @@ public class LucentClientClient implements ClientModInitializer {
 			}
 		});
 
+		if (Boolean.getBoolean("lucentclient.auditMixins")) {
+			// Development check: apply every mixin now, so a wrong target fails at startup, not later in play.
+			org.spongepowered.asm.mixin.MixinEnvironment.getCurrentEnvironment().audit();
+			LucentClient.LOGGER.info("Mixin audit finished");
+		}
 		LucentClient.LOGGER.info("Lucent Client initialized");
 	}
 }

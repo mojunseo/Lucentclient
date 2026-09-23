@@ -24,6 +24,10 @@ loom {
     runConfigs.all {
         preferGradleTask = true
         runDirectory = rootProject.file("run")
+        // tools/mixin_check.sh passes -Plucentclient.audit=true to apply every mixin at startup.
+        if (providers.gradleProperty("lucentclient.audit").isPresent) {
+            vmArg("-Dlucentclient.auditMixins=true")
+        }
     }
 }
 

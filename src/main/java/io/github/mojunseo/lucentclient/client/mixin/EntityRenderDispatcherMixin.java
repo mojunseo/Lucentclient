@@ -12,8 +12,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRenderDispatcherMixin {
 	@Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
+	//? if >=26.3 {
 	private void lucentclient$cull(Entity entity, Frustum culler, double camX, double camY, double camZ, float partialTicks,
 			CallbackInfoReturnable<Boolean> cir) {
+	//?} else {
+	/*private void lucentclient$cull(Entity entity, Frustum culler, double camX, double camY, double camZ,
+			CallbackInfoReturnable<Boolean> cir) {
+	*///?}
 		if (ModuleManager.ENTITY_CULLING.cullsEntity(entity, camX, camY, camZ)) cir.setReturnValue(false);
 	}
 }
