@@ -47,9 +47,9 @@ public record CosmeticMotion(float moving, float crouch, float wingPhase, float 
 			if (dt > 0.0F) {
 				tracker.moving += (targetMoving - tracker.moving) * (1.0F - (float) Math.exp(-dt * 0.12F));
 				tracker.crouch += (targetCrouch - tracker.crouch) * (1.0F - (float) Math.exp(-dt * 0.35F));
-				tracker.wingPhase += dt * (0.07F + tracker.moving * 0.08F);
+				tracker.wingPhase += dt * (0.16F + tracker.moving * 0.14F);
 				tracker.clothPhase += dt * (0.15F + tracker.moving * 0.15F);
-				tracker.flutterPhase += dt * (0.25F + tracker.moving * 0.25F);
+				tracker.flutterPhase += dt * (0.4F + tracker.moving * 0.3F);
 			}
 		}
 		tracker.lastAge = state.ageInTicks;
