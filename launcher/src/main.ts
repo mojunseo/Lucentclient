@@ -278,6 +278,50 @@ $<HTMLSelectElement>("version").addEventListener("change", async (event) => {
 
 let modQuery = "";
 let modOffset = 0;
+let modSort = "downloads";
+const modCategories = new Set<string>();
+
+/** Modrinth mod categories with Korean names, most useful for a client first. */
+const CATEGORIES: [string, string][] = [
+  ["optimization", "최적화"],
+  ["utility", "유틸리티"],
+  ["decoration", "장식"],
+  ["adventure", "모험"],
+  ["worldgen", "월드 생성"],
+  ["technology", "기술"],
+  ["magic", "마법"],
+  ["storage", "저장"],
+  ["equipment", "장비"],
+  ["mobs", "몹"],
+  ["food", "음식"],
+  ["game-mechanics", "게임 메커니즘"],
+  ["transportation", "이동 수단"],
+  ["social", "소셜"],
+  ["management", "관리"],
+  ["economy", "경제"],
+  ["minigame", "미니게임"],
+  ["library", "라이브러리"],
+  ["cursed", "기묘한 것"],
+];
+
+function renderCategories() {
+  const box = $("mod-categories");
+  box.replaceChildren(
+    ...CATEGORIES.map(([id, name]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "category" + (modCategories.has(id) ? " active" : "");
+      button.textContent = name;
+      button.setAttribute("aria-pressed", String(modCategories.has(id)));
+      button.addEventListener("click", () => {
+        if (!modCategories.delete(id)) modCategories.add(id);
+        renderCategories();
+        searchMods(true);
+      });
+      return button;
+    }),
+  );
+}
 
 function modIcon(url: string | null) {
   if (!url) {
@@ -392,8 +436,14 @@ async function searchMods(reset: boolean) {
   }
   $("mods-error").hidden = true;
   try {
-    const page = await invoke<{ hits: SearchHit[]; total: number }>("search_mods", { query: modQuery, offset: modOffset });
+    const page = await invoke<{ hits: SearchHit[]; total: number }>("search_mods", {
+      query: modQuery,
+      offset: modOffset,
+      sort: modSort,
+      categories: [...modCategories],
+    });
     results = results.concat(page.hits);
+    $("mod-count").textContent = page.total === 0 ? "조건에 맞는 모드가 없어요." : `${page.total.toLocaleString()}개`;
     modOffset += 20;
     $("more-mods").hidden = modOffset >= page.total;
     renderResults();
@@ -406,6 +456,8 @@ async function searchMods(reset: boolean) {
 
 async function openMods() {
   $("mods-title").textContent = `${info.version}용 모드`;
+  $<HTMLSelectElement>("mod-sort").value = modSort;
+  renderCategories();
   await renderInstalled();
   if (results.length === 0) await searchMods(true);
 }
@@ -413,6 +465,15 @@ async function openMods() {
 $("mod-search").addEventListener("submit", (event) => {
   event.preventDefault();
   modQuery = $<HTMLInputElement>("mod-query").value;
+  // Typing a query without choosing a sort means "best match".
+  if (modQuery.trim() && modSort === "downloads") {
+    modSort = "relevance";
+    $<HTMLSelectElement>("mod-sort").value = modSort;
+  }
+  searchMods(true);
+});
+$<HTMLSelectElement>("mod-sort").addEventListener("change", (event) => {
+  modSort = (event.target as HTMLSelectElement).value;
   searchMods(true);
 });
 $("more-mods").addEventListener("click", () => searchMods(false));

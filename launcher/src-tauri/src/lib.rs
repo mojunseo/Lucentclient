@@ -150,8 +150,14 @@ fn set_version(app: State<'_, Arc<App>>, version: String) -> Result<(), String> 
 }
 
 #[tauri::command]
-async fn search_mods(app: State<'_, Arc<App>>, query: String, offset: u32) -> Result<modrinth::SearchPage, String> {
-    modrinth::search(&app.client, &query, &app.version(), offset).await.map_err(|e| e.to_string())
+async fn search_mods(
+    app: State<'_, Arc<App>>,
+    query: String,
+    offset: u32,
+    sort: String,
+    categories: Vec<String>,
+) -> Result<modrinth::SearchPage, String> {
+    modrinth::search(&app.client, &query, &app.version(), offset, &sort, &categories).await.map_err(|e| e.to_string())
 }
 
 #[tauri::command]

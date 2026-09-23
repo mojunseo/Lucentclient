@@ -47,8 +47,17 @@
           <h2>Modrinth에서 찾기</h2>
           <form class="inline search" id="mod-search">
             <input id="mod-query" placeholder="모드 이름" autocomplete="off" />
+            <select id="mod-sort" aria-label="정렬">
+              <option value="relevance">관련도순</option>
+              <option value="downloads">인기순</option>
+              <option value="follows">팔로우 많은 순</option>
+              <option value="newest">새로 나온 순</option>
+              <option value="updated">최근 업데이트순</option>
+            </select>
             <button class="button quiet" type="submit">검색</button>
           </form>
+          <div class="categories" id="mod-categories"></div>
+          <p class="note result-count" id="mod-count"></p>
           <ul class="rows" id="mod-results"></ul>
           <div class="actions"><button class="button quiet" id="more-mods" hidden>더 보기</button></div>
           <p class="error" id="mods-error" hidden></p>

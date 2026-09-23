@@ -104,13 +104,33 @@ fn encode(value: &str) -> String {
         .collect()
 }
 
-pub async fn search(client: &reqwest::Client, query: &str, minecraft: &str, offset: u32) -> Result<SearchPage> {
-    let facets = format!(r#"[["project_type:mod"],["categories:fabric"],["versions:{minecraft}"]]"#);
-    let index = if query.trim().is_empty() { "downloads" } else { "relevance" };
+/// Sort orders Modrinth search accepts.
+const SORTS: [&str; 5] = ["relevance", "downloads", "follows", "newest", "updated"];
+
+/// Searches Fabric mods for `minecraft`. Every category in `categories` must match.
+pub async fn search(
+    client: &reqwest::Client,
+    query: &str,
+    minecraft: &str,
+    offset: u32,
+    sort: &str,
+    categories: &[String],
+) -> Result<SearchPage> {
+    let mut facets = vec![
+        r#"["project_type:mod"]"#.to_string(),
+        r#"["categories:fabric"]"#.to_string(),
+        format!(r#"["versions:{minecraft}"]"#),
+    ];
+    for category in categories {
+        if category.chars().all(|c| c.is_ascii_lowercase() || c == '-') {
+            facets.push(format!(r#"["categories:{category}"]"#));
+        }
+    }
+    let index = if SORTS.contains(&sort) { sort } else { "relevance" };
     let url = format!(
         "{API}/search?query={}&facets={}&index={index}&limit=20&offset={offset}",
         encode(query.trim()),
-        encode(&facets)
+        encode(&format!("[{}]", facets.join(",")))
     );
     let response: SearchResponse = download::get_json(client, &url).await?;
     Ok(SearchPage {

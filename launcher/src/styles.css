@@ -230,3 +230,14 @@ h2 { font-size: 15px; font-weight: 600; color: var(--tuff); margin: 28px 0 10px;
 .mod-row .control { align-self: center; }
 .mod-row .lamp { cursor: pointer; }
 .tag { color: var(--tuff); font-size: 12px; }
+.categories { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0 6px; max-width: 620px; }
+.category {
+  background: none;
+  border: 0;
+  padding: 3px 0;
+  color: var(--tuff);
+  border-bottom: 1px solid transparent;
+}
+.category:hover { color: var(--calcite); }
+.category.active { color: var(--calcite); border-bottom-color: var(--calcite); }
+.result-count { margin: 4px 0 8px; }
