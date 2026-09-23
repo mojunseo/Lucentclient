@@ -20,10 +20,6 @@ pub fn fabric_loader() -> &'static str {
     property("loader_version")
 }
 
-pub fn fabric_api() -> &'static str {
-    property("fabric_api_version")
-}
-
 pub fn mod_version() -> &'static str {
     property("version")
 }

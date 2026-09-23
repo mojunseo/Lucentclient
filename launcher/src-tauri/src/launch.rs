@@ -39,7 +39,7 @@ fn substitute(argument: &str, vars: &HashMap<&str, String>) -> String {
 pub fn command(layout: &Layout, installed: &Installed, account: &Account, settings: &Settings) -> Command {
     let separator = if cfg!(windows) { ";" } else { ":" };
     let classpath = installed.classpath.iter().map(|p| p.to_string_lossy().into_owned()).collect::<Vec<_>>().join(separator);
-    let game_dir = layout.game();
+    let game_dir = installed.game_dir.clone();
     let path = |p: PathBuf| p.to_string_lossy().into_owned();
 
     let vars: HashMap<&str, String> = HashMap::from([

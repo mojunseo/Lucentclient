@@ -12,6 +12,7 @@
       <nav class="sidebar">
         <div class="wordmark">Lucent</div>
         <button class="nav" data-view="play">플레이</button>
+        <button class="nav" data-view="mods">모드</button>
         <button class="nav" data-view="accounts">계정</button>
         <button class="nav" data-view="settings">설정</button>
         <button class="nav" data-view="logs">게임 로그</button>
@@ -22,6 +23,10 @@
       <main>
         <section class="view" id="view-play">
           <div class="stage">
+            <div class="version-line">
+              <label for="version">버전</label>
+              <select id="version"></select>
+            </div>
             <p class="stack" id="stack"></p>
             <button class="play" id="play">
               <span class="lamp" aria-hidden="true"></span>
@@ -33,6 +38,20 @@
             </div>
             <p class="error" id="play-error" hidden></p>
           </div>
+        </section>
+
+        <section class="view" id="view-mods" hidden>
+          <h1 id="mods-title">모드</h1>
+          <h2>설치한 모드</h2>
+          <ul class="rows" id="installed-mods"></ul>
+          <h2>Modrinth에서 찾기</h2>
+          <form class="inline search" id="mod-search">
+            <input id="mod-query" placeholder="모드 이름" autocomplete="off" />
+            <button class="button quiet" type="submit">검색</button>
+          </form>
+          <ul class="rows" id="mod-results"></ul>
+          <div class="actions"><button class="button quiet" id="more-mods" hidden>더 보기</button></div>
+          <p class="error" id="mods-error" hidden></p>
         </section>
 
         <section class="view" id="view-accounts" hidden>

@@ -4,6 +4,7 @@ mod install;
 mod java;
 mod launch;
 mod meta;
+mod modrinth;
 mod state;
 mod versions;
 
@@ -26,6 +27,15 @@ struct App {
 }
 
 impl App {
+    /// The Minecraft version to play.
+    fn version(&self) -> String {
+        self.settings.lock().unwrap().version.clone().unwrap_or_else(|| versions::minecraft().to_string())
+    }
+
+    fn instance(&self) -> modrinth::Instance {
+        modrinth::Instance { dir: self.layout.instance(&self.version()) }
+    }
+
     fn settings_path(&self) -> PathBuf {
         self.layout.root.join("settings.json")
     }
@@ -43,7 +53,10 @@ impl App {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Info {
+    /// The version Lucent Client is built for.
     minecraft: &'static str,
+    /// The version selected to play.
+    version: String,
     fabric_loader: &'static str,
     mod_version: &'static str,
     launcher_version: &'static str,
@@ -82,6 +95,7 @@ fn get_info(app: State<'_, Arc<App>>) -> Info {
     let accounts = app.accounts.lock().unwrap();
     Info {
         minecraft: versions::minecraft(),
+        version: app.version(),
         fabric_loader: versions::fabric_loader(),
         mod_version: versions::mod_version(),
         launcher_version: env!("CARGO_PKG_VERSION"),
@@ -99,6 +113,65 @@ fn save_settings(app: State<'_, Arc<App>>, settings: Settings) -> Result<(), Str
     state::save(&app.settings_path(), &settings, false).map_err(|e| e.to_string())?;
     *app.settings.lock().unwrap() = settings;
     Ok(())
+}
+
+#[derive(serde::Deserialize)]
+struct GameVersion {
+    version: String,
+    stable: bool,
+}
+
+/// Minecraft releases Fabric supports, from 1.19 on (older versions need a different launch setup).
+#[tauri::command]
+async fn list_versions(app: State<'_, Arc<App>>) -> Result<Vec<String>, String> {
+    let all: Vec<GameVersion> = download::get_json(&app.client, "https://meta.fabricmc.net/v2/versions/game")
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(all
+        .into_iter()
+        .filter(|v| v.stable)
+        .map(|v| v.version)
+        .filter(|v| {
+            let mut parts = v.split('.').map(|p| p.parse::<u32>().unwrap_or(0));
+            match (parts.next(), parts.next()) {
+                (Some(1), Some(minor)) => minor >= 19,
+                (Some(major), _) => major > 1,
+                _ => false,
+            }
+        })
+        .collect())
+}
+
+#[tauri::command]
+fn set_version(app: State<'_, Arc<App>>, version: String) -> Result<(), String> {
+    let mut settings = app.settings.lock().unwrap();
+    settings.version = if version == versions::minecraft() { None } else { Some(version) };
+    state::save(&app.settings_path(), &*settings, false).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn search_mods(app: State<'_, Arc<App>>, query: String, offset: u32) -> Result<modrinth::SearchPage, String> {
+    modrinth::search(&app.client, &query, &app.version(), offset).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn installed_mods(app: State<'_, Arc<App>>) -> Vec<modrinth::InstalledView> {
+    app.instance().list()
+}
+
+#[tauri::command]
+async fn install_mod(app: State<'_, Arc<App>>, project_id: String) -> Result<(), String> {
+    app.instance().install(&app.client, &project_id, &app.version()).await.map_err(|e| format!("{e:#}"))
+}
+
+#[tauri::command]
+fn remove_mod(app: State<'_, Arc<App>>, project_id: String) -> Result<(), String> {
+    app.instance().remove(&project_id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn set_mod_enabled(app: State<'_, Arc<App>>, filename: String, enabled: bool) -> Result<(), String> {
+    app.instance().set_enabled(&filename, enabled).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -176,7 +249,7 @@ async fn run_game(handle: &AppHandle, app: &Arc<App>) -> anyhow::Result<()> {
         app.accounts.lock().unwrap().upsert(account.clone());
         app.save_accounts().map_err(anyhow::Error::msg)?;
     }
-    let installed = install::install(&app.client, &app.layout, |progress| {
+    let installed = install::install(&app.client, &app.layout, &app.version(), |progress| {
         handle.emit("install-progress", progress).ok();
     })
     .await?;
@@ -209,7 +282,7 @@ async fn run_game(handle: &AppHandle, app: &Arc<App>) -> anyhow::Result<()> {
 #[tauri::command]
 fn open_game_directory(handle: AppHandle, app: State<'_, Arc<App>>) -> Result<(), String> {
     use tauri_plugin_opener::OpenerExt;
-    let dir = app.layout.game();
+    let dir = app.layout.instance(&app.version());
     std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
     handle.opener().open_path(dir.to_string_lossy(), None::<&str>).map_err(|e| e.to_string())
 }
@@ -222,6 +295,14 @@ pub fn run() {
             let root = tauri_app.path().app_data_dir()?;
             std::fs::create_dir_all(&root)?;
             let layout = Layout { root };
+            // Before per-version instances, the game directory was data/game; it belongs to the
+            // version Lucent Client was built for.
+            let legacy = layout.root.join("game");
+            let instance = layout.instance(versions::minecraft());
+            if legacy.exists() && !instance.exists() {
+                std::fs::create_dir_all(instance.parent().unwrap())?;
+                std::fs::rename(&legacy, &instance)?;
+            }
             let settings: Settings = state::load(&layout.root.join("settings.json"));
             let accounts: Accounts = state::load(&layout.root.join("accounts.json"));
             tauri_app.manage(Arc::new(App {
@@ -241,7 +322,14 @@ pub fn run() {
             add_offline_account,
             sign_in,
             play,
-            open_game_directory
+            open_game_directory,
+            list_versions,
+            set_version,
+            search_mods,
+            installed_mods,
+            install_mod,
+            remove_mod,
+            set_mod_enabled
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -259,7 +347,8 @@ mod tests {
         let root = PathBuf::from(std::env::var("LUCENT_TEST_DIR").expect("set LUCENT_TEST_DIR"));
         let layout = Layout { root };
         let client = download::client();
-        let installed = install::install(&client, &layout, |p| {
+        let version = std::env::var("LUCENT_TEST_VERSION").unwrap_or_else(|_| versions::minecraft().to_string());
+        let installed = install::install(&client, &layout, &version, |p| {
             if p.done == p.total {
                 println!("{} {}/{}", p.stage, p.done, p.total);
             }
@@ -269,5 +358,19 @@ mod tests {
         assert!(installed.java.exists(), "java missing at {}", installed.java.display());
         let command = launch::command(&layout, &installed, &auth::offline("Tester"), &Settings::default());
         println!("{:?}", command.as_std());
+    }
+
+    /// Installs a mod with its dependencies from Modrinth into LUCENT_TEST_DIR/instances/<version>.
+    #[tokio::test]
+    #[ignore]
+    async fn install_modrinth_mod() {
+        let root = PathBuf::from(std::env::var("LUCENT_TEST_DIR").expect("set LUCENT_TEST_DIR"));
+        let version = std::env::var("LUCENT_TEST_VERSION").unwrap_or_else(|_| versions::minecraft().to_string());
+        let project = std::env::var("LUCENT_TEST_MOD").unwrap_or_else(|_| "AANobbMI".into());
+        let instance = modrinth::Instance { dir: Layout { root }.instance(&version) };
+        instance.install(&download::client(), &project, &version).await.expect("install");
+        for installed in instance.list() {
+            println!("{} {} enabled={} dependency={}", installed.installed.title, installed.installed.filename, installed.enabled, installed.installed.dependency);
+        }
     }
 }

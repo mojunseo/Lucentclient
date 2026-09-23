@@ -14,11 +14,13 @@ pub struct Settings {
     pub jvm_args: String,
     /// Hide the launcher while the game runs.
     pub hide_on_launch: bool,
+    /// Minecraft version to play; None means the version Lucent Client is built for.
+    pub version: Option<String>,
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { memory_mb: 4096, jvm_args: String::new(), hide_on_launch: true }
+        Self { memory_mb: 4096, jvm_args: String::new(), hide_on_launch: true, version: None }
     }
 }
 

@@ -2,7 +2,7 @@
 
 use crate::download::{self, Download};
 use crate::meta::{self, AssetIndex, Version, VersionManifest};
-use crate::{java, versions};
+use crate::{java, modrinth, versions};
 use anyhow::{anyhow, bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -29,9 +29,10 @@ impl Layout {
     pub fn natives(&self) -> PathBuf {
         self.root.join("natives")
     }
-    /// The game directory: saves, options, mods and configs.
-    pub fn game(&self) -> PathBuf {
-        self.root.join("game")
+    /// One game directory per Minecraft version (saves, options, mods, configs), since mods only
+    /// work with the version they were made for.
+    pub fn instance(&self, minecraft: &str) -> PathBuf {
+        self.root.join("instances").join(minecraft)
     }
 }
 
@@ -45,18 +46,24 @@ pub struct Progress {
 
 pub struct Installed {
     pub version: Version,
+    pub game_dir: PathBuf,
     pub java: PathBuf,
     pub classpath: Vec<PathBuf>,
     /// The JVM argument that points log4j at its config, already filled in.
     pub logging_argument: Option<String>,
 }
 
-pub async fn install(client: &reqwest::Client, layout: &Layout, progress: impl Fn(Progress) + Send + Sync) -> Result<Installed> {
+pub async fn install(
+    client: &reqwest::Client,
+    layout: &Layout,
+    minecraft: &str,
+    progress: impl Fn(Progress) + Send + Sync,
+) -> Result<Installed> {
     let report = |stage: &'static str| move |done: usize, total: usize| (stage, done, total);
     let emit = |(stage, done, total): (&'static str, usize, usize)| progress(Progress { stage, done, total });
 
     emit(report("metadata")(0, 1));
-    let version = resolve_version(client, layout).await?;
+    let version = resolve_version(client, layout, minecraft).await?;
     emit(report("metadata")(1, 1));
 
     // Game jar and libraries.
@@ -79,7 +86,7 @@ pub async fn install(client: &reqwest::Client, layout: &Layout, progress: impl F
         downloads.push(Download { url, path: target, sha1, size, executable: false });
     }
     let client_download = version.downloads.as_ref().context("version has no client download")?.client.clone();
-    let client_jar = layout.versions().join(versions::minecraft()).join(format!("{}.jar", versions::minecraft()));
+    let client_jar = layout.versions().join(minecraft).join(format!("{minecraft}.jar"));
     downloads.push(Download {
         url: client_download.url,
         path: client_jar.clone(),
@@ -144,15 +151,42 @@ pub async fn install(client: &reqwest::Client, layout: &Layout, progress: impl F
 
     // Mods.
     emit(report("mods")(0, 2));
-    install_mods(client, layout).await?;
+    let game_dir = layout.instance(minecraft);
+    install_mods(client, &game_dir, minecraft).await?;
     emit(report("mods")(2, 2));
 
     download::ensure_dir(&layout.natives())?;
-    Ok(Installed { version, java, classpath, logging_argument })
+    Ok(Installed { version, game_dir, java, classpath, logging_argument })
 }
 
-async fn resolve_version(client: &reqwest::Client, layout: &Layout) -> Result<Version> {
-    let id = versions::minecraft();
+#[derive(Deserialize)]
+struct LoaderEntry {
+    loader: LoaderVersion,
+}
+
+#[derive(Deserialize)]
+struct LoaderVersion {
+    version: String,
+    stable: bool,
+}
+
+/// The Fabric Loader to use: the one the mod was built with for its own version, otherwise the
+/// newest stable loader for that Minecraft version.
+async fn fabric_loader(client: &reqwest::Client, minecraft: &str) -> Result<String> {
+    if minecraft == versions::minecraft() {
+        return Ok(versions::fabric_loader().to_string());
+    }
+    let loaders: Vec<LoaderEntry> =
+        download::get_json(client, &format!("https://meta.fabricmc.net/v2/versions/loader/{minecraft}")).await?;
+    loaders
+        .into_iter()
+        .find(|l| l.loader.stable)
+        .map(|l| l.loader.version)
+        .ok_or_else(|| anyhow!("Fabric doesn't support Minecraft {minecraft}"))
+}
+
+async fn resolve_version(client: &reqwest::Client, layout: &Layout, minecraft: &str) -> Result<Version> {
+    let id = minecraft;
     let dir = layout.versions().join(id);
     let vanilla_path = dir.join(format!("{id}.json"));
     let vanilla: Version = match tokio::fs::read(&vanilla_path).await {
@@ -166,11 +200,9 @@ async fn resolve_version(client: &reqwest::Client, layout: &Layout) -> Result<Ve
             serde_json::from_slice(&bytes)?
         }
     };
-    let fabric_url = format!(
-        "https://meta.fabricmc.net/v2/versions/loader/{id}/{}/profile/json",
-        versions::fabric_loader()
-    );
-    let fabric_path = dir.join(format!("fabric-{}.json", versions::fabric_loader()));
+    let loader = fabric_loader(client, id).await?;
+    let fabric_url = format!("https://meta.fabricmc.net/v2/versions/loader/{id}/{loader}/profile/json");
+    let fabric_path = dir.join(format!("fabric-{loader}.json"));
     let fabric: Version = match tokio::fs::read(&fabric_path).await {
         Ok(bytes) => serde_json::from_slice(&bytes)?,
         Err(_) => {
@@ -194,30 +226,26 @@ struct ReleaseAsset {
     browser_download_url: String,
 }
 
-/// Puts Fabric API and Lucent Client into the mods folder, replacing older copies the launcher put there.
-async fn install_mods(client: &reqwest::Client, layout: &Layout) -> Result<()> {
-    let mods = layout.game().join("mods");
+/// Puts Fabric API, and Lucent Client when this is its version, into the instance's mods folder,
+/// replacing older copies the launcher put there. Mods installed from Modrinth are left alone.
+async fn install_mods(client: &reqwest::Client, game_dir: &Path, minecraft: &str) -> Result<()> {
+    let mods = game_dir.join("mods");
     download::ensure_dir(&mods)?;
 
-    let fabric_api = format!("fabric-api-{}.jar", versions::fabric_api());
-    download::fetch(
-        client,
-        &Download {
-            url: format!(
-                "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/{v}/fabric-api-{v}.jar",
-                v = versions::fabric_api()
-            ),
-            path: mods.join(&fabric_api),
-            sha1: None,
-            size: None,
-            executable: false,
-        },
-    )
-    .await?;
+    let fabric_api = modrinth::latest_version(client, modrinth::FABRIC_API_PROJECT, minecraft)
+        .await
+        .context("finding Fabric API")?;
+    let file = modrinth::primary_file(&fabric_api)?;
+    download::fetch(client, &modrinth::file_download(file, &mods)).await?;
+    remove_stale(&mods, "fabric-api-", &file.filename)?;
 
-    let lucent = install_lucent(client, &mods).await?;
-    remove_stale(&mods, "fabric-api-", &fabric_api)?;
-    remove_stale(&mods, "lucentclient-", &lucent)?;
+    if minecraft == versions::minecraft() {
+        let lucent = install_lucent(client, &mods).await?;
+        remove_stale(&mods, "lucentclient-", &lucent)?;
+    } else {
+        // Lucent Client is built for one Minecraft version only.
+        remove_stale(&mods, "lucentclient-", "")?;
+    }
     Ok(())
 }
 

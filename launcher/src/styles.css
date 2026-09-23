@@ -74,6 +74,15 @@ main { overflow: auto; padding: 36px 44px; }
 h1 { font-size: 26px; font-weight: 700; margin: 0 0 20px; letter-spacing: -0.01em; }
 
 /* Play */
+.version-line { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.version-line label { color: var(--tuff); }
+select {
+  background: var(--deepslate);
+  color: var(--calcite);
+  border: 1px solid var(--seam);
+  padding: 6px 10px;
+  font: inherit;
+}
 #view-play { height: 100%; display: flex; }
 .stage { margin-top: auto; width: min(520px, 100%); }
 .stack { color: var(--tuff); margin: 0 0 14px; }
@@ -96,7 +105,7 @@ h1 { font-size: 26px; font-weight: 700; margin: 0 0 20px; letter-spacing: -0.01e
 .bar { height: 4px; background: var(--deepslate); }
 .fill { height: 100%; width: 0; background: var(--calcite); transition: width 120ms linear; }
 .progress-text { color: var(--tuff); margin: 8px 0 0; font-variant-numeric: tabular-nums; }
-.error { color: var(--danger); margin: 14px 0 0; user-select: text; white-space: pre-wrap; }
+.error { color: var(--danger); margin: 14px 0 0; user-select: text; white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* The redstone lamp: dark with a brown grid when off, glowing when lit. */
 .lamp {
@@ -207,3 +216,17 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* Mods */
+h2 { font-size: 15px; font-weight: 600; color: var(--tuff); margin: 28px 0 10px; }
+.search { margin-bottom: 12px; }
+.mod-row { align-items: flex-start; padding: 10px 0; }
+.mod-row img, .mod-row .no-icon { width: 36px; height: 36px; flex: none; background: var(--deepslate); object-fit: cover; }
+.mod-main { display: flex; gap: 12px; min-width: 0; flex: 1; }
+.mod-text { min-width: 0; }
+.mod-text strong { font-weight: 600; }
+.mod-text small { color: var(--tuff); margin-left: 6px; }
+.mod-text p { margin: 2px 0 0; color: var(--tuff); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 420px; }
+.mod-row .control { align-self: center; }
+.mod-row .lamp { cursor: pointer; }
+.tag { color: var(--tuff); font-size: 12px; }

@@ -6,6 +6,7 @@ type Settings = { memoryMb: number; jvmArgs: string; hideOnLaunch: boolean };
 type AccountView = { kind: "microsoft" | "offline"; name: string; uuid: string };
 type Info = {
   minecraft: string;
+  version: string;
   fabricLoader: string;
   modVersion: string;
   launcherVersion: string;
@@ -18,6 +19,8 @@ type Info = {
 };
 type Progress = { stage: "metadata" | "libraries" | "assets" | "java" | "mods"; done: number; total: number };
 type DeviceCode = { user_code: string; verification_uri: string };
+type SearchHit = { projectId: string; title: string; author: string; description: string; downloads: number; iconUrl: string | null };
+type InstalledMod = { projectId: string; title: string; filename: string; iconUrl: string | null; dependency: boolean; enabled: boolean };
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 let info: Info;
@@ -28,7 +31,12 @@ function show(view: string) {
   document.querySelectorAll<HTMLElement>(".view").forEach((el) => (el.hidden = el.id !== `view-${view}`));
   document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) => el.classList.toggle("active", el.dataset.view === view));
 }
-document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) => el.addEventListener("click", () => show(el.dataset.view!)));
+document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) =>
+  el.addEventListener("click", () => {
+    show(el.dataset.view!);
+    if (el.dataset.view === "mods") openMods();
+  }),
+);
 
 // --- Accounts ---------------------------------------------------------------------------------
 
@@ -244,15 +252,188 @@ $<HTMLInputElement>("jvm-args").addEventListener("change", (event) =>
 $("hide-row").addEventListener("click", () => saveSettings({ hideOnLaunch: !info.settings.hideOnLaunch }));
 $("open-folder").addEventListener("click", () => invoke("open_game_directory"));
 
+// --- Versions ---------------------------------------------------------------------------------
+
+async function loadVersions() {
+  const select = $<HTMLSelectElement>("version");
+  const versions = await invoke<string[]>("list_versions").catch(() => [info.minecraft]);
+  if (!versions.includes(info.version)) versions.unshift(info.version);
+  select.replaceChildren(
+    ...versions.map((version) => {
+      const option = document.createElement("option");
+      option.value = version;
+      option.textContent = version === info.minecraft ? `${version} (Lucent Client)` : version;
+      return option;
+    }),
+  );
+  select.value = info.version;
+}
+
+$<HTMLSelectElement>("version").addEventListener("change", async (event) => {
+  await invoke("set_version", { version: (event.target as HTMLSelectElement).value });
+  await refresh();
+});
+
+// --- Mods -------------------------------------------------------------------------------------
+
+let modQuery = "";
+let modOffset = 0;
+
+function modIcon(url: string | null) {
+  if (!url) {
+    const blank = document.createElement("span");
+    blank.className = "no-icon";
+    return blank;
+  }
+  const img = document.createElement("img");
+  img.src = url;
+  img.alt = "";
+  img.loading = "lazy";
+  return img;
+}
+
+function modRow(icon: string | null, title: string, detail: string, tag?: string) {
+  const row = document.createElement("li");
+  row.className = "row mod-row";
+  const main = document.createElement("div");
+  main.className = "mod-main";
+  const text = document.createElement("div");
+  text.className = "mod-text";
+  const strong = document.createElement("strong");
+  strong.textContent = title;
+  text.append(strong);
+  if (tag) {
+    const small = document.createElement("small");
+    small.textContent = tag;
+    text.append(small);
+  }
+  const p = document.createElement("p");
+  p.textContent = detail;
+  text.append(p);
+  main.append(modIcon(icon), text);
+  const control = document.createElement("div");
+  control.className = "control";
+  row.append(main, control);
+  return { row, control };
+}
+
+let installed: InstalledMod[] = [];
+
+async function renderInstalled() {
+  installed = await invoke<InstalledMod[]>("installed_mods");
+  const list = $("installed-mods");
+  list.replaceChildren();
+  if (installed.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "empty";
+    empty.textContent = "아직 설치한 모드가 없어요. 아래에서 찾아 설치하세요.";
+    list.append(empty);
+  }
+  for (const mod of installed) {
+    const { row, control } = modRow(mod.iconUrl, mod.title, mod.filename, mod.dependency ? "다른 모드에 필요" : undefined);
+    const remove = document.createElement("button");
+    remove.className = "button quiet";
+    remove.textContent = "삭제";
+    remove.addEventListener("click", async () => {
+      await invoke("remove_mod", { projectId: mod.projectId });
+      await renderInstalled();
+      renderResults();
+    });
+    const lamp = document.createElement("span");
+    lamp.className = "lamp" + (mod.enabled ? " on" : "");
+    lamp.title = mod.enabled ? "켜짐" : "꺼짐";
+    lamp.addEventListener("click", async () => {
+      await invoke("set_mod_enabled", { filename: mod.filename, enabled: !mod.enabled });
+      await renderInstalled();
+    });
+    control.append(remove, lamp);
+    list.append(row);
+  }
+}
+
+let results: SearchHit[] = [];
+
+function renderResults() {
+  const list = $("mod-results");
+  list.replaceChildren();
+  for (const hit of results) {
+    const downloads = `${hit.author}, 다운로드 ${hit.downloads.toLocaleString()}회`;
+    const { row, control } = modRow(hit.iconUrl, hit.title, hit.description, downloads);
+    const done = installed.some((mod) => mod.projectId === hit.projectId);
+    const button = document.createElement("button");
+    button.className = done ? "button quiet" : "button";
+    button.textContent = done ? "설치됨" : "설치";
+    button.disabled = done;
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      button.textContent = "설치 중";
+      $("mods-error").hidden = true;
+      try {
+        await invoke("install_mod", { projectId: hit.projectId });
+        await renderInstalled();
+        renderResults();
+      } catch (error) {
+        const message = $("mods-error");
+        message.hidden = false;
+        message.textContent = `${hit.title}: ${error}`;
+        button.disabled = false;
+        button.textContent = "설치";
+      }
+    });
+    control.append(button);
+    list.append(row);
+  }
+}
+
+async function searchMods(reset: boolean) {
+  if (reset) {
+    modOffset = 0;
+    results = [];
+  }
+  $("mods-error").hidden = true;
+  try {
+    const page = await invoke<{ hits: SearchHit[]; total: number }>("search_mods", { query: modQuery, offset: modOffset });
+    results = results.concat(page.hits);
+    modOffset += 20;
+    $("more-mods").hidden = modOffset >= page.total;
+    renderResults();
+  } catch (error) {
+    const message = $("mods-error");
+    message.hidden = false;
+    message.textContent = String(error);
+  }
+}
+
+async function openMods() {
+  $("mods-title").textContent = `${info.version}용 모드`;
+  await renderInstalled();
+  if (results.length === 0) await searchMods(true);
+}
+
+$("mod-search").addEventListener("submit", (event) => {
+  event.preventDefault();
+  modQuery = $<HTMLInputElement>("mod-query").value;
+  searchMods(true);
+});
+$("more-mods").addEventListener("click", () => searchMods(false));
+
 // --- Startup ----------------------------------------------------------------------------------
 
 async function refresh() {
   info = await invoke<Info>("get_info");
-  $("stack").textContent = `Minecraft ${info.minecraft}, Fabric ${info.fabricLoader}, Lucent Client ${info.modVersion}`;
+  const lucent = info.version === info.minecraft;
+  $("stack").textContent = lucent
+    ? `Fabric ${info.fabricLoader}와 Lucent Client ${info.modVersion}로 실행합니다.`
+    : `Lucent Client는 ${info.minecraft} 전용이라, 이 버전은 Fabric과 설치한 모드로만 실행합니다.`;
+  // Search results depend on the version; start over when it changes.
+  results = [];
   $("launcher-version").textContent = `런처 ${info.launcherVersion}`;
   renderAccounts();
   renderSettings();
   setPlaying(info.playing ? "running" : "idle");
 }
 
-refresh().then(() => show(selectedAccount() ? "play" : "accounts"));
+refresh().then(() => {
+  loadVersions();
+  show(selectedAccount() ? "play" : "accounts");
+});
