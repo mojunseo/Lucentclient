@@ -18,7 +18,7 @@ public class ZoomModule extends Module {
 	private float currentFactor;
 
 	public ZoomModule() {
-		super("zoom", true);
+		super("zoom", Category.PVP, true);
 	}
 
 	public void setKey(KeyMapping key) {

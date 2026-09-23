@@ -32,7 +32,7 @@ public class DiscordModule extends Module {
 	private String sessionKey = "";
 
 	public DiscordModule() {
-		super("discord", true);
+		super("discord", Category.OTHER, true);
 	}
 
 	public static boolean configured() {

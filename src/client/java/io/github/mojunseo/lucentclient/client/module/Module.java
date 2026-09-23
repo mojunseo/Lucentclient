@@ -12,16 +12,22 @@ import java.util.List;
 
 public abstract class Module {
 	private final String id;
+	private final Category category;
 	private final List<Setting<?>> settings = new ArrayList<>();
 	private boolean enabled;
 
-	protected Module(String id, boolean enabledByDefault) {
+	protected Module(String id, Category category, boolean enabledByDefault) {
 		this.id = id;
+		this.category = category;
 		this.enabled = enabledByDefault;
 	}
 
 	public String id() {
 		return id;
+	}
+
+	public Category category() {
+		return category;
 	}
 
 	public Component name() {

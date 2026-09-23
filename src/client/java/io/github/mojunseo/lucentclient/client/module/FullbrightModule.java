@@ -6,7 +6,7 @@ public class FullbrightModule extends Module {
 	private final NumberSetting strength = setting(new NumberSetting("strength", 100, 10, 100, 5, "%"));
 
 	public FullbrightModule() {
-		super("fullbright", false);
+		super("fullbright", Category.OTHER, false);
 	}
 
 	/** How strongly to apply the night-vision lighting, 0..1. */

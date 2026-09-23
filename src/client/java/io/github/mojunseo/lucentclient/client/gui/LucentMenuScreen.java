@@ -10,6 +10,7 @@ import io.github.mojunseo.lucentclient.client.gui.ui.Animations;
 import io.github.mojunseo.lucentclient.client.gui.ui.PlayerPreview;
 import io.github.mojunseo.lucentclient.client.gui.ui.Theme;
 import io.github.mojunseo.lucentclient.client.gui.ui.Ui;
+import io.github.mojunseo.lucentclient.client.module.Category;
 import io.github.mojunseo.lucentclient.client.module.HudModule;
 import io.github.mojunseo.lucentclient.client.module.Module;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
@@ -40,6 +41,7 @@ import java.util.Objects;
 public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 	private static final int SIDEBAR_WIDTH = 96;
 	private static final int ROW_HEIGHT = 22;
+	private static final int CATEGORY_HEIGHT = 18;
 	private static final int PAD = 14;
 	private static final long FADE_MS = 120;
 	/** On open, lit lamps switch on one after another, this far apart. */
@@ -228,29 +230,41 @@ public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 		int top = py + 56;
 		graphics.fill(cx, top - 1, cx + cw, top, color(Theme.SEAM));
 		int y0 = beginScroll(graphics, cx - 6, top, cw + 12, py + ph - PAD - top);
-		for (int i = 0; i < modules.size(); i++) {
-			Module module = modules.get(i);
-			int y = y0 + i * ROW_HEIGHT;
-			boolean hovered = hovered(mouseX, mouseY, cx - 6, y, cw + 12, ROW_HEIGHT);
-			if (hovered) graphics.fill(cx - 6, y, cx + cw + 6, y + ROW_HEIGHT, color(Theme.SEAM));
-
-			int textY = y + (ROW_HEIGHT - 8) / 2;
-			graphics.text(font, module.name(), cx, textY, color(Theme.CALCITE), false);
-			String description = Component.translatable("module.lucentclient." + module.id() + ".desc").getString();
-			int descriptionWidth = cw - nameColumn - Ui.LAMP_SIZE - 24;
-			graphics.text(font, Ui.ellipsize(font, description, descriptionWidth), cx + nameColumn, textY, color(Theme.TUFF), false);
-			// "›" marks that the row opens the module's settings.
-			graphics.text(font, "›", cx + cw - Ui.LAMP_SIZE - 12, textY, color(hovered ? Theme.CALCITE : Theme.SEAM), false);
-			int lampX = cx + cw - Ui.LAMP_SIZE;
-			Ui.lamp(graphics, lampX, y + (ROW_HEIGHT - Ui.LAMP_SIZE) / 2, lamp(module.id(), module.isEnabled(), i), alpha);
-
-			scrolledHit(lampX - 5, y, Ui.LAMP_SIZE + 11, ROW_HEIGHT, () -> {
-				module.setEnabled(!module.isEnabled());
-				ModuleManager.save();
-			});
-			scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, () -> openSettings(module));
+		int y = y0;
+		int order = 0;
+		for (Category category : Category.values()) {
+			List<Module> inCategory = modules.stream().filter(module -> module.category() == category).toList();
+			if (inCategory.isEmpty()) continue;
+			// Category name, then its modules.
+			graphics.text(font, category.displayName(), cx, y + (CATEGORY_HEIGHT - 8) / 2 + 2, color(Theme.TUFF), false);
+			y += CATEGORY_HEIGHT;
+			for (Module module : inCategory) {
+				extractModuleRow(graphics, mouseX, mouseY, module, cx, y, cw, nameColumn, order++);
+				y += ROW_HEIGHT;
+			}
 		}
-		endScroll(graphics, modules.size() * ROW_HEIGHT);
+		endScroll(graphics, y - y0);
+	}
+
+	private void extractModuleRow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Module module, int cx, int y, int cw, int nameColumn, int order) {
+		boolean hovered = hovered(mouseX, mouseY, cx - 6, y, cw + 12, ROW_HEIGHT);
+		if (hovered) graphics.fill(cx - 6, y, cx + cw + 6, y + ROW_HEIGHT, color(Theme.SEAM));
+
+		int textY = y + (ROW_HEIGHT - 8) / 2;
+		graphics.text(font, module.name(), cx, textY, color(Theme.CALCITE), false);
+		String description = Component.translatable("module.lucentclient." + module.id() + ".desc").getString();
+		int descriptionWidth = cw - nameColumn - Ui.LAMP_SIZE - 24;
+		graphics.text(font, Ui.ellipsize(font, description, descriptionWidth), cx + nameColumn, textY, color(Theme.TUFF), false);
+		// "›" marks that the row opens the module's settings.
+		graphics.text(font, "›", cx + cw - Ui.LAMP_SIZE - 12, textY, color(hovered ? Theme.CALCITE : Theme.SEAM), false);
+		int lampX = cx + cw - Ui.LAMP_SIZE;
+		Ui.lamp(graphics, lampX, y + (ROW_HEIGHT - Ui.LAMP_SIZE) / 2, lamp(module.id(), module.isEnabled(), order), alpha);
+
+		scrolledHit(lampX - 5, y, Ui.LAMP_SIZE + 11, ROW_HEIGHT, () -> {
+			module.setEnabled(!module.isEnabled());
+			ModuleManager.save();
+		});
+		scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, () -> openSettings(module));
 	}
 
 

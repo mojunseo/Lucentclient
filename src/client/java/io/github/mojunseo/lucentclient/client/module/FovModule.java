@@ -22,7 +22,7 @@ public class FovModule extends Module {
 	private final BooleanSetting bowZoom = setting(new BooleanSetting("fov_bow", true));
 
 	public FovModule() {
-		super("fov", false);
+		super("fov", Category.PVP, false);
 	}
 
 	public float modifier(AbstractClientPlayer player) {

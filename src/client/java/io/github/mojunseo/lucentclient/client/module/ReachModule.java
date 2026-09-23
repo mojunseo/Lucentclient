@@ -27,7 +27,7 @@ public class ReachModule extends HudModule {
 	private long lastHitAt;
 
 	public ReachModule() {
-		super("reach", true, 0.5F, 0.58F);
+		super("reach", Category.PVP, true, 0.5F, 0.58F);
 	}
 
 	/** Called when the local player attacks an entity. */

@@ -17,7 +17,7 @@ public class ToggleSprintModule extends HudModule {
 	private final BooleanSetting showStatus = setting(new BooleanSetting("show_status", true));
 
 	public ToggleSprintModule() {
-		super("toggle_sprint", false, 0.0F, 1.0F);
+		super("toggle_sprint", Category.PVP, false, 0.0F, 1.0F);
 	}
 
 	/** Whether this key should toggle, on top of the vanilla toggle options. */

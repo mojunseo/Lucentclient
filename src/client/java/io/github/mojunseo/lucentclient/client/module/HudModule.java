@@ -30,7 +30,11 @@ public abstract class HudModule extends Module {
 	private float y;
 
 	protected HudModule(String id, boolean enabledByDefault, float defaultX, float defaultY) {
-		super(id, enabledByDefault);
+		this(id, Category.HUD, enabledByDefault, defaultX, defaultY);
+	}
+
+	protected HudModule(String id, Category category, boolean enabledByDefault, float defaultX, float defaultY) {
+		super(id, category, enabledByDefault);
 		this.x = defaultX;
 		this.y = defaultY;
 	}
