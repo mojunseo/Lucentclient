@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "lucentclient",
+	"version": "${version}",
+	"name": "Lucent Client",
+	"description": "A Minecraft client mod.",
+	"authors": [
+		"mojunseo"
+	],
+	"contact": {
+		"sources": "https://github.com/mojunseo/Lucentclient",
+		"issues": "https://github.com/mojunseo/Lucentclient/issues"
+	},
+	"license": "Apache-2.0",
+	"icon": "assets/lucentclient/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"io.github.mojunseo.lucentclient.LucentClient"
+		],
+		"client": [
+			"io.github.mojunseo.lucentclient.client.LucentClientClient"
+		]
+	},
+	"mixins": [
+		{
+			"config": "lucentclient.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
