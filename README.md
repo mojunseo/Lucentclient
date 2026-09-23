@@ -1,33 +1,66 @@
+<p align="center"><img src="launcher/src-tauri/icons/128x128.png" width="96" alt=""></p>
+
 # Lucent Client
 
-Minecraft 클라이언트 모드 (Fabric, Minecraft 26.3).
+**English** | [한국어](README.ko.md) | [日本語](README.ja.md)
 
-## 지원 버전
+A Fabric client mod for Minecraft: Java Edition, with its own desktop launcher.
 
-Minecraft 26.1 ~ 26.3 (Fabric). 버전별 빌드와 호환 범위는 `stonecutter.properties.toml`에 있습니다.
-[Stonecutter](https://github.com/kikugie/stonecutter)로 소스 한 벌에서 버전마다 jar를 만들고,
-버전마다 다른 API는 `client/compat/Mc.java`와 `//? if` 조건 주석으로 처리합니다.
+## Features
 
-## 빌드 / 실행
+Press **Right Shift** in game to open the menu. Click a module's lamp to turn it on or off, or the rest of its row to change its settings.
 
-JDK 25 이상으로 Gradle을 실행하세요. 다른 버전에 필요한 JDK는 Gradle이 알아서 받습니다.
+- **HUD**: FPS, coordinates, keystrokes with CPS, armor and durability, status effects, ping, clock. Drag them anywhere with the layout editor, and change text color, background, shadow and size per module.
+- **PvP**: reach display, toggle sprint and sneak, zoom (scroll to change it while zoomed), FOV changer with separate amounts for walking, sprinting, Speed and flying.
+- **Performance**: entity and block entity culling by distance, fewer particles, hide rain and snow.
+- **Other**: fullbright, Discord Rich Presence.
+- **Cosmetics**: capes drawn as moving cloth, feathered, dragon and butterfly wings, hats and halos. For now only you can see yours.
+
+## Install
+
+### Mod
+
+Supports Minecraft **26.1 to 26.3**.
+
+1. Install [Fabric Loader](https://fabricmc.net/use/) 0.19.5 or newer and [Fabric API](https://modrinth.com/mod/fabric-api).
+2. Download the jar for your Minecraft version from [Releases](https://github.com/mojunseo/Lucentclient/releases) and put it in your `mods` folder.
+
+| Minecraft | File |
+|---|---|
+| 26.1, 26.1.1, 26.1.2 | `lucentclient-<version>+26.1.2.jar` |
+| 26.2 | `lucentclient-<version>+26.2.jar` |
+| 26.3 | `lucentclient-<version>+26.3.jar` |
+
+### Launcher
+
+Download it from [Releases](https://github.com/mojunseo/Lucentclient/releases): the `.exe` or `.msi` for Windows, the `.dmg` for macOS, or the `.AppImage`, `.deb` or `.rpm` for Linux.
+
+The launcher signs in with your Microsoft account, then installs the game, Fabric, Java and Lucent Client on its own. Pick any Minecraft version from 1.19 on, and add mods from Modrinth: your mod list is shared by every version, and the right file for each version is downloaded when you play.
+
+> Microsoft sign-in is waiting for Mojang to approve the launcher, so the launcher can't start the game yet. Until then, use the mod jar with any launcher. The launcher isn't code-signed yet: on Windows choose "More info, Run anyway"; on macOS right-click the app and choose Open.
+
+## Build
+
+Run Gradle with JDK 25 or newer; it downloads the other JDKs it needs.
 
 ```sh
-./gradlew build               # 모든 버전 빌드 → versions/<버전>/build/libs/
-./gradlew buildAndCollect     # 모든 jar를 build/libs/<모드 버전>/ 에 모으기
-./gradlew :26.3:runClient     # 특정 버전으로 개발용 클라이언트 실행
-./gradlew "Set active project to 26.2"   # 편집기에서 보는 소스를 다른 버전으로 전환
+./gradlew build               # every Minecraft version, into versions/<version>/build/libs/
+./gradlew buildAndCollect     # collect all jars into build/libs/<mod version>/
+./gradlew :26.3:runClient     # start a development client for one version
+tools/mixin_check.sh          # start each version once and check every mixin applies
 ```
 
-기본(커밋되는) 소스 상태는 26.3입니다. 다른 버전으로 전환해서 작업했다면 커밋 전에 26.3으로 되돌리세요.
+The mod is built for several Minecraft versions from one source tree with [Stonecutter](https://github.com/kikugie/stonecutter). The builds and the versions each one runs on are listed in `stonecutter.properties.toml`. Code that differs between versions lives in `client/compat/Mc.java` or behind `//? if` comments. The committed source is in the 26.3 state; switch back before committing if you switched versions.
 
-## 구조
+The launcher is in [`launcher/`](launcher/README.md).
 
-- `src/main` — 모드 코드 (클라이언트 전용)
-- `versions/<버전>` — Stonecutter가 만드는 버전별 빌드 폴더
-- `launcher/` — 데스크톱 런처 (Tauri)
-- `tools/` — 치장품 텍스처 생성 스크립트
+## Project layout
 
-## 라이선스
+- `src/main`: the mod (client only)
+- `versions/<version>`: per-version build directories made by Stonecutter
+- `launcher/`: the desktop launcher (Tauri)
+- `tools/`: texture and icon generators, the mixin check
 
-Apache-2.0
+## License
+
+[Apache-2.0](LICENSE)
