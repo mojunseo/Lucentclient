@@ -23,10 +23,9 @@ public final class ClothCapeRenderer {
 	private static final float PIXEL = 1.0F / 16.0F;
 
 	/** Values copied out of the render state, since drawing happens later than the layer's submit. */
-	public record Params(float time, float lean, float flap, float moving, int light) {
-		public static Params of(AvatarRenderState state, int light) {
-			return new Params(state.ageInTicks, state.capeLean, state.capeFlap,
-					Mth.clamp(state.walkAnimationSpeed, 0.0F, 1.0F), light);
+	public record Params(float phase, float lean, float moving, int light) {
+		public static Params of(AvatarRenderState state, CosmeticMotion motion, int light) {
+			return new Params(motion.clothPhase(), state.capeLean, motion.moving(), light);
 		}
 	}
 
@@ -44,7 +43,7 @@ public final class ClothCapeRenderer {
 		float z = -THICKNESS / 2;
 		for (int row = 0; row <= ROWS; row++) {
 			float s = row / (float) ROWS;
-			float ripple = Mth.sin(s * 7.5F - params.time * (0.18F + params.moving * 0.25F)) * 0.07F * energy * s;
+			float ripple = Mth.sin(s * 7.5F - params.phase) * 0.07F * energy * s;
 			angle[row] = bend * s + ripple;
 			lineY[row] = y;
 			lineZ[row] = z;
@@ -59,7 +58,7 @@ public final class ClothCapeRenderer {
 			float s = row / (float) ROWS;
 			for (int column = 0; column <= COLUMNS; column++) {
 				float x = column / (float) COLUMNS * WIDTH - WIDTH / 2;
-				offsetZ[row][column] = Mth.sin(x * 0.7F + params.time * 0.3F + s * 3.0F) * 0.35F * energy * s * s;
+				offsetZ[row][column] = Mth.sin(x * 0.7F + params.phase * 1.6F + s * 3.0F) * 0.35F * energy * s * s;
 			}
 		}
 

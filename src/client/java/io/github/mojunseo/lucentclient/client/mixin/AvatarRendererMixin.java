@@ -4,6 +4,7 @@ import io.github.mojunseo.lucentclient.client.cosmetic.Cosmetic;
 import io.github.mojunseo.lucentclient.client.cosmetic.CosmeticType;
 import io.github.mojunseo.lucentclient.client.cosmetic.CosmeticsManager;
 import io.github.mojunseo.lucentclient.client.cosmetic.PlayerCosmetics;
+import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticMotion;
 import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticRenderState;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
@@ -24,10 +25,12 @@ public class AvatarRendererMixin {
 	private void lucentclient$extractCosmetics(Avatar entity, AvatarRenderState state, float partialTicks, CallbackInfo ci) {
 		if (!(entity instanceof AbstractClientPlayer player)) {
 			state.setData(CosmeticRenderState.COSMETICS, null);
+			state.setData(CosmeticRenderState.MOTION, null);
 			return;
 		}
 		PlayerCosmetics cosmetics = CosmeticsManager.get(player.getUUID());
 		state.setData(CosmeticRenderState.COSMETICS, cosmetics);
+		state.setData(CosmeticRenderState.MOTION, cosmetics.isEmpty() ? null : CosmeticMotion.update(state));
 
 		// Swap the skin's cape so the vanilla cape layer (and its physics) draws ours.
 		Cosmetic cape = cosmetics.get(CosmeticType.CAPE);

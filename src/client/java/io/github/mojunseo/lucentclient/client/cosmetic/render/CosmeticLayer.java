@@ -74,6 +74,8 @@ public class CosmeticLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 	}
 
 	private void submitCape(PoseStack poseStack, SubmitNodeCollector collector, int lightCoords, AvatarRenderState state, Cosmetic cape) {
+		CosmeticMotion motion = state.getData(CosmeticRenderState.MOTION);
+		if (motion == null) return;
 		capePose.setupAnim(state);
 		poseStack.pushPose();
 		if (!state.chestEquipment.isEmpty()) {
@@ -83,7 +85,7 @@ public class CosmeticLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 		capePose.root().translateAndRotate(poseStack);
 		capePose.body.translateAndRotate(poseStack);
 		capePart.translateAndRotate(poseStack);
-		ClothCapeRenderer.Params params = ClothCapeRenderer.Params.of(state, lightCoords);
+		ClothCapeRenderer.Params params = ClothCapeRenderer.Params.of(state, motion, lightCoords);
 		collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(cape.texturePath()),
 				(pose, buffer) -> ClothCapeRenderer.render(pose, buffer, params));
 		poseStack.popPose();
