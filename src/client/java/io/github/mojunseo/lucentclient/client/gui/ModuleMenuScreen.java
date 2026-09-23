@@ -17,7 +17,7 @@ public class ModuleMenuScreen extends Screen {
 	}
 
 	private int top() {
-		int rows = ModuleManager.modules().size() + 2;
+		int rows = ModuleManager.modules().size() + 3;
 		return (height - rows * ROW_HEIGHT) / 2 + 8;
 	}
 
@@ -35,6 +35,9 @@ public class ModuleMenuScreen extends Screen {
 		y += ROW_HEIGHT / 2;
 		addRenderableWidget(Button.builder(Component.translatable("screen.lucentclient.hud_edit"),
 				button -> minecraft.gui.setScreen(new HudEditScreen(this))).bounds(x, y, BUTTON_WIDTH, 20).build());
+		y += ROW_HEIGHT;
+		addRenderableWidget(Button.builder(Component.translatable("screen.lucentclient.cosmetics"),
+				button -> minecraft.gui.setScreen(new CosmeticsScreen(this))).bounds(x, y, BUTTON_WIDTH, 20).build());
 		y += ROW_HEIGHT;
 		addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
 				.bounds(x, y, BUTTON_WIDTH, 20).build());

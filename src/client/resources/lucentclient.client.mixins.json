@@ -3,6 +3,7 @@
 	"package": "io.github.mojunseo.lucentclient.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"AvatarRendererMixin",
 		"CameraMixin",
 		"LightmapRenderStateExtractorMixin",
 		"MinecraftMixin",

@@ -2,6 +2,9 @@ package io.github.mojunseo.lucentclient.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.mojunseo.lucentclient.LucentClient;
+import io.github.mojunseo.lucentclient.client.cosmetic.CosmeticsManager;
+import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticLayer;
+import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticModels;
 import io.github.mojunseo.lucentclient.client.gui.HudEditScreen;
 import io.github.mojunseo.lucentclient.client.gui.ModuleMenuScreen;
 import io.github.mojunseo.lucentclient.client.module.HudModule;
@@ -10,9 +13,11 @@ import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 
 public class LucentClientClient implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(LucentClient.id("main"));
@@ -20,6 +25,14 @@ public class LucentClientClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ModuleManager.load();
+		CosmeticsManager.load();
+
+		CosmeticModels.register();
+		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, renderer, helper, context) -> {
+			if (renderer instanceof AvatarRenderer<?> avatarRenderer) {
+				helper.register(new CosmeticLayer(avatarRenderer, context.getModelSet()));
+			}
+		});
 
 		KeyMapping menuKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.lucentclient.menu", InputConstants.KEY_RSHIFT, CATEGORY));
