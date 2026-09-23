@@ -6,43 +6,37 @@ import net.minecraft.util.Mth;
 
 /** Drawing helpers for the custom menus. */
 public final class Ui {
+	public static final int LAMP_SIZE = 10;
+
 	private Ui() {
 	}
 
-	/** A filled rectangle with rounded corners, drawn one scanline at a time in the corners. */
-	public static void roundedRect(GuiGraphicsExtractor graphics, int x, int y, int w, int h, int radius, int color) {
-		if (w <= 0 || h <= 0) return;
-		int r = Math.min(radius, Math.min(w, h) / 2);
-		if (r <= 0) {
-			graphics.fill(x, y, x + w, y + h, color);
-			return;
+	/** A 1px outline around a filled rectangle. */
+	public static void box(GuiGraphicsExtractor graphics, int x, int y, int w, int h, int fill, int border) {
+		graphics.fill(x, y, x + w, y + h, border);
+		graphics.fill(x + 1, y + 1, x + w - 1, y + h - 1, fill);
+	}
+
+	/**
+	 * A redstone lamp used as the on/off indicator. {@code on} eases from 0 to 1; when lit, the lamp
+	 * glows onto its surroundings.
+	 */
+	public static void lamp(GuiGraphicsExtractor graphics, int x, int y, float on, float alpha) {
+		int s = LAMP_SIZE;
+		if (on > 0.01F) {
+			graphics.fill(x - 3, y - 3, x + s + 3, y + s + 3, withAlpha(Theme.LAMP_ON, 0.10F * on * alpha));
+			graphics.fill(x - 1, y - 1, x + s + 1, y + s + 1, withAlpha(Theme.LAMP_ON, 0.25F * on * alpha));
 		}
-		for (int i = 0; i < r; i++) {
-			float dy = r - i - 0.5F;
-			int inset = Math.round(r - (float) Math.sqrt(r * r - dy * dy));
-			graphics.fill(x + inset, y + i, x + w - inset, y + i + 1, color);
-			graphics.fill(x + inset, y + h - i - 1, x + w - inset, y + h - i, color);
-		}
-		graphics.fill(x, y + r, x + w, y + h - r, color);
+		graphics.fill(x, y, x + s, y + s, withAlpha(lerpColor(Theme.LAMP_OFF, Theme.LAMP_ON, on), alpha));
+		// The lamp's grid: a cross and a border, dark when off and bright when lit.
+		int grid = withAlpha(lerpColor(Theme.LAMP_OFF_GRID, Theme.LAMP_ON_CORE, on), alpha);
+		graphics.fill(x + s / 2 - 1, y + 1, x + s / 2 + 1, y + s - 1, grid);
+		graphics.fill(x + 1, y + s / 2 - 1, x + s - 1, y + s / 2 + 1, grid);
+		graphics.outline(x, y, s, s, withAlpha(lerpColor(Theme.LAMP_OFF_GRID, 0xFFC98F2E, on), alpha));
 	}
 
-	/** A rounded rectangle with a 1px border. */
-	public static void roundedBox(GuiGraphicsExtractor graphics, int x, int y, int w, int h, int radius, int fill, int border) {
-		roundedRect(graphics, x, y, w, h, radius, border);
-		roundedRect(graphics, x + 1, y + 1, w - 2, h - 2, Math.max(0, radius - 1), fill);
-	}
-
-	/** A pill-shaped on/off switch; {@code on} animates from 0 to 1. */
-	public static void toggle(GuiGraphicsExtractor graphics, int x, int y, float on, float alpha) {
-		int w = 22;
-		int h = 12;
-		roundedRect(graphics, x, y, w, h, h / 2, withAlpha(lerpColor(Theme.SWITCH_OFF, Theme.ACCENT, on), alpha));
-		int knob = h - 4;
-		int knobX = Math.round(Mth.lerp(on, x + 2, x + w - 2 - knob));
-		roundedRect(graphics, knobX, y + 2, knob, knob, knob / 2, withAlpha(Theme.KNOB, alpha));
-	}
-
-	public static void text(GuiGraphicsExtractor graphics, Font font, String text, int x, int y, int color, float scale) {
+	/** Draws text at a whole-number scale so the pixel font stays crisp. */
+	public static void text(GuiGraphicsExtractor graphics, Font font, String text, int x, int y, int color, int scale) {
 		graphics.pose().pushMatrix();
 		graphics.pose().translate(x, y);
 		graphics.pose().scale(scale, scale);
@@ -71,10 +65,5 @@ public final class Ui {
 
 	public static boolean inside(double mouseX, double mouseY, int x, int y, int w, int h) {
 		return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
-	}
-
-	public static float easeOutCubic(float t) {
-		float inv = 1.0F - Mth.clamp(t, 0.0F, 1.0F);
-		return 1.0F - inv * inv * inv;
 	}
 }

@@ -27,15 +27,17 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * The Lucent Client menu: a sidebar with tabs and custom-drawn cards, toggles and a cosmetics
- * preview. Nothing here uses vanilla widgets; clickable areas are collected while drawing and
- * checked on click.
+ * The Lucent Client menu. Modules and cosmetics are plain rows, each with a redstone lamp that is
+ * lit when the row is on. Everything is drawn by hand; clickable areas are collected while drawing
+ * and checked on click.
  */
 public class LucentMenuScreen extends Screen {
-	private static final int SIDEBAR_WIDTH = 112;
-	private static final int RADIUS = 8;
-	private static final int HEADER_HEIGHT = 46;
-	private static final long OPEN_MS = 220;
+	private static final int SIDEBAR_WIDTH = 96;
+	private static final int ROW_HEIGHT = 22;
+	private static final int PAD = 14;
+	private static final long FADE_MS = 120;
+	/** On open, lit lamps switch on one after another, this far apart. */
+	private static final long LAMP_STAGGER_MS = 45;
 
 	private enum Tab {
 		MODULES,
@@ -62,7 +64,7 @@ public class LucentMenuScreen extends Screen {
 	private boolean draggingPreview;
 	private int previewX, previewY, previewW, previewH;
 	private long lastFrame = Util.getMillis();
-
+	private long now;
 	private float alpha = 1.0F;
 
 	public LucentMenuScreen() {
@@ -77,11 +79,21 @@ public class LucentMenuScreen extends Screen {
 		hits.add(new Hit(x, y, w, h, action));
 	}
 
-	/** Adds a hit area inside the scrolled content, clipped to the visible part. */
+	/** Adds a hit area inside the scrolled list, clipped to the visible part. */
 	private void scrolledHit(int x, int y, int w, int h, Runnable action) {
 		int top = Math.max(y, scrollY);
 		int bottom = Math.min(y + h, scrollY + scrollH);
 		if (bottom > top) hit(x, top, w, bottom - top, action);
+	}
+
+	private boolean hovered(int mouseX, int mouseY, int x, int y, int w, int h) {
+		return Ui.inside(mouseX, mouseY, x, y, w, h) && Ui.inside(mouseX, mouseY, scrollX, scrollY, scrollW, scrollH);
+	}
+
+	/** Lamp brightness for a row, including the staggered switch-on when the menu opens. */
+	private float lamp(String key, boolean on, int order) {
+		boolean lit = on && now - openedAt > 80 + order * LAMP_STAGGER_MS;
+		return animations.get("lamp_" + key, lit);
 	}
 
 	private void setTab(Tab tab) {
@@ -95,83 +107,68 @@ public class LucentMenuScreen extends Screen {
 		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 		animations.frame();
 		hits.clear();
-		long now = Util.getMillis();
-		float open = Ui.easeOutCubic((now - openedAt) / (float) OPEN_MS);
-		alpha = open;
+		now = Util.getMillis();
+		alpha = Mth.clamp((now - openedAt) / (float) FADE_MS, 0.0F, 1.0F);
 		scroll += (scrollTarget - scroll) * 0.35F;
 		if (!draggingPreview) previewYaw += (now - lastFrame) * 0.03F;
 		lastFrame = now;
 
-		int pw = Math.min(width - 32, 500);
-		int ph = Math.min(height - 32, 300);
+		int pw = Math.min(width - 24, 460);
+		int ph = Math.min(height - 24, 280);
 		int px = (width - pw) / 2;
 		int py = (height - ph) / 2;
 
 		graphics.fill(0, 0, width, height, color(Theme.BACKDROP));
-		graphics.pose().pushMatrix();
-		float scale = 0.94F + 0.06F * open;
-		graphics.pose().translate(width / 2.0F, height / 2.0F);
-		graphics.pose().scale(scale, scale);
-		graphics.pose().translate(-width / 2.0F, -height / 2.0F);
-
-		// Panel with a darker sidebar on the left.
-		Ui.roundedRect(graphics, px, py, pw, ph, RADIUS, color(Theme.PANEL));
-		Ui.roundedRect(graphics, px, py, SIDEBAR_WIDTH + RADIUS, ph, RADIUS, color(Theme.SIDEBAR));
-		graphics.fill(px + SIDEBAR_WIDTH, py, px + SIDEBAR_WIDTH + RADIUS, py + ph, color(Theme.PANEL));
-		graphics.fill(px + SIDEBAR_WIDTH, py + 10, px + SIDEBAR_WIDTH + 1, py + ph - 10, color(Theme.OUTLINE));
+		Ui.box(graphics, px - 1, py - 1, pw + 2, ph + 2, color(Theme.SLATE), color(Theme.SEAM));
+		graphics.fill(px, py, px + SIDEBAR_WIDTH, py + ph, color(Theme.DEEPSLATE));
 
 		extractSidebar(graphics, mouseX, mouseY, px, py, ph);
 
-		int cx = px + SIDEBAR_WIDTH + 16;
-		int cw = pw - SIDEBAR_WIDTH - 32;
+		int cx = px + SIDEBAR_WIDTH + PAD;
+		int cw = pw - SIDEBAR_WIDTH - PAD * 2;
 		switch (tab) {
 			case MODULES -> extractModules(graphics, mouseX, mouseY, cx, py, cw, ph);
 			case COSMETICS -> extractCosmetics(graphics, mouseX, mouseY, cx, py, cw, ph);
 		}
-		graphics.pose().popMatrix();
 	}
 
 	private void extractSidebar(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int px, int py, int ph) {
-		Ui.text(graphics, font, "LUCENT", px + 14, py + 14, color(Theme.ACCENT), 1.8F);
-		Ui.text(graphics, font, "CLIENT", px + 15, py + 32, color(Theme.SUBTEXT), 0.8F);
-		graphics.fillGradient(px + 14, py + 42, px + SIDEBAR_WIDTH - 14, py + 43, color(Theme.ACCENT), color(Theme.ACCENT_2));
+		Ui.text(graphics, font, "Lucent", px + PAD, py + PAD, color(Theme.CALCITE), 2);
 
-		int y = py + 56;
-		y = sidebarTab(graphics, mouseX, mouseY, px, y, "tab_modules", Component.translatable("screen.lucentclient.tab.modules"),
+		int y = py + 52;
+		y = sidebarItem(graphics, mouseX, mouseY, px, y, Component.translatable("screen.lucentclient.tab.modules"),
 				tab == Tab.MODULES, () -> setTab(Tab.MODULES));
-		y = sidebarTab(graphics, mouseX, mouseY, px, y, "tab_cosmetics", Component.translatable("screen.lucentclient.tab.cosmetics"),
+		y = sidebarItem(graphics, mouseX, mouseY, px, y, Component.translatable("screen.lucentclient.tab.cosmetics"),
 				tab == Tab.COSMETICS, () -> setTab(Tab.COSMETICS));
-		sidebarTab(graphics, mouseX, mouseY, px, y, "tab_hud", Component.translatable("screen.lucentclient.hud_edit"),
+		sidebarItem(graphics, mouseX, mouseY, px, y, Component.translatable("screen.lucentclient.hud_edit"),
 				false, () -> minecraft.gui.setScreen(new HudEditScreen(this)));
 
-		Ui.text(graphics, font, "v" + version, px + 14, py + ph - 16, color(Theme.SUBTEXT), 0.75F);
+		graphics.text(font, version, px + PAD, py + ph - PAD - 8, color(Theme.SEAM), false);
 	}
 
-	private int sidebarTab(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int px, int y, String key, Component label,
+	private int sidebarItem(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int px, int y, Component label,
 			boolean active, Runnable action) {
-		int x = px + 8;
-		int w = SIDEBAR_WIDTH - 16;
-		int h = 22;
-		boolean hovered = Ui.inside(mouseX, mouseY, x, y, w, h);
-		float hover = animations.get(key + "_hover", hovered);
-		float selected = animations.get(key + "_active", active);
-		float highlight = Math.max(hover * 0.6F, selected);
-		Ui.roundedRect(graphics, x, y, w, h, 5, color(Ui.lerpColor(0x00000000 | (Theme.CARD & 0xFFFFFF), Theme.CARD, highlight)));
-		if (selected > 0.01F) {
-			int barH = Math.round(12 * selected);
-			Ui.roundedRect(graphics, x + 3, y + (h - barH) / 2, 2, barH, 1, color(Theme.ACCENT));
+		int h = 18;
+		boolean hovered = Ui.inside(mouseX, mouseY, px, y, SIDEBAR_WIDTH, h);
+		if (active) {
+			graphics.fill(px, y, px + SIDEBAR_WIDTH, y + h, color(Theme.SLATE));
+		} else if (hovered) {
+			graphics.fill(px, y, px + SIDEBAR_WIDTH, y + h, color(0xFF26272D));
 		}
-		graphics.text(font, label, x + 12, y + 7, color(Ui.lerpColor(Theme.SUBTEXT, Theme.TEXT, highlight)), false);
-		hit(x, y, w, h, action);
-		return y + h + 4;
+		int textColor = active ? Theme.CALCITE : hovered ? Ui.lerpColor(Theme.TUFF, Theme.CALCITE, 0.5F) : Theme.TUFF;
+		graphics.text(font, label, px + PAD, y + 5, color(textColor), false);
+		hit(px, y, SIDEBAR_WIDTH, h, action);
+		return y + h;
 	}
 
-	private void extractHeader(GuiGraphicsExtractor graphics, int cx, int py, Component title, Component subtitle) {
-		Ui.text(graphics, font, title.getString(), cx, py + 14, color(Theme.TEXT), 1.5F);
-		graphics.text(font, subtitle, cx, py + 31, color(Theme.SUBTEXT), false);
+	private void extractTitle(GuiGraphicsExtractor graphics, int cx, int py, Component title, @Nullable Component note) {
+		Ui.text(graphics, font, title.getString(), cx, py + PAD, color(Theme.CALCITE), 2);
+		if (note != null) {
+			graphics.text(font, note, cx, py + PAD + 22, color(Theme.TUFF), false);
+		}
 	}
 
-	/** Starts the scrollable content area; returns the y to draw at, already offset by the scroll. */
+	/** Starts the scrollable list; returns the y to draw at, already offset by the scroll. */
 	private int beginScroll(GuiGraphicsExtractor graphics, int x, int y, int w, int h) {
 		scrollX = x;
 		scrollY = y;
@@ -186,9 +183,9 @@ public class LucentMenuScreen extends Screen {
 		maxScroll = Math.max(0, contentHeight - scrollH);
 		scrollTarget = Mth.clamp(scrollTarget, 0, maxScroll);
 		if (maxScroll > 0) {
-			int barH = Math.max(16, scrollH * scrollH / contentHeight);
+			int barH = Math.max(12, scrollH * scrollH / contentHeight);
 			int barY = scrollY + Math.round((scrollH - barH) * (scroll / maxScroll));
-			Ui.roundedRect(graphics, scrollX + scrollW + 4, barY, 3, barH, 1, color(Theme.OUTLINE));
+			graphics.fill(scrollX + scrollW + 3, barY, scrollX + scrollW + 5, barY + barH, color(Theme.SEAM));
 		}
 	}
 
@@ -197,134 +194,114 @@ public class LucentMenuScreen extends Screen {
 	private void extractModules(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int cx, int py, int cw, int ph) {
 		List<Module> modules = ModuleManager.modules();
 		long enabled = modules.stream().filter(Module::isEnabled).count();
-		extractHeader(graphics, cx, py, Component.translatable("screen.lucentclient.tab.modules"),
-				Component.translatable("screen.lucentclient.modules.count", modules.size(), enabled));
+		extractTitle(graphics, cx, py, Component.translatable("screen.lucentclient.tab.modules"),
+				Component.translatable("screen.lucentclient.modules.enabled", enabled));
 
-		int columns = cw >= 330 ? 3 : 2;
-		int gap = 8;
-		int cardW = (cw - gap * (columns - 1)) / columns;
-		int cardH = 58;
-		int top = py + HEADER_HEIGHT + 6;
-		int areaH = py + ph - 14 - top;
-		int y0 = beginScroll(graphics, cx, top, cw, areaH);
+		int nameColumn = 0;
+		for (Module module : modules) nameColumn = Math.max(nameColumn, font.width(module.name()));
+		nameColumn += 16;
+
+		int top = py + 56;
+		graphics.fill(cx, top - 1, cx + cw, top, color(Theme.SEAM));
+		int y0 = beginScroll(graphics, cx - 6, top, cw + 12, py + ph - PAD - top);
 		for (int i = 0; i < modules.size(); i++) {
 			Module module = modules.get(i);
-			int x = cx + (i % columns) * (cardW + gap);
-			int y = y0 + (i / columns) * (cardH + gap);
-			extractModuleCard(graphics, mouseX, mouseY, module, x, y, cardW, cardH);
+			int y = y0 + i * ROW_HEIGHT;
+			boolean hovered = hovered(mouseX, mouseY, cx - 6, y, cw + 12, ROW_HEIGHT);
+			if (hovered) graphics.fill(cx - 6, y, cx + cw + 6, y + ROW_HEIGHT, color(Theme.SEAM));
+
+			int textY = y + (ROW_HEIGHT - 8) / 2;
+			graphics.text(font, module.name(), cx, textY, color(Theme.CALCITE), false);
+			String description = Component.translatable("module.lucentclient." + module.id() + ".desc").getString();
+			int descriptionWidth = cw - nameColumn - Ui.LAMP_SIZE - 12;
+			graphics.text(font, Ui.ellipsize(font, description, descriptionWidth), cx + nameColumn, textY, color(Theme.TUFF), false);
+			Ui.lamp(graphics, cx + cw - Ui.LAMP_SIZE, y + (ROW_HEIGHT - Ui.LAMP_SIZE) / 2, lamp(module.id(), module.isEnabled(), i), alpha);
+
+			scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, () -> {
+				module.setEnabled(!module.isEnabled());
+				ModuleManager.save();
+			});
 		}
-		int rows = (modules.size() + columns - 1) / columns;
-		endScroll(graphics, rows * (cardH + gap) - gap);
-	}
-
-	private void extractModuleCard(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Module module, int x, int y, int w, int h) {
-		boolean hovered = Ui.inside(mouseX, mouseY, x, y, w, h) && Ui.inside(mouseX, mouseY, scrollX, scrollY, scrollW, scrollH);
-		float hover = animations.get("module_hover_" + module.id(), hovered);
-		float on = animations.get("module_on_" + module.id(), module.isEnabled());
-
-		Ui.roundedBox(graphics, x, y, w, h, 6, color(Ui.lerpColor(Theme.CARD, Theme.CARD_HOVER, hover)),
-				color(Ui.lerpColor(Theme.OUTLINE, Theme.ACCENT, on * 0.7F)));
-		int badge = 18;
-		Ui.roundedRect(graphics, x + 10, y + 10, badge, badge, 5, color(Ui.lerpColor(Theme.SWITCH_OFF, Theme.ACCENT, on)));
-		String name = module.name().getString();
-		graphics.centeredText(font, name.substring(0, 1), x + 10 + badge / 2, y + 15, color(Theme.TEXT));
-		graphics.text(font, Ui.ellipsize(font, name, w - 70), x + 34, y + 15, color(Theme.TEXT), false);
-		Ui.toggle(graphics, x + w - 32, y + 13, on, alpha);
-		String description = Component.translatable("module.lucentclient." + module.id() + ".desc").getString();
-		Ui.text(graphics, font, Ui.ellipsize(font, description, Math.round((w - 20) / 0.8F)), x + 10, y + 38, color(Theme.SUBTEXT), 0.8F);
-
-		scrolledHit(x, y, w, h, () -> {
-			module.setEnabled(!module.isEnabled());
-			ModuleManager.save();
-		});
+		endScroll(graphics, modules.size() * ROW_HEIGHT);
 	}
 
 	// --- Cosmetics ----------------------------------------------------------------------------
 
 	private void extractCosmetics(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int cx, int py, int cw, int ph) {
-		extractHeader(graphics, cx, py, Component.translatable("screen.lucentclient.tab.cosmetics"),
-				Component.translatable("screen.lucentclient.cosmetics.subtitle"));
+		extractTitle(graphics, cx, py, Component.translatable("screen.lucentclient.tab.cosmetics"), null);
 
-		int gridW = Math.round(cw * 0.56F);
-		int top = py + HEADER_HEIGHT + 4;
+		// The preview stage takes the right part of the panel, edge to edge.
+		int listW = Math.min(150, cw / 2);
+		previewX = cx + listW + PAD;
+		previewY = py;
+		previewW = cx + cw + PAD - previewX;
+		previewH = ph;
+		graphics.fill(previewX, previewY, previewX + previewW, previewY + previewH, color(Theme.DEEPSLATE));
 
-		// Category chips.
-		int chipX = cx;
+		// Slot switcher: plain words, the current one underlined.
+		int tabY = py + 40;
+		int tabX = cx;
 		for (CosmeticType type : CosmeticType.values()) {
-			String label = type.displayName().getString();
-			int w = font.width(label) + 16;
+			Component label = type.displayName();
+			int w = font.width(label);
 			boolean active = type == cosmeticType;
-			boolean hovered = Ui.inside(mouseX, mouseY, chipX, top, w, 16);
-			float t = animations.get("chip_" + type.id(), active);
-			float hover = animations.get("chip_hover_" + type.id(), hovered);
-			int fill = Ui.lerpColor(Ui.lerpColor(Theme.CARD, Theme.CARD_HOVER, hover), Theme.ACCENT, t);
-			Ui.roundedRect(graphics, chipX, top, w, 16, 8, color(fill));
-			graphics.text(font, label, chipX + 8, top + 4, color(Ui.lerpColor(Theme.SUBTEXT, Theme.TEXT, Math.max(t, hover))), false);
-			hit(chipX, top, w, 16, () -> {
+			boolean hovered = Ui.inside(mouseX, mouseY, tabX - 2, tabY - 3, w + 4, 14);
+			int textColor = active ? Theme.CALCITE : hovered ? Ui.lerpColor(Theme.TUFF, Theme.CALCITE, 0.5F) : Theme.TUFF;
+			graphics.text(font, label, tabX, tabY, color(textColor), false);
+			if (active) graphics.fill(tabX, tabY + 10, tabX + w, tabY + 11, color(Theme.CALCITE));
+			hit(tabX - 2, tabY - 3, w + 4, 14, () -> {
 				if (cosmeticType != type) {
 					cosmeticType = type;
 					scroll = scrollTarget = 0;
 				}
 			});
-			chipX += w + 6;
+			tabX += w + 10;
 		}
 
-		// Options grid.
-		int gridTop = top + 24;
-		int areaH = py + ph - 14 - gridTop;
-		int columns = 2;
-		int gap = 6;
-		int cardW = (gridW - gap) / columns;
-		int cardH = 30;
 		List<@Nullable Cosmetic> options = new ArrayList<>();
 		options.add(null);
 		options.addAll(Cosmetics.ofType(cosmeticType));
-		int y0 = beginScroll(graphics, cx, gridTop, gridW, areaH);
+		int top = py + 58;
+		graphics.fill(cx, top - 1, cx + listW, top, color(Theme.SEAM));
+		int y0 = beginScroll(graphics, cx - 6, top, listW + 6, py + ph - PAD - top);
+		String equipped = CosmeticsManager.local().id(cosmeticType);
 		for (int i = 0; i < options.size(); i++) {
-			int x = cx + (i % columns) * (cardW + gap);
-			int y = y0 + (i / columns) * (cardH + gap);
-			extractCosmeticCard(graphics, mouseX, mouseY, options.get(i), x, y, cardW, cardH);
+			Cosmetic cosmetic = options.get(i);
+			String id = cosmetic == null ? null : cosmetic.id();
+			int y = y0 + i * ROW_HEIGHT;
+			if (hovered(mouseX, mouseY, cx - 6, y, listW + 6, ROW_HEIGHT)) {
+				graphics.fill(cx - 6, y, cx + listW, y + ROW_HEIGHT, color(Theme.SEAM));
+			}
+			Component name = cosmetic == null ? Component.translatable("cosmetic.lucentclient.none") : cosmetic.displayName();
+			graphics.text(font, Ui.ellipsize(font, name.getString(), listW - Ui.LAMP_SIZE - 8), cx, y + (ROW_HEIGHT - 8) / 2,
+					color(Theme.CALCITE), false);
+			float lit = lamp(cosmeticType.id() + "_" + id, Objects.equals(equipped, id), i);
+			Ui.lamp(graphics, cx + listW - Ui.LAMP_SIZE - 4, y + (ROW_HEIGHT - Ui.LAMP_SIZE) / 2, lit, alpha);
+			scrolledHit(cx - 6, y, listW + 6, ROW_HEIGHT,
+					() -> CosmeticsManager.setLocal(CosmeticsManager.local().with(cosmeticType, id)));
 		}
-		int rows = (options.size() + columns - 1) / columns;
-		endScroll(graphics, rows * (cardH + gap) - gap);
+		endScroll(graphics, options.size() * ROW_HEIGHT);
 
-		// Preview.
-		previewX = cx + gridW + 14;
-		previewY = top;
-		previewW = cx + cw - previewX;
-		previewH = py + ph - 14 - top;
-		Ui.roundedBox(graphics, previewX, previewY, previewW, previewH, 6, color(0xFF0E1015), color(Theme.OUTLINE));
-		graphics.fillGradient(previewX + 1, previewY + previewH / 2, previewX + previewW - 1, previewY + previewH - 6,
-				color(0x00000000), color(0x308B6CFF));
+		extractPreview(graphics);
+	}
+
+	private void extractPreview(GuiGraphicsExtractor graphics) {
+		int centerX = previewX + previewW / 2;
 		LocalPlayer player = minecraft.player;
 		if (player == null) {
 			graphics.centeredText(font, Component.translatable("screen.lucentclient.cosmetics.no_preview"),
-					previewX + previewW / 2, previewY + previewH / 2, color(Theme.SUBTEXT));
-		} else if (alpha > 0.99F) {
-			int size = Math.min(previewW, previewH) * 2 / 5;
-			PlayerPreview.extract(graphics, player, previewX, previewY + 4, previewX + previewW, previewY + previewH - 14, size, previewYaw);
-			Ui.text(graphics, font, Component.translatable("screen.lucentclient.cosmetics.drag_hint").getString(),
-					previewX + 6, previewY + previewH - 11, color(Theme.SUBTEXT), 0.75F);
+					centerX, previewY + previewH / 2, color(Theme.TUFF));
+			return;
 		}
-	}
-
-	private void extractCosmeticCard(GuiGraphicsExtractor graphics, int mouseX, int mouseY, @Nullable Cosmetic cosmetic, int x, int y, int w, int h) {
-		String id = cosmetic == null ? null : cosmetic.id();
-		String key = cosmeticType.id() + "_" + (id == null ? "none" : id);
-		boolean equipped = Objects.equals(CosmeticsManager.local().id(cosmeticType), id);
-		boolean hovered = Ui.inside(mouseX, mouseY, x, y, w, h) && Ui.inside(mouseX, mouseY, scrollX, scrollY, scrollW, scrollH);
-		float hover = animations.get("cosmetic_hover_" + key, hovered);
-		float on = animations.get("cosmetic_on_" + key, equipped);
-
-		int fill = Ui.lerpColor(Ui.lerpColor(Theme.CARD, Theme.CARD_HOVER, hover), Theme.CARD_ACTIVE, on);
-		Ui.roundedBox(graphics, x, y, w, h, 6, color(fill), color(Ui.lerpColor(Theme.OUTLINE, Theme.ACCENT, on)));
-		Component name = cosmetic == null ? Component.translatable("cosmetic.lucentclient.none") : cosmetic.displayName();
-		graphics.text(font, Ui.ellipsize(font, name.getString(), w - 26), x + 9, y + (h - 8) / 2, color(Theme.TEXT), false);
-		if (on > 0.01F) {
-			int dot = 8;
-			Ui.roundedRect(graphics, x + w - 9 - dot, y + (h - dot) / 2, dot, dot, dot / 2, color(Ui.withAlpha(Theme.ACCENT_2, on)));
+		int ground = previewY + previewH - 34;
+		int size = Math.min(previewW, previewH) * 2 / 5;
+		// A floor for the player to stand on.
+		graphics.fill(previewX + 18, ground, previewX + previewW - 18, ground + 1, color(Theme.SEAM));
+		if (alpha >= 1.0F) {
+			PlayerPreview.extract(graphics, player, previewX, previewY + 8, previewX + previewW, ground + 4, size, previewYaw);
 		}
-		scrolledHit(x, y, w, h, () -> CosmeticsManager.setLocal(CosmeticsManager.local().with(cosmeticType, id)));
+		graphics.centeredText(font, Component.translatable("screen.lucentclient.cosmetics.drag_hint"),
+				centerX, previewY + previewH - 20, color(Theme.TUFF));
 	}
 
 	// --- Input --------------------------------------------------------------------------------

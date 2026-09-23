@@ -7,7 +7,7 @@
 	"module.lucentclient.zoom": "줌",
 	"module.lucentclient.coordinates": "좌표",
 	"module.lucentclient.fullbright": "풀브라이트",
-	"screen.lucentclient.hud_edit": "HUD 위치 편집",
+	"screen.lucentclient.hud_edit": "HUD 위치",
 	"screen.lucentclient.hud_edit.hint": "HUD 요소를 드래그해서 옮기세요. 다 되면 Esc를 누르세요.",
 	"hud.lucentclient.facing": "방향: %s (%s)",
 	"hud.lucentclient.biome": "바이옴: %s",
@@ -17,8 +17,8 @@
 	"hud.lucentclient.direction.west": "서쪽",
 	"hud.lucentclient.direction.up": "위",
 	"hud.lucentclient.direction.down": "아래",
-	"screen.lucentclient.cosmetics.no_preview": "월드에 들어가면 미리보기가 보입니다",
-	"screen.lucentclient.cosmetics.drag_hint": "드래그해서 회전",
+	"screen.lucentclient.cosmetics.no_preview": "월드에 들어가면 여기서 볼 수 있어요",
+	"screen.lucentclient.cosmetics.drag_hint": "드래그해서 돌려 보기",
 	"cosmetic.lucentclient.none": "없음",
 	"cosmetic.lucentclient.type.cape": "망토",
 	"cosmetic.lucentclient.type.wings": "날개",
@@ -42,11 +42,10 @@
 	"screen.lucentclient.menu": "Lucent Client",
 	"screen.lucentclient.tab.modules": "모듈",
 	"screen.lucentclient.tab.cosmetics": "치장품",
-	"screen.lucentclient.modules.count": "모듈 %s개 · %s개 켜짐",
-	"screen.lucentclient.cosmetics.subtitle": "착용할 치장품을 고르세요. 바로 적용됩니다",
 	"module.lucentclient.fps.desc": "현재 프레임을 표시합니다",
 	"module.lucentclient.coordinates.desc": "좌표, 방향, 바이옴 표시",
 	"module.lucentclient.keystrokes.desc": "WASD, 마우스 버튼, CPS 표시",
 	"module.lucentclient.zoom.desc": "C를 누르고 있으면 확대",
-	"module.lucentclient.fullbright.desc": "어두운 곳도 밝게 보입니다"
+	"module.lucentclient.fullbright.desc": "어두운 곳도 밝게 보입니다",
+	"screen.lucentclient.modules.enabled": "%s개 켜짐"
 }

@@ -1,20 +1,23 @@
 package io.github.mojunseo.lucentclient.client.gui.ui;
 
-/** Colors for the Lucent menus (ARGB). */
+/**
+ * Colors for the Lucent menus (ARGB), taken from Minecraft materials: deepslate and tuff for the
+ * surfaces, calcite for text, and a redstone lamp for anything that is switched on.
+ */
 public final class Theme {
-	public static final int BACKDROP = 0x90000000;
-	public static final int PANEL = 0xFF121419;
-	public static final int SIDEBAR = 0xFF0C0E12;
-	public static final int CARD = 0xFF1B1E27;
-	public static final int CARD_HOVER = 0xFF242835;
-	public static final int CARD_ACTIVE = 0xFF2A2544;
-	public static final int OUTLINE = 0xFF2C3040;
-	public static final int ACCENT = 0xFF8B6CFF;
-	public static final int ACCENT_2 = 0xFF4CC9F0;
-	public static final int TEXT = 0xFFE9EBF2;
-	public static final int SUBTEXT = 0xFF8C92A6;
-	public static final int SWITCH_OFF = 0xFF3A3F50;
-	public static final int KNOB = 0xFFFFFFFF;
+	public static final int BACKDROP = 0x80000000;
+	/** Main panel. */
+	public static final int SLATE = 0xFF2B2D33;
+	/** Sidebar and preview stage. */
+	public static final int DEEPSLATE = 0xFF1F2025;
+	/** Borders, dividers and hovered rows. */
+	public static final int SEAM = 0xFF3A3D45;
+	public static final int CALCITE = 0xFFE4E2DA;
+	public static final int TUFF = 0xFF8E9089;
+	public static final int LAMP_ON = 0xFFF6C768;
+	public static final int LAMP_ON_CORE = 0xFFFFEBB0;
+	public static final int LAMP_OFF = 0xFF4A3326;
+	public static final int LAMP_OFF_GRID = 0xFF2E2019;
 
 	private Theme() {
 	}
