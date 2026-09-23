@@ -1,6 +1,7 @@
 package io.github.mojunseo.lucentclient.client.module;
 
 import com.google.gson.JsonObject;
+import io.github.mojunseo.lucentclient.client.gui.HudPreviewScreen;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.ColorSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
@@ -76,6 +77,11 @@ public abstract class HudModule extends Module {
 		graphics.pose().scale(scale.floatValue(), scale.floatValue());
 		extractAt(minecraft, graphics);
 		graphics.pose().popMatrix();
+	}
+
+	/** True while a Lucent editor or menu is open, when empty modules should draw sample content. */
+	protected static boolean previewing(Minecraft minecraft) {
+		return minecraft.gui.screen() instanceof HudPreviewScreen;
 	}
 
 	/** Background fill for boxes, or fully transparent when the background is off. */

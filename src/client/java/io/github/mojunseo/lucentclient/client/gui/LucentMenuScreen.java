@@ -37,7 +37,7 @@ import java.util.Objects;
  * lit when the row is on. Everything is drawn by hand; clickable areas are collected while drawing
  * and checked on click.
  */
-public class LucentMenuScreen extends Screen {
+public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 	private static final int SIDEBAR_WIDTH = 96;
 	private static final int ROW_HEIGHT = 22;
 	private static final int PAD = 14;

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Lets the player drag enabled HUD modules around. The regular HUD skips drawing while this is open. */
-public class HudEditScreen extends Screen {
+public class HudEditScreen extends Screen implements HudPreviewScreen {
 	private final Screen parent;
 	private HudModule dragging;
 	private int dragOffsetX;
