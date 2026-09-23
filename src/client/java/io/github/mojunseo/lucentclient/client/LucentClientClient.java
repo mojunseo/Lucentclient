@@ -9,7 +9,7 @@ import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticRenderStat
 import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticLayer;
 import io.github.mojunseo.lucentclient.client.cosmetic.render.CosmeticModels;
 import io.github.mojunseo.lucentclient.client.gui.HudEditScreen;
-import io.github.mojunseo.lucentclient.client.gui.ModuleMenuScreen;
+import io.github.mojunseo.lucentclient.client.gui.LucentMenuScreen;
 import io.github.mojunseo.lucentclient.client.module.HudModule;
 import io.github.mojunseo.lucentclient.client.module.Module;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
@@ -50,7 +50,7 @@ public class LucentClientClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			while (menuKey.consumeClick()) {
-				if (minecraft.gui.screen() == null) minecraft.gui.setScreen(new ModuleMenuScreen());
+				if (minecraft.gui.screen() == null) minecraft.gui.setScreen(new LucentMenuScreen());
 			}
 			for (Module module : ModuleManager.modules()) {
 				if (module.isEnabled()) module.tick(minecraft);

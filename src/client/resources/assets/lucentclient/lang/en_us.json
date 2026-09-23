@@ -2,7 +2,6 @@
 	"key.category.lucentclient.main": "Lucent Client",
 	"key.lucentclient.menu": "Open Module Menu",
 	"key.lucentclient.zoom": "Zoom",
-	"screen.lucentclient.modules": "Lucent Client Modules",
 	"module.lucentclient.fps": "FPS",
 	"module.lucentclient.keystrokes": "Keystrokes",
 	"module.lucentclient.zoom": "Zoom",
@@ -18,7 +17,6 @@
 	"hud.lucentclient.direction.west": "West",
 	"hud.lucentclient.direction.up": "Up",
 	"hud.lucentclient.direction.down": "Down",
-	"screen.lucentclient.cosmetics": "Cosmetics",
 	"screen.lucentclient.cosmetics.no_preview": "Join a world to see a preview",
 	"screen.lucentclient.cosmetics.drag_hint": "Drag to rotate",
 	"cosmetic.lucentclient.none": "None",
@@ -40,5 +38,15 @@
 	"cosmetic.lucentclient.wings.phoenix": "Phoenix",
 	"cosmetic.lucentclient.wings.raven": "Raven",
 	"cosmetic.lucentclient.wings.void": "Void Dragon",
-	"cosmetic.lucentclient.wings.monarch": "Monarch Butterfly"
+	"cosmetic.lucentclient.wings.monarch": "Monarch Butterfly",
+	"screen.lucentclient.menu": "Lucent Client",
+	"screen.lucentclient.tab.modules": "Modules",
+	"screen.lucentclient.tab.cosmetics": "Cosmetics",
+	"screen.lucentclient.modules.count": "%s modules · %s enabled",
+	"screen.lucentclient.cosmetics.subtitle": "Pick what you wear; changes apply instantly",
+	"module.lucentclient.fps.desc": "Shows your frame rate",
+	"module.lucentclient.coordinates.desc": "Position, facing and biome",
+	"module.lucentclient.keystrokes.desc": "WASD, mouse buttons and CPS",
+	"module.lucentclient.zoom.desc": "Hold C to zoom in",
+	"module.lucentclient.fullbright.desc": "See clearly in the dark"
 }
