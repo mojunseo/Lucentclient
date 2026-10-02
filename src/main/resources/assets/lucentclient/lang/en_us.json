@@ -147,5 +147,12 @@
 	"setting.lucentclient.particles_explosions": "Explosions",
 	"setting.lucentclient.particles_rain": "Rain splashes",
 	"setting.lucentclient.hide_rain": "Hide rain",
-	"setting.lucentclient.hide_snow": "Hide snow"
+	"setting.lucentclient.hide_snow": "Hide snow",
+	"module.lucentclient.lightweight": "Lightweight Mode",
+	"module.lucentclient.lightweight.desc": "The lightest graphics settings, for low-end PCs",
+	"setting.lucentclient.lite_render_distance": "Render distance (chunks)",
+	"setting.lucentclient.lite_uncap_fps": "No FPS limit or VSync",
+	"setting.lucentclient.lite_no_clouds": "No clouds",
+	"setting.lucentclient.lite_minimal_particles": "Minimal particles",
+	"setting.lucentclient.lite_flat_lighting": "No smooth lighting"
 }

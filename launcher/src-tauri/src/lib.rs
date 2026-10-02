@@ -38,7 +38,8 @@ impl App {
 
     /// Brings the selected version's mods folder in line with the shared mod list.
     async fn sync_mods(&self) -> anyhow::Result<modrinth::SyncReport> {
-        modrinth::sync(&self.client, &self.layout.root, &self.instance_dir(), &self.version()).await
+        let bundled: &[&str] = if self.settings.lock().unwrap().performance_mods { &modrinth::PERFORMANCE_MODS } else { &[] };
+        modrinth::sync(&self.client, &self.layout.root, &self.instance_dir(), &self.version(), bundled).await
     }
 
     fn update_wanted(&self, change: impl FnOnce(&mut Vec<modrinth::WantedMod>)) -> Result<(), String> {
@@ -430,7 +431,7 @@ mod tests {
         let client = download::client();
         modrinth::add(&client, &root, &project).await.expect("add");
         let instance = Layout { root: root.clone() }.instance(&version);
-        let report = modrinth::sync(&client, &root, &instance, &version).await.expect("sync");
+        let report = modrinth::sync(&client, &root, &instance, &version, &[]).await.expect("sync");
         println!("missing for {version}: {:?}", report.missing);
         for file in modrinth::load_record(&instance).files {
             println!("{version}: {} dependency={}", file.filename, file.dependency);

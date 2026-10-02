@@ -146,6 +146,7 @@ select {
 }
 .toggle-row, .account-row { cursor: pointer; }
 .toggle-row:hover, .account-row:hover { background: rgba(58, 61, 69, 0.4); }
+.toggle-row .hint { display: block; margin-top: 4px; font-size: 12px; color: var(--tuff, #8e9089); }
 .account-row img { width: 24px; height: 24px; image-rendering: pixelated; }
 .account-row .who { display: flex; align-items: center; gap: 12px; }
 .account-row small { color: var(--tuff); margin-left: 6px; }

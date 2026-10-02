@@ -147,5 +147,12 @@
 	"setting.lucentclient.particles_explosions": "폭발",
 	"setting.lucentclient.particles_rain": "빗방울 튀김",
 	"setting.lucentclient.hide_rain": "비 숨기기",
-	"setting.lucentclient.hide_snow": "눈 숨기기"
+	"setting.lucentclient.hide_snow": "눈 숨기기",
+	"module.lucentclient.lightweight": "경량 모드",
+	"module.lucentclient.lightweight.desc": "저사양 PC용으로 그래픽 설정을 가장 가볍게",
+	"setting.lucentclient.lite_render_distance": "렌더 거리 (청크)",
+	"setting.lucentclient.lite_uncap_fps": "FPS 제한과 수직 동기화 끄기",
+	"setting.lucentclient.lite_no_clouds": "구름 끄기",
+	"setting.lucentclient.lite_minimal_particles": "파티클 최소",
+	"setting.lucentclient.lite_flat_lighting": "부드러운 조명 끄기"
 }

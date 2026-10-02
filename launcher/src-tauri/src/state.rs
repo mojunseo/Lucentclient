@@ -16,11 +16,13 @@ pub struct Settings {
     pub hide_on_launch: bool,
     /// Minecraft version to play; None means the version Lucent Client is built for.
     pub version: Option<String>,
+    /// Install the performance mods (Sodium and friends) next to Lucent Client.
+    pub performance_mods: bool,
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { memory_mb: 4096, jvm_args: String::new(), hide_on_launch: true, version: None }
+        Self { memory_mb: 4096, jvm_args: String::new(), hide_on_launch: true, version: None, performance_mods: true }
     }
 }
 

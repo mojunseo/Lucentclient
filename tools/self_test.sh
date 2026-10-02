@@ -21,7 +21,7 @@ for build in "${builds[@]}"; do
       case "$(basename "$jar")" in lucentclient-*|fabric-api-*) ;; *) cp "$jar" run/mods/ ;; esac
     done
   fi
-  ./gradlew ":$build:runClient" --console=plain -Plucentclient.selfTest="$build" > "$log" 2>&1 &
+  ./gradlew ":$build:runClient" --console=plain -Plucentclient.selfTest="$build" ${BENCHMARK:+-Plucentclient.benchmark=true} > "$log" 2>&1 &
   gradle=$!
   result="timeout"
   for _ in $(seq 1 300); do
@@ -35,6 +35,7 @@ for build in "${builds[@]}"; do
   kill $gradle 2>/dev/null
   wait $gradle 2>/dev/null
   rm -rf run/mods
+  grep -o "\[benchmark\].*" "$log"
   echo "$build: $result ($(ls run/screenshots/selftest-"$build"-*.png 2>/dev/null | wc -l) screenshots)"
   [ "$result" = ok ] || status=1
   grep -E "ERROR|Exception|WARN.*lucentclient" "$log" | grep -vE "Failed to fetch user properties|InvalidCredentials|Status: 401|realms|Realms|flite|narrator|Native library" | sort | uniq -c | sort -rn | head -8

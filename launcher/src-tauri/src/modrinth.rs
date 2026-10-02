@@ -14,6 +14,10 @@ use std::path::Path;
 const API: &str = "https://api.modrinth.com/v2";
 /// Fabric API's Modrinth project; the launcher installs it itself.
 pub const FABRIC_API_PROJECT: &str = "P7dR8mSH";
+/// Performance mods installed with Lucent Client unless the player turns them off: Sodium (rendering),
+/// Lithium (game logic), FerriteCore (memory), ImmediatelyFast (HUD and text), Entity Culling and
+/// More Culling (skip what can't be seen). They don't show up in the player's mod list.
+pub const PERFORMANCE_MODS: [&str; 6] = ["AANobbMI", "gvQqBUqZ", "uXXizFIs", "5ZwdcRci", "NNAgCjsB", "51shyZVL"];
 const WANTED: &str = "mods.json";
 const INSTANCE_RECORD: &str = "lucent-mods.json";
 
@@ -262,9 +266,10 @@ pub struct SyncReport {
 }
 
 /// Makes an instance's mods folder match the shared list for `minecraft`: downloads the newest
-/// file of every enabled mod and its required dependencies, and deletes files the launcher added
-/// earlier that are no longer needed. Jars the player dropped in by hand are left alone.
-pub async fn sync(client: &reqwest::Client, root: &Path, instance: &Path, minecraft: &str) -> Result<SyncReport> {
+/// file of every enabled mod, every project in `bundled` and their required dependencies, and
+/// deletes files the launcher added earlier that are no longer needed. Jars the player dropped in
+/// by hand are left alone. A bundled mod with no file for this version is skipped quietly.
+pub async fn sync(client: &reqwest::Client, root: &Path, instance: &Path, minecraft: &str, bundled: &[&str]) -> Result<SyncReport> {
     let mods = instance.join("mods");
     download::ensure_dir(&mods)?;
     let wanted = load_wanted(root);
@@ -277,6 +282,11 @@ pub async fn sync(client: &reqwest::Client, root: &Path, instance: &Path, minecr
     for mod_ in wanted.iter().filter(|w| w.enabled) {
         seen.insert(mod_.project_id.clone());
         queue.push((mod_.project_id.clone(), None, false));
+    }
+    for project in bundled {
+        if seen.insert(project.to_string()) {
+            queue.push((project.to_string(), None, false));
+        }
     }
 
     let mut downloads = Vec::new();

@@ -31,6 +31,10 @@ loom {
         }
         // tools/self_test.sh passes -Plucentclient.selfTest=<name> to run SelfTest.
         providers.gradleProperty("lucentclient.selfTest").orNull?.let { vmArg("-Dlucentclient.selfTest=$it") }
+        // tools/benchmark.sh adds -Plucentclient.benchmark=true to measure FPS instead.
+        if (providers.gradleProperty("lucentclient.benchmark").isPresent) {
+            vmArg("-Dlucentclient.benchmark=true")
+        }
     }
 }
 

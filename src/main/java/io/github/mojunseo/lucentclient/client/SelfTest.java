@@ -40,6 +40,8 @@ final class SelfTest {
 	private record Step(int at, String shot, Runnable action) {
 	}
 
+	private static final boolean BENCHMARK = Boolean.getBoolean("lucentclient.benchmark");
+
 	private static boolean worldRequested;
 	private static int ticksInWorld = -1;
 	private static int next;
@@ -89,10 +91,16 @@ final class SelfTest {
 
 	private static void setUp(Minecraft minecraft) {
 		ticksInWorld = 0;
+		if (BENCHMARK) {
+			setUpBenchmark(minecraft);
+			return;
+		}
 		// Keep running when the test window isn't focused, instead of opening the pause menu.
 		minecraft.options.pauseOnLostFocus = false;
 		for (Module module : ModuleManager.modules()) {
-			if (module != ModuleManager.FULLBRIGHT && module != ModuleManager.WEATHER) module.setEnabled(true);
+			if (module != ModuleManager.FULLBRIGHT && module != ModuleManager.WEATHER && module != ModuleManager.LIGHTWEIGHT) {
+				module.setEnabled(true);
+			}
 		}
 		CosmeticsManager.setLocal(PlayerCosmetics.NONE
 				.with(CosmeticType.CAPE, "galaxy").with(CosmeticType.WINGS, "phoenix")
@@ -120,6 +128,54 @@ final class SelfTest {
 					Mc.setScreen(minecraft, null);
 					minecraft.stop();
 				}));
+	}
+
+	/**
+	 * FPS benchmark (-Dlucentclient.benchmark=true): the HUD and cosmetics on, standing still and looking
+	 * at the horizon with no FPS cap. Measures 15 seconds with the player's own video settings at a
+	 * 12-chunk render distance, then 15 seconds with Lightweight Mode, and logs average and lowest FPS.
+	 */
+	private static void setUpBenchmark(Minecraft minecraft) {
+		for (Module module : ModuleManager.modules()) {
+			module.setEnabled(module.category() == io.github.mojunseo.lucentclient.client.module.Category.HUD);
+		}
+		CosmeticsManager.setLocal(PlayerCosmetics.NONE.with(CosmeticType.CAPE, "galaxy").with(CosmeticType.WINGS, "phoenix"));
+		minecraft.options.setCameraType(CameraType.FIRST_PERSON);
+		minecraft.options.framerateLimit().set(net.minecraft.client.Options.UNLIMITED_FRAMERATE_CUTOFF);
+		minecraft.options.enableVsync().set(false);
+		minecraft.options.renderDistance().set(12);
+		minecraft.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
+		java.util.List<Integer> samples = new java.util.ArrayList<>();
+		Runnable look = () -> {
+			minecraft.player.setYRot(0.0F);
+			minecraft.player.setXRot(0.0F);
+		};
+		Runnable sample = () -> samples.add(minecraft.getFps());
+		java.util.function.Consumer<String> report = phase -> {
+			// getFps() changes once a second; one sample per second.
+			java.util.List<Integer> perSecond = new java.util.ArrayList<>();
+			for (int i = 0; i < samples.size(); i += 20) perSecond.add(samples.get(i));
+			double average = perSecond.stream().mapToInt(Integer::intValue).average().orElse(0);
+			int lowest = perSecond.stream().mapToInt(Integer::intValue).min().orElse(0);
+			LucentClient.LOGGER.info("[benchmark] {}: average {} FPS, lowest {} FPS ({} s)", phase, Math.round(average), lowest, perSecond.size());
+			samples.clear();
+		};
+		List<Step> list = new java.util.ArrayList<>();
+		list.add(new Step(1, null, look));
+		// Let chunks load before measuring.
+		for (int t = 400; t < 700; t++) list.add(new Step(t, null, sample));
+		list.add(new Step(700, null, () -> {
+			report.accept("player settings, 12 chunks");
+			ModuleManager.LIGHTWEIGHT.setEnabled(true);
+		}));
+		for (int t = 900; t < 1200; t++) list.add(new Step(t, null, sample));
+		list.add(new Step(1200, null, () -> {
+			report.accept("lightweight mode");
+			ModuleManager.LIGHTWEIGHT.setEnabled(false);
+			LucentClient.LOGGER.info("[selftest] finished");
+			minecraft.stop();
+		}));
+		steps = list;
 	}
 
 	private static void shot(Minecraft minecraft, String step) {

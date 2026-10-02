@@ -33,12 +33,13 @@ public final class ModuleManager {
 	public static final EntityCullingModule ENTITY_CULLING = new EntityCullingModule();
 	public static final ParticlesModule PARTICLES = new ParticlesModule();
 	public static final WeatherModule WEATHER = new WeatherModule();
+	public static final LightweightModule LIGHTWEIGHT = new LightweightModule();
 	public static final FullbrightModule FULLBRIGHT = new FullbrightModule();
 	public static final DiscordModule DISCORD = new DiscordModule();
 
 	private static final List<Module> MODULES = List.of(
 			FPS, COORDINATES, KEYSTROKES, ARMOR, POTIONS, PING, CLOCK, REACH, TOGGLE_SPRINT, ZOOM, FOV,
-			ENTITY_CULLING, PARTICLES, WEATHER, FULLBRIGHT, DISCORD);
+			LIGHTWEIGHT, ENTITY_CULLING, PARTICLES, WEATHER, FULLBRIGHT, DISCORD);
 
 	private ModuleManager() {
 	}

@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
-type Settings = { memoryMb: number; jvmArgs: string; hideOnLaunch: boolean };
+type Settings = { memoryMb: number; jvmArgs: string; hideOnLaunch: boolean; performanceMods: boolean };
 type AccountView = { kind: "microsoft" | "offline"; name: string; uuid: string };
 type Info = {
   lucentVersions: string[];
@@ -244,6 +244,7 @@ function renderSettings() {
   $("memory-value").textContent = `${(info.settings.memoryMb / 1024).toFixed(1)} GB`;
   $<HTMLInputElement>("jvm-args").value = info.settings.jvmArgs;
   $("hide-lamp").classList.toggle("on", info.settings.hideOnLaunch);
+  $("perf-lamp").classList.toggle("on", info.settings.performanceMods);
 }
 
 async function saveSettings(change: Partial<Settings>) {
@@ -263,6 +264,7 @@ $<HTMLInputElement>("jvm-args").addEventListener("change", (event) =>
   saveSettings({ jvmArgs: (event.target as HTMLInputElement).value.trim() }),
 );
 $("hide-row").addEventListener("click", () => saveSettings({ hideOnLaunch: !info.settings.hideOnLaunch }));
+$("perf-row").addEventListener("click", () => saveSettings({ performanceMods: !info.settings.performanceMods }));
 $("open-folder").addEventListener("click", () => invoke("open_game_directory"));
 
 // --- Versions ---------------------------------------------------------------------------------
