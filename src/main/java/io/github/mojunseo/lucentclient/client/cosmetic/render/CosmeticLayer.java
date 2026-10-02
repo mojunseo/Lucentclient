@@ -32,7 +32,9 @@ public class CosmeticLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 
 	public CosmeticLayer(RenderLayerParent<AvatarRenderState, PlayerModel> renderer, EntityModelSet modelSet) {
 		super(renderer);
-		CosmeticModels.LAYERS.forEach((name, layer) -> models.put(name, new CosmeticModel(modelSet.bakeLayer(layer), name)));
+		// Only posed, never drawn; see CosmeticModel.
+		PlayerModel poser = new PlayerModel(modelSet.bakeLayer(ModelLayers.PLAYER), false);
+		CosmeticModels.LAYERS.forEach((name, layer) -> models.put(name, new CosmeticModel(modelSet.bakeLayer(layer), name, poser)));
 		this.capePose = new PlayerCapeModel(modelSet.bakeLayer(ModelLayers.PLAYER_CAPE));
 		this.capePart = capePose.body.getChild("cape");
 	}

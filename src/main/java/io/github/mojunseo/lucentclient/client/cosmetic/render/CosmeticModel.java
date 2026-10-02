@@ -1,23 +1,35 @@
 package io.github.mojunseo.lucentclient.client.cosmetic.render;
 
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Player-shaped model whose only cubes are cosmetic parts, so it poses exactly like the player.
- * Wing and halo parts, when present, are animated on top of that.
+ * A model whose only cubes are cosmetic parts, hanging off a head and a body that copy the player's
+ * pose. Wing and halo parts, when present, are animated on top of that.
+ *
+ * <p>This is deliberately not a {@link PlayerModel}: mods such as 3D Skin Layers add their overlay to
+ * every PlayerModel, which drew a large skin overlay in the cosmetic's texture over the player. The
+ * pose comes from a separate PlayerModel that is posed but never drawn.
  */
-public class CosmeticModel extends PlayerModel {
+public class CosmeticModel extends Model<AvatarRenderState> {
+	private final ModelPart head;
+	private final ModelPart body;
+	private final PlayerModel poser;
 	private final @Nullable Wing left;
 	private final @Nullable Wing right;
 	private final @Nullable ModelPart halo;
 	private final String kind;
 
-	public CosmeticModel(ModelPart root, String kind) {
-		super(root, false);
+	public CosmeticModel(ModelPart root, String kind, PlayerModel poser) {
+		super(root, RenderTypes::entityCutout);
+		this.head = root.getChild("head");
+		this.body = root.getChild("body");
+		this.poser = poser;
 		this.kind = kind;
 		this.left = body.hasChild("left_wing") ? new Wing(body.getChild("left_wing")) : null;
 		this.right = body.hasChild("right_wing") ? new Wing(body.getChild("right_wing")) : null;
@@ -42,6 +54,9 @@ public class CosmeticModel extends PlayerModel {
 	@Override
 	public void setupAnim(AvatarRenderState state) {
 		super.setupAnim(state);
+		poser.setupAnim(state);
+		head.loadPose(poser.head.storePose());
+		body.loadPose(poser.body.storePose());
 		float time = state.ageInTicks;
 		CosmeticMotion motion = state.getData(CosmeticRenderState.MOTION);
 		if (left != null && right != null && motion != null) {
