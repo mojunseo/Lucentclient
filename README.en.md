@@ -1,4 +1,4 @@
-<p align="center"><img src="launcher/src-tauri/icons/128x128.png" width="96" alt=""></p>
+<p align="center"><img src="branding/lucent-icon.svg" width="96" alt=""></p>
 
 # Lucent Client
 
@@ -59,7 +59,8 @@ The launcher is in [`launcher/`](launcher/README.md).
 - `src/main`: the mod (client only)
 - `versions/<version>`: per-version build directories made by Stonecutter
 - `launcher/`: the desktop launcher (Tauri)
-- `tools/`: texture and icon generators, the mixin check
+- `tools/`: texture generator, mixin check and self-test
+- `branding/`: the logo (SVG)
 
 ## License
 

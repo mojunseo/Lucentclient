@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Lucent</title>
+  <defs>
+    <!-- A daytime sky, lighter towards the top. -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A4DCFF"/>
+      <stop offset="1" stop-color="#2E8FE3"/>
+    </linearGradient>
+    <!-- Front face of the L: a pane of light blue glass. -->
+    <linearGradient id="face" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#CDEBFF"/>
+    </linearGradient>
+    <clipPath id="L"><path d="M292 184 h184 v448 h268 v184 h-452 z"/></clipPath>
+  </defs>
+  <rect width="1024" height="1024" rx="232" fill="url(#sky)"/>
+  <!-- Depth: the L is a block, its sides drop down and to the right. -->
+  <path d="M476 184 l48 48 v400 h-48 z" fill="#5AAAE8"/>
+  <path d="M744 632 l48 48 v184 l-48 -48 z" fill="#3D93DA"/>
+  <path d="M292 816 h452 l48 48 h-452 z" fill="#2A7CC4"/>
+  <path d="M476 632 h268 l48 48 h-268 z" fill="#5AAAE8"/>
+  <!-- Front face. -->
+  <path d="M292 184 h184 v448 h268 v184 h-452 z" fill="url(#face)"/>
+  <!-- Reflections, stepped like pixels. -->
+  <g clip-path="url(#L)" fill="#A9DBFF" opacity="0.6">
+    <path d="M292 728 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-64 z"/>
+    <path d="M420 816 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v-32 h32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 h-32 v32 z" opacity="0.7"/>
+  </g>
+  <!-- A glint of sunlight on the corner. -->
+  <g fill="#FFE38A">
+    <rect x="556" y="112" width="32" height="96"/>
+    <rect x="524" y="144" width="96" height="32"/>
+  </g>
+</svg>

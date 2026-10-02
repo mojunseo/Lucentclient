@@ -1,4 +1,4 @@
-<p align="center"><img src="launcher/src-tauri/icons/128x128.png" width="96" alt=""></p>
+<p align="center"><img src="branding/lucent-icon.svg" width="96" alt=""></p>
 
 # Lucent Client
 
@@ -59,7 +59,8 @@ tools/mixin_check.sh          # 버전마다 한 번씩 실행해서 모든 mixi
 - `src/main`: 모드 코드 (클라이언트 전용)
 - `versions/<버전>`: Stonecutter가 만드는 버전별 빌드 폴더
 - `launcher/`: 데스크톱 런처 (Tauri)
-- `tools/`: 텍스처와 아이콘 생성기, mixin 검사
+- `tools/`: 텍스처 생성기, mixin 검사와 자동 점검
+- `branding/`: 로고 (SVG)
 
 ## 라이선스
 

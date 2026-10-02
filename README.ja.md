@@ -1,4 +1,4 @@
-<p align="center"><img src="launcher/src-tauri/icons/128x128.png" width="96" alt=""></p>
+<p align="center"><img src="branding/lucent-icon.svg" width="96" alt=""></p>
 
 # Lucent Client
 
@@ -59,7 +59,8 @@ tools/mixin_check.sh          # バージョンごとに一度起動し、すべ
 - `src/main`: MOD 本体（クライアント専用）
 - `versions/<バージョン>`: Stonecutter が作るバージョン別のビルドフォルダ
 - `launcher/`: デスクトップランチャー（Tauri）
-- `tools/`: テクスチャとアイコンの生成スクリプト、mixin チェック
+- `tools/`: テクスチャ生成スクリプト、mixin チェックと自動テスト
+- `branding/`: ロゴ（SVG）
 
 ## ライセンス
 
