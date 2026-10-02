@@ -524,7 +524,41 @@ async function refresh() {
   setPlaying(info.playing ? "running" : "idle");
 }
 
+// --- Updates ----------------------------------------------------------------------------------
+
+type UpdateProgress = { version: string; done: number; total: number | null };
+
+listen<UpdateProgress>("update-progress", (event) => {
+  const { version, done, total } = event.payload;
+  const box = $("update");
+  box.hidden = false;
+  box.textContent = total
+    ? `런처 ${version} 받는 중 ${Math.floor((done / total) * 100)}%`
+    : `런처 ${version} 받는 중`;
+});
+
+/** Installs a newer launcher when there is one; the launcher restarts itself afterwards. */
+async function checkForUpdate() {
+  if (info.development) return;
+  try {
+    await invoke<string | null>("update_launcher");
+  } catch (error) {
+    // Installed in a way the launcher can't replace itself (e.g. .deb or .rpm): point to the download.
+    const [version] = String(error).split("|");
+    const box = $("update");
+    box.hidden = false;
+    box.replaceChildren();
+    const link = document.createElement("a");
+    link.href = "https://puritymc.kr/client/";
+    link.target = "_blank";
+    link.textContent = /^\d/.test(version) ? `런처 ${version} 받기` : "새 런처 받기";
+    box.append("새 버전이 있어요. ", link);
+    console.warn("update failed", error);
+  }
+}
+
 refresh().then(() => {
   loadVersions();
   show(selectedAccount() ? "play" : "accounts");
+  checkForUpdate();
 });

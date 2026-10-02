@@ -244,3 +244,7 @@ h2 { font-size: 15px; font-weight: 600; color: var(--tuff); margin: 28px 0 10px;
 .result-count { margin: 4px 0 8px; }
 .list-note { margin: -4px 0 10px; }
 .missing { color: var(--lamp-on); font-size: 12px; margin-left: 6px; }
+
+/* Launcher update notice, above the version line in the sidebar. */
+.update { margin-top: 12px; padding: 8px 10px; font-size: 12px; line-height: 1.4; color: var(--calcite, #e4e2da); background: rgba(246, 199, 104, 0.12); border-left: 2px solid #f6c768; }
+.update a { color: #f6c768; }

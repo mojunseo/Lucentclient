@@ -269,6 +269,49 @@ async fn sign_in(handle: AppHandle, app: State<'_, Arc<App>>) -> Result<(), Stri
     Ok(())
 }
 
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+struct UpdateProgress {
+    version: String,
+    done: u64,
+    total: Option<u64>,
+}
+
+/// Looks for a newer launcher on GitHub (the release's latest.json, signed with the project's key)
+/// and, if there is one, installs it and restarts. Progress arrives as `update-progress`. Returns
+/// without doing anything while the game runs. A newer launcher also brings the matching
+/// Lucent Client jar, since the launcher plays the mod version it was built with.
+#[tauri::command]
+async fn update_launcher(handle: AppHandle, app: State<'_, Arc<App>>) -> Result<Option<String>, String> {
+    use tauri_plugin_updater::UpdaterExt;
+    if app.playing.load(Ordering::SeqCst) {
+        return Ok(None);
+    }
+    let updater = handle.updater().map_err(|e| e.to_string())?;
+    let Some(update) = updater.check().await.map_err(|e| e.to_string())? else { return Ok(None) };
+    // Keep Play from starting the game halfway through the update.
+    if app.playing.swap(true, Ordering::SeqCst) {
+        return Ok(None);
+    }
+    let version = update.version.clone();
+    let mut done = 0u64;
+    let result = update
+        .download_and_install(
+            |chunk, total| {
+                done += chunk as u64;
+                handle.emit("update-progress", UpdateProgress { version: version.clone(), done, total }).ok();
+            },
+            || {},
+        )
+        .await;
+    app.playing.store(false, Ordering::SeqCst);
+    match result {
+        Ok(()) => handle.restart(),
+        // e.g. a .deb or .rpm install on Linux, which only a package manager can update.
+        Err(error) => Err(format!("{}|{error}", update.version)),
+    }
+}
+
 /// Installs whatever is missing and starts the game. Progress arrives as `install-progress`, game
 /// output as `game-log`, and the end as `game-exit` (exit code) or `play-error` (message).
 #[tauri::command]
@@ -350,6 +393,7 @@ fn open_game_directory(handle: AppHandle, app: State<'_, Arc<App>>) -> Result<()
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|tauri_app| {
             let root = tauri_app.path().app_data_dir()?;
             std::fs::create_dir_all(&root)?;
@@ -390,7 +434,8 @@ pub fn run() {
             installed_mods,
             install_mod,
             remove_mod,
-            set_mod_enabled
+            set_mod_enabled,
+            update_launcher
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

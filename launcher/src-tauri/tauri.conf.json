@@ -36,6 +36,18 @@
     ],
     "category": "Game",
     "shortDescription": "Lucent Client launcher",
-    "publisher": "mojunseo"
+    "publisher": "mojunseo",
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUyMUZBMkJGNTA5Q0FCQzQKUldURXE1eFF2NklmNGt3QnZVL2hhUmxNWEt6OFVCeFdjWEhQWTdHc0FDaFRwajdEblhCUG5Jd3gK",
+      "endpoints": [
+        "https://github.com/mojunseo/Lucentclient/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

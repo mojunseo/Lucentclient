@@ -1,5 +1,6 @@
 # Publishes a GitHub release when a version tag (v1.2.3) is pushed: the mod jar for every supported
-# Minecraft build, and the launcher for Windows, macOS and Linux.
+# Minecraft build, and the launcher for Windows, macOS and Linux with signed updater bundles and
+# latest.json, which installed launchers check to update themselves.
 name: release
 on:
   push:
@@ -77,6 +78,9 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          # Signs the updater bundles; latest.json in the release points launchers at them.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: launcher
           releaseId: ${{ needs.create-release.outputs.id }}
