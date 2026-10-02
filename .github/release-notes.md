@@ -3,6 +3,9 @@
 Lucent Client는 Minecraft: Java Edition용 Fabric 클라이언트 모드와 데스크톱 런처입니다. 기능은 [README](https://github.com/mojunseo/Lucentclient#readme)를 참고하세요.
 
 ### 이번 버전에서 바뀐 것
+- **런처 자동 업데이트**: 이제 런처가 켜질 때 새 버전을 스스로 받아 설치하고 다시 시작합니다. 모드도 함께 새 버전으로 바뀌어요. (Linux .deb, .rpm 설치본은 새 버전 안내만 표시합니다.) v0.1.1 이하를 쓰고 있다면 이번 한 번만 직접 받아 주세요.
+
+v0.1.1에서 바뀐 것:
 - **경량 모드**: 저사양 PC용 모듈. 켜 있는 동안 그래픽 설정을 가장 가볍게 하고, 끄면 원래 설정으로 돌아갑니다.
 - **런처가 성능 모드를 함께 설치**: Sodium, Lithium, FerriteCore, ImmediatelyFast, Entity Culling, More Culling을 버전에 맞춰 설치합니다. 설정에서 끌 수 있어요.
 - 26.1, 26.2에서 날개·모자·헤일로를 끼면 캐릭터에 큰 덧씌움이 생기던 문제 수정 (3D Skin Layers와 함께 쓸 때)
@@ -30,7 +33,9 @@ Windows: `*_x64-setup.exe` 또는 `.msi` · macOS(Apple Silicon과 Intel): `*_un
 
 Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop launcher. See the [README](https://github.com/mojunseo/Lucentclient/blob/main/README.en.md) for features.
 
-**What's new**: Lightweight Mode (the lightest graphics settings while it's on, your own settings back when it's off); the launcher installs Sodium, Lithium, FerriteCore, ImmediatelyFast, Entity Culling and More Culling for your version (can be turned off in Settings); fixed a large overlay on the player with wings, hats or halos on 26.1 and 26.2 alongside 3D Skin Layers; fixed Discord status on Windows; empty armor and effect boxes are no longer drawn; new logo.
+**What's new**: the launcher now updates itself: when it starts it downloads and installs a new release and restarts, and the mod updates with it (Linux .deb and .rpm installs only show a notice). If you have v0.1.1 or older, download this version by hand once.
+
+**From v0.1.1**: Lightweight Mode (the lightest graphics settings while it's on, your own settings back when it's off); the launcher installs Sodium, Lithium, FerriteCore, ImmediatelyFast, Entity Culling and More Culling for your version (can be turned off in Settings); fixed a large overlay on the player with wings, hats or halos on 26.1 and 26.2 alongside 3D Skin Layers; fixed Discord status on Windows; empty armor and effect boxes are no longer drawn; new logo.
 
 **Mod**: supports Minecraft 26.1 to 26.3. Install Fabric Loader 0.19.5 or newer and Fabric API, then put the jar for your version into `mods` (see the table above). Press Right Shift in game to open the menu.
 
@@ -44,7 +49,9 @@ The launcher signs in with your Microsoft account and starts the game. It isn't 
 
 Lucent Client は Minecraft: Java Edition 向けの Fabric クライアント MOD とデスクトップランチャーです。機能は [README](https://github.com/mojunseo/Lucentclient/blob/main/README.ja.md) をご覧ください。
 
-**今回の変更**: 軽量モードを追加（オンの間はグラフィック設定を最も軽くし、オフで元の設定に戻ります）。ランチャーが Sodium、Lithium、FerriteCore、ImmediatelyFast、Entity Culling、More Culling をバージョンに合わせて一緒にインストールします（設定でオフにできます）。26.1・26.2 で 3D Skin Layers と併用時に翼・帽子・ヘイローを付けるとプレイヤーに大きな重なりが出る問題を修正。Windows で Discord のステータスが表示されない問題を修正。防具・効果 HUD が空のとき空の枠が残る問題を修正。新しいロゴ。
+**今回の変更**: ランチャーが自動で更新されるようになりました。起動時に新しいリリースをダウンロード・インストールして再起動し、MOD も一緒に更新されます（Linux の .deb、.rpm 版はお知らせのみ表示）。v0.1.1 以前をお使いの場合は、今回だけ手動でダウンロードしてください。
+
+**v0.1.1 の変更**: 軽量モードを追加（オンの間はグラフィック設定を最も軽くし、オフで元の設定に戻ります）。ランチャーが Sodium、Lithium、FerriteCore、ImmediatelyFast、Entity Culling、More Culling をバージョンに合わせて一緒にインストールします（設定でオフにできます）。26.1・26.2 で 3D Skin Layers と併用時に翼・帽子・ヘイローを付けるとプレイヤーに大きな重なりが出る問題を修正。Windows で Discord のステータスが表示されない問題を修正。防具・効果 HUD が空のとき空の枠が残る問題を修正。新しいロゴ。
 
 **MOD**: Minecraft 26.1〜26.3 に対応しています。Fabric Loader 0.19.5 以降と Fabric API をインストールし、バージョンに合った jar を `mods` フォルダに入れてください（ファイルは上の表をご覧ください）。ゲーム内で右 Shift を押すとメニューが開きます。
 
