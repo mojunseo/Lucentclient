@@ -14,7 +14,7 @@ Minecraft 26.1 ~ 26.3을 지원합니다. Fabric Loader 0.19.5 이상과 Fabric 
 ### 런처
 Windows: `*_x64-setup.exe` 또는 `.msi` · macOS(Apple Silicon과 Intel): `*_universal.dmg` · Linux: `.AppImage`, `.deb`, `.rpm`
 
-사전 릴리스입니다. Microsoft 로그인이 Mojang의 런처 승인을 기다리는 중이라 아직 런처로 게임을 켤 수 없습니다. 그동안은 모드 jar를 다른 런처에서 사용하세요. 런처는 코드 서명이 없습니다. Windows에서는 "추가 정보 → 실행"을, macOS에서는 앱을 우클릭한 뒤 "열기"를 누르세요.
+런처는 Microsoft 계정으로 로그인해서 게임을 바로 실행합니다. 런처는 코드 서명이 없습니다. Windows에서는 "추가 정보 → 실행"을, macOS에서는 앱을 우클릭한 뒤 "열기"를 누르세요.
 
 ---
 
@@ -26,7 +26,7 @@ Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop
 
 **Launcher**: Windows `*_x64-setup.exe` or `.msi`, macOS (Apple silicon and Intel) `*_universal.dmg`, Linux `.AppImage`, `.deb` or `.rpm`.
 
-This is a pre-release. Microsoft sign-in is waiting for Mojang to approve the launcher, so it can't start the game yet; use the mod jar with any launcher in the meantime. The launcher isn't code-signed: on Windows choose "More info, Run anyway"; on macOS right-click the app and choose Open.
+The launcher signs in with your Microsoft account and starts the game. It isn't code-signed: on Windows choose "More info, Run anyway"; on macOS right-click the app and choose Open.
 
 ---
 
@@ -38,4 +38,4 @@ Lucent Client は Minecraft: Java Edition 向けの Fabric クライアント MO
 
 **ランチャー**: Windows は `*_x64-setup.exe` または `.msi`、macOS（Apple シリコンと Intel）は `*_universal.dmg`、Linux は `.AppImage`、`.deb`、`.rpm` です。
 
-プレリリースです。Microsoft サインインは Mojang によるランチャーの承認待ちのため、現在ランチャーからゲームを起動することはできません。それまでは MOD の jar を他のランチャーでご利用ください。ランチャーはコード署名されていません。Windows では「詳細情報 → 実行」を、macOS ではアプリを右クリックして「開く」を選んでください。
+ランチャーは Microsoft アカウントでサインインしてゲームを起動します。ランチャーはコード署名されていません。Windows では「詳細情報 → 実行」を、macOS ではアプリを右クリックして「開く」を選んでください。

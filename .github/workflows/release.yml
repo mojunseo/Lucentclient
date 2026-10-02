@@ -19,7 +19,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --prerelease --title "Lucent Client $GITHUB_REF_NAME" --notes-file .github/release-notes.md
+          gh release create "$GITHUB_REF_NAME" --title "Lucent Client $GITHUB_REF_NAME" --notes-file .github/release-notes.md
           echo "id=$(gh release view "$GITHUB_REF_NAME" --json databaseId -q .databaseId)" >> "$GITHUB_OUTPUT"
 
   mod:

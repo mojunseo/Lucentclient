@@ -3,7 +3,7 @@
 use crate::download::{self, Download};
 use crate::meta::{self, AssetIndex, Version, VersionManifest};
 use crate::{java, modrinth, versions};
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
@@ -259,11 +259,25 @@ async fn install_lucent(client: &reqwest::Client, mods: &Path, build: &str) -> R
             return Ok(name);
         }
     }
-    let response = client.get("https://api.github.com/repos/mojunseo/Lucentclient/releases/latest").send().await?;
-    if response.status() == reqwest::StatusCode::NOT_FOUND {
-        bail!("No Lucent Client release has been published yet");
+    // The release for this launcher's mod version first, so the launcher and mod always match.
+    // Then the latest release; GitHub's "latest" skips pre-releases, so fall back to the full list.
+    const API: &str = "https://api.github.com/repos/mojunseo/Lucentclient/releases";
+    let mut release: Option<Release> = None;
+    for url in [format!("{API}/tags/v{}", versions::mod_version()), format!("{API}/latest")] {
+        let response = client.get(&url).send().await?;
+        if response.status().is_success() {
+            let candidate: Release = response.json().await?;
+            if candidate.assets.iter().any(|a| a.name == name) {
+                release = Some(candidate);
+                break;
+            }
+        }
     }
-    let release: Release = response.error_for_status()?.json().await?;
+    if release.is_none() {
+        let all: Vec<Release> = client.get(API).send().await?.error_for_status()?.json().await?;
+        release = all.into_iter().find(|r| r.assets.iter().any(|a| a.name == name));
+    }
+    let release = release.with_context(|| format!("No published Lucent Client release has a jar for Minecraft {build}"))?;
     let asset = release
         .assets
         .into_iter()
