@@ -10,11 +10,33 @@ if [ -n "$PERF_MODS" ]; then
   for build in "${builds[@]}"; do
     dir="build/perf-mods/$build"
     mkdir -p "$dir"
-    for project in sodium lithium ferrite-core immediatelyfast entityculling moreculling; do
-      url=$(curl -s "https://api.modrinth.com/v2/project/$project/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22$build%22%5D" \
-        | python3 -c "import json,sys;v=json.load(sys.stdin);print(next(f['url'] for f in v[0]['files'] if f['primary']) if v else '')")
-      [ -n "$url" ] && [ ! -f "$dir/$(basename "$url")" ] && curl -sL -o "$dir/$(basename "$url")" "$url"
-    done
+    # The same choice as the launcher: newest release (else newest) for the build, plus required dependencies.
+    python3 - "$build" "$dir" <<'PY'
+import json, os, sys, urllib.parse, urllib.request
+build, dest = sys.argv[1], sys.argv[2]
+api = "https://api.modrinth.com/v2"
+def get(url):
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "lucentclient-benchmark"})) as r:
+        return json.load(r)
+queue = ["sodium", "lithium", "ferrite-core", "immediatelyfast", "entityculling", "moreculling"]
+seen = set(queue) | {"P7dR8mSH"}
+while queue:
+    project = queue.pop()
+    q = urllib.parse.urlencode({"loaders": '["fabric"]', "game_versions": f'["{build}"]'})
+    versions = get(f"{api}/project/{project}/version?{q}")
+    if not versions:
+        print(f"no {project} for {build}")
+        continue
+    version = next((v for v in versions if v["version_type"] == "release"), versions[0])
+    file = next(f for f in version["files"] if f["primary"])
+    path = os.path.join(dest, file["filename"])
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(file["url"], path)
+    for dep in version["dependencies"]:
+        if dep["dependency_type"] == "required" and dep["project_id"] not in seen:
+            seen.add(dep["project_id"])
+            queue.append(dep["project_id"])
+PY
   done
   export EXTRA_MODS="$PWD/build/perf-mods/{build}"
 fi
