@@ -31,7 +31,7 @@ while read -r name url; do
     [[ $name =~ $pattern ]] && target=${map[$pattern]}
   done
   # Mod jars: lucentclient-<version>+<build>.jar -> lucentclient-<build>.jar
-  [[ $name =~ ^lucentclient-.*\+(.+)\.jar$ ]] && target="lucentclient-${BASH_REMATCH[1]}.jar"
+  [[ $name =~ ^lucentclient-${version//./\\.}\+(.+)\.jar$ ]] && target="lucentclient-${BASH_REMATCH[1]}.jar"
   [ -z "$target" ] && continue
   curl -fsSL -o "$tmp/$target" "$url"
   echo "$name -> $target"
