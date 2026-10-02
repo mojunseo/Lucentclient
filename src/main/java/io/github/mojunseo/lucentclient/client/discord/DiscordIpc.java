@@ -217,7 +217,12 @@ final class DiscordIpc implements Closeable {
 		}
 	}
 
-	/** Windows: a named pipe, which Java can open as a file. */
+	/**
+	 * Windows: a named pipe, which Java can open as a file. Java opens it for synchronous I/O, so a
+	 * read waiting for data blocks every write on the same pipe; Discord would then never receive
+	 * SET_ACTIVITY. Reads therefore only take bytes that have already arrived, which length() reports
+	 * for pipes (PeekNamedPipe), and sleep briefly otherwise.
+	 */
 	private static final class PipeTransport implements Transport {
 		private final RandomAccessFile pipe;
 
@@ -232,7 +237,22 @@ final class DiscordIpc implements Closeable {
 
 		@Override
 		public void readFully(byte[] bytes) throws IOException {
-			pipe.readFully(bytes);
+			int done = 0;
+			while (done < bytes.length) {
+				long available = pipe.length();
+				if (available <= 0) {
+					try {
+						Thread.sleep(25);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+						throw new IOException("interrupted", e);
+					}
+					continue;
+				}
+				int read = pipe.read(bytes, done, (int) Math.min(available, bytes.length - done));
+				if (read < 0) throw new EOFException();
+				done += read;
+			}
 		}
 
 		@Override
