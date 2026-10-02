@@ -70,20 +70,25 @@ public class ArmorModule extends HudModule {
 	@Override
 	public int width(Minecraft minecraft) {
 		List<ItemStack> items = items(minecraft);
+		// Nothing worn or held: draw nothing, not an empty box.
+		if (items.isEmpty()) return 0;
 		int labels = labelWidth(minecraft, items);
 		if (vertical()) return ITEM + 4 + (labels > 0 ? labels + 4 : 0);
-		return Math.max(1, items.size()) * (Math.max(ITEM, labels) + 4);
+		return items.size() * (Math.max(ITEM, labels) + 4);
 	}
 
 	@Override
 	public int height(Minecraft minecraft) {
-		if (vertical()) return Math.max(1, items(minecraft).size()) * ROW + 2;
+		int count = items(minecraft).size();
+		if (count == 0) return 0;
+		if (vertical()) return count * ROW + 2;
 		return ITEM + (durability.get().equals("none") ? 4 : 14);
 	}
 
 	@Override
 	protected void extractAt(Minecraft minecraft, GuiGraphicsExtractor graphics) {
 		List<ItemStack> items = items(minecraft);
+		if (items.isEmpty()) return;
 		fillBackground(graphics, 0, 0, width(minecraft), height(minecraft));
 		int cell = Math.max(ITEM, labelWidth(minecraft, items)) + 4;
 		for (int i = 0; i < items.size(); i++) {

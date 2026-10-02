@@ -29,6 +29,8 @@ loom {
         if (providers.gradleProperty("lucentclient.audit").isPresent) {
             vmArg("-Dlucentclient.auditMixins=true")
         }
+        // tools/self_test.sh passes -Plucentclient.selfTest=<name> to run SelfTest.
+        providers.gradleProperty("lucentclient.selfTest").orNull?.let { vmArg("-Dlucentclient.selfTest=$it") }
     }
 }
 

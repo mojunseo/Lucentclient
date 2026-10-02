@@ -43,6 +43,14 @@ public final class Mc {
 		*///?}
 	}
 
+	public static com.mojang.blaze3d.pipeline.RenderTarget mainRenderTarget(Minecraft minecraft) {
+		//? if >=26.2 {
+		return minecraft.gameRenderer.mainRenderTarget();
+		//?} else {
+		/*return minecraft.getMainRenderTarget();
+		*///?}
+	}
+
 	/** Submits a model tinted with an ARGB color. */
 	public static <S> void submitModel(SubmitNodeCollector collector, Model<? super S> model, S state, PoseStack poseStack,
 			RenderType renderType, int light, int overlay, int tint, int outline) {

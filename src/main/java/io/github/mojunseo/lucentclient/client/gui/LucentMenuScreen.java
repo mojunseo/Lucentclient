@@ -118,6 +118,17 @@ public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 		scroll = scrollTarget = 0;
 	}
 
+	/** Opens the cosmetics tab (used by the development self-test). */
+	public void showCosmetics() {
+		setTab(Tab.COSMETICS);
+	}
+
+	/** Opens a module's settings (used by the development self-test). */
+	public void showSettings(Module module) {
+		setTab(Tab.MODULES);
+		openSettings(module);
+	}
+
 	private void openSettings(@Nullable Module module) {
 		settingsModule = module;
 		scroll = scrollTarget = 0;

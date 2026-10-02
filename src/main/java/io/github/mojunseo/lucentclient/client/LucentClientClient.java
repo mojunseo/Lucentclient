@@ -59,6 +59,7 @@ public class LucentClientClient implements ClientModInitializer {
 			for (Module module : ModuleManager.modules()) {
 				if (module.isEnabled()) module.tick(minecraft);
 			}
+			if (SelfTest.enabled()) SelfTest.tick(minecraft);
 		});
 
 		AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {

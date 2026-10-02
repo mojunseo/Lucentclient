@@ -56,8 +56,11 @@ public class PotionsModule extends HudModule {
 
 	@Override
 	public int width(Minecraft minecraft) {
+		List<MobEffectInstance> effects = effects(minecraft);
+		// No effects: draw nothing, not an empty box.
+		if (effects.isEmpty()) return 0;
 		int width = 0;
-		for (MobEffectInstance effect : effects(minecraft)) {
+		for (MobEffectInstance effect : effects) {
 			width = Math.max(width, Math.max(minecraft.font.width(name(effect)), minecraft.font.width(MobEffectUtil.formatDuration(effect, 1.0F, 20.0F))));
 		}
 		return textLeft() + width + 4;
@@ -65,12 +68,14 @@ public class PotionsModule extends HudModule {
 
 	@Override
 	public int height(Minecraft minecraft) {
-		return Math.max(1, effects(minecraft).size()) * ROW + 2;
+		int count = effects(minecraft).size();
+		return count == 0 ? 0 : count * ROW + 2;
 	}
 
 	@Override
 	protected void extractAt(Minecraft minecraft, GuiGraphicsExtractor graphics) {
 		List<MobEffectInstance> effects = effects(minecraft);
+		if (effects.isEmpty()) return;
 		fillBackground(graphics, 0, 0, width(minecraft), height(minecraft));
 		for (int i = 0; i < effects.size(); i++) {
 			MobEffectInstance effect = effects.get(i);
