@@ -300,6 +300,11 @@ main { flex: 1; min-height: 0; overflow: auto; padding: 38px 48px; }
    it stays bottom-left, flush with main's own padding, not boxed into that column. */
 .view { max-width: 760px; margin: 0 auto; }
 #view-logs { max-width: 920px; }
+#view-mods { max-width: 1040px; }
+/* Installed mods on the left (narrower — it's a flat list of what you already have), the
+   Modrinth search on the right (wider — it's the browsing/discovery surface). */
+.mods-layout { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 36px; align-items: start; }
+.mods-layout h2:first-child { margin-top: 0; }
 h1 {
   font-size: 22px;
   font-weight: 600;
