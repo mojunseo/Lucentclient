@@ -64,17 +64,12 @@ button { cursor: pointer; }
   100% { background-position: 60px -45px, -50px 45px, -30px -50px, 40px 30px, 0 0; }
 }
 
-/* The whole scene (stars, sun, aurora, terrain, blocks) breathes with one slow cinematic
-   zoom, like a trailer's opening dolly shot — everything in it moves together. */
+/* Groups stars, sun, aurora, terrain and blocks into one layer, sized a bit past the
+   viewport so nothing clips at the edges. No transform of its own — each child animates
+   independently. */
 .scene {
   position: absolute;
   inset: -4%;
-  animation: sceneZoom 50s ease-in-out infinite alternate;
-  transform-origin: 50% 68%;
-}
-@keyframes sceneZoom {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.08); }
 }
 
 /* Aurora curtains: wide, soft-edged ribbons of light drifting and billowing over the void,
