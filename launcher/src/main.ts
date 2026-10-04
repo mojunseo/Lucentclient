@@ -50,8 +50,8 @@ function show(view: string) {
 /** Slides the shared highlight pill behind whichever nav button is active. */
 function moveNavIndicator(el: HTMLElement) {
   const indicator = $("nav-indicator");
-  indicator.style.top = `${el.offsetTop}px`;
-  indicator.style.height = `${el.offsetHeight}px`;
+  indicator.style.left = `${el.offsetLeft}px`;
+  indicator.style.width = `${el.offsetWidth}px`;
 }
 document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) =>
   el.addEventListener("click", () => {
