@@ -72,35 +72,33 @@ button { cursor: pointer; }
   inset: -4%;
 }
 
-/* Aurora curtains: wide, soft-edged ribbons of light drifting and billowing over the void,
-   screen-blended so colors brighten and mix like real auroral bands instead of sitting flat. */
+/* Aurora curtains: wide, soft-edged ribbons of light drifting over the void. */
+/* No filter/blur and no mix-blend-mode here on purpose: an animated blurred, blend-moded
+   layer this large turned out to render inconsistently in the real app's engine (WebKit),
+   pulsing in apparent size in a way Chrome-based testing never showed. A gradient is soft
+   on its own by construction, so it doesn't need filter: blur() for a diffuse look, and
+   plain alpha layering (no blend mode) is the safer, more predictable choice. */
 .aurora {
   position: absolute;
-  left: -25%;
-  right: -25%;
-  top: -35%;
-  height: 170%;
+  left: -15%;
+  right: -15%;
+  top: -15%;
+  height: 140%;
   background: linear-gradient(
     100deg,
-    transparent 4%,
-    rgba(139, 92, 246, 0.55) 18%,
-    transparent 34%,
-    rgba(34, 211, 238, 0.5) 50%,
-    transparent 66%,
-    rgba(244, 114, 182, 0.45) 82%,
-    transparent 96%
+    transparent 0%,
+    rgba(139, 92, 246, 0.3) 16%,
+    transparent 36%,
+    rgba(34, 211, 238, 0.26) 54%,
+    transparent 72%,
+    rgba(244, 114, 182, 0.24) 90%,
+    transparent 100%
   );
-  mix-blend-mode: screen;
-  filter: blur(55px);
-  transform-origin: 50% 30%;
-  will-change: transform, opacity;
+  pointer-events: none;
 }
-/* Fixed opacity per layer — animating opacity on a blurred, screen-blended shape makes its
-   soft edge visibly expand and contract as it brightens and dims, which reads as the whole
-   shape growing and shrinking even though nothing is actually being scaled. */
-.aurora-1 { opacity: 0.46; animation: auroraSway1 13s ease-in-out infinite; }
-.aurora-2 { opacity: 0.35; filter: blur(70px); animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
-.aurora-3 { opacity: 0.28; filter: blur(50px); animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
+.aurora-1 { animation: auroraSway1 13s ease-in-out infinite; }
+.aurora-2 { animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
+.aurora-3 { animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
 @keyframes auroraSway1 {
   0%, 100% { transform: translate(-6%, -3%); }
   50% { transform: translate(6%, 4%); }
