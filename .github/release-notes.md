@@ -3,6 +3,9 @@
 Lucent Client는 Minecraft: Java Edition용 Fabric 클라이언트 모드와 데스크톱 런처입니다. 기능은 [README](https://github.com/mojunseo/Lucentclient#readme)를 참고하세요.
 
 ### 이번 버전에서 바뀐 것
+- **모드 화면을 둘로 나눴습니다**: 왼쪽에는 설치한 모드, 오른쪽에는 Modrinth 검색이 함께 보여서 더 이상 아래로 오르내리지 않아도 됩니다.
+
+v0.1.3에서 바뀐 것:
 - **런처 디자인을 새로 그렸습니다**: 유리판(글래스모피즘) 화면에, 보라·시안·핑크 오로라가 떠다니는 밤하늘 배경(별, 떠있는 블록, 블록 스카이라인, 빛나는 해)을 깔았습니다. 메뉴는 화면 위쪽 가운데로 옮기고, 화면 전환과 목록에 움직임을 더했습니다.
 - **서버 목록 맨 위에 PurityMC(puritymc.kr)가 자동으로 고정**됩니다. 지울 수 없어요.
 
@@ -37,7 +40,9 @@ Windows: `*_x64-setup.exe` 또는 `.msi` · macOS(Apple Silicon과 Intel): `*_un
 
 Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop launcher. See the [README](https://github.com/mojunseo/Lucentclient/blob/main/README.en.md) for features.
 
-**What's new**: the launcher has a new look — glassmorphic panels over a night-sky background with a drifting violet/cyan/pink aurora, stars, floating blocks, a block skyline and a glowing sun. The menu moved to the top of the window and is centered, and screens and lists now animate. PurityMC (puritymc.kr) is now pinned to the top of your server list automatically and can't be removed.
+**What's new**: the Mods screen is now split in two — installed mods on the left, Modrinth search on the right — side by side instead of stacked.
+
+**From v0.1.3**: the launcher has a new look — glassmorphic panels over a night-sky background with a drifting violet/cyan/pink aurora, stars, floating blocks, a block skyline and a glowing sun. The menu moved to the top of the window and is centered, and screens and lists now animate. PurityMC (puritymc.kr) is now pinned to the top of your server list automatically and can't be removed.
 
 **From v0.1.2**: the launcher now updates itself: when it starts it downloads and installs a new release and restarts, and the mod updates with it (Linux .deb and .rpm installs only show a notice). If you have v0.1.1 or older, download this version by hand once.
 
@@ -55,7 +60,9 @@ The launcher signs in with your Microsoft account and starts the game. It isn't 
 
 Lucent Client は Minecraft: Java Edition 向けの Fabric クライアント MOD とデスクトップランチャーです。機能は [README](https://github.com/mojunseo/Lucentclient/blob/main/README.ja.md) をご覧ください。
 
-**今回の変更**: ランチャーのデザインを一新しました。ガラス風(グラスモーフィズム)のパネルに、紫・シアン・ピンクのオーロラが漂う夜空の背景(星、浮かぶブロック、ブロックのスカイライン、光る太陽)を重ねています。メニューはウィンドウ上部中央に移動し、画面切り替えやリストにも動きを加えました。サーバー一覧には PurityMC(puritymc.kr)が自動で一番上に固定されるようになり、削除できません。
+**今回の変更**: MOD画面を左右に分けました。左に導入済みMOD、右に Modrinth 検索が並んで表示され、上下にスクロールしなくて済みます。
+
+**v0.1.3 の変更**: ランチャーのデザインを一新しました。ガラス風(グラスモーフィズム)のパネルに、紫・シアン・ピンクのオーロラが漂う夜空の背景(星、浮かぶブロック、ブロックのスカイライン、光る太陽)を重ねています。メニューはウィンドウ上部中央に移動し、画面切り替えやリストにも動きを加えました。サーバー一覧には PurityMC(puritymc.kr)が自動で一番上に固定されるようになり、削除できません。
 
 **v0.1.2 の変更**: ランチャーが自動で更新されるようになりました。起動時に新しいリリースをダウンロード・インストールして再起動し、MOD も一緒に更新されます（Linux の .deb、.rpm 版はお知らせのみ表示）。v0.1.1 以前をお使いの場合は、今回だけ手動でダウンロードしてください。
 

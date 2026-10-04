@@ -1,7 +1,7 @@
 # Mod metadata and, per build, the Minecraft versions it runs on and the dependencies it builds against.
 # The launcher reads this file too, to know which jar goes with which Minecraft version.
 mod.id = "lucentclient"
-mod.version = "0.1.3"
+mod.version = "0.1.4"
 
 deps.fabric_loader = "0.19.5"
 loomx.loom_version = "1.18.2"
