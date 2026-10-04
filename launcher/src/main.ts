@@ -25,6 +25,17 @@ type InstalledMod = { projectId: string; title: string; iconUrl: string | null; 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 let info: Info;
 
+/** Click and keyboard (Enter/Space) both trigger the same action, for row-as-control elements. */
+function onActivate(el: HTMLElement, handler: () => void) {
+  el.addEventListener("click", handler);
+  el.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handler();
+    }
+  });
+}
+
 // --- Navigation -------------------------------------------------------------------------------
 
 function show(view: string) {
@@ -85,7 +96,9 @@ function renderAccounts() {
       name.append(tag);
     }
     row.querySelector(".lamp")!.classList.toggle("on", account.uuid === info.selected);
-    row.addEventListener("click", async () => {
+    row.tabIndex = 0;
+    row.setAttribute("role", "button");
+    onActivate(row, async () => {
       await invoke("select_account", { uuid: account.uuid });
       await refresh();
     });
@@ -245,6 +258,8 @@ function renderSettings() {
   $<HTMLInputElement>("jvm-args").value = info.settings.jvmArgs;
   $("hide-lamp").classList.toggle("on", info.settings.hideOnLaunch);
   $("perf-lamp").classList.toggle("on", info.settings.performanceMods);
+  $("hide-row").setAttribute("aria-checked", String(info.settings.hideOnLaunch));
+  $("perf-row").setAttribute("aria-checked", String(info.settings.performanceMods));
 }
 
 async function saveSettings(change: Partial<Settings>) {
@@ -263,8 +278,8 @@ $<HTMLInputElement>("memory").addEventListener("change", (event) =>
 $<HTMLInputElement>("jvm-args").addEventListener("change", (event) =>
   saveSettings({ jvmArgs: (event.target as HTMLInputElement).value.trim() }),
 );
-$("hide-row").addEventListener("click", () => saveSettings({ hideOnLaunch: !info.settings.hideOnLaunch }));
-$("perf-row").addEventListener("click", () => saveSettings({ performanceMods: !info.settings.performanceMods }));
+onActivate($("hide-row"), () => saveSettings({ hideOnLaunch: !info.settings.hideOnLaunch }));
+onActivate($("perf-row"), () => saveSettings({ performanceMods: !info.settings.performanceMods }));
 $("open-folder").addEventListener("click", () => invoke("open_game_directory"));
 
 // --- Versions ---------------------------------------------------------------------------------
@@ -404,7 +419,10 @@ async function renderInstalled() {
     const lamp = document.createElement("span");
     lamp.className = "lamp" + (mod.enabled ? " on" : "");
     lamp.title = mod.enabled ? "켜짐" : "꺼짐";
-    lamp.addEventListener("click", () =>
+    lamp.tabIndex = 0;
+    lamp.setAttribute("role", "switch");
+    lamp.setAttribute("aria-checked", String(mod.enabled));
+    onActivate(lamp, () =>
       changeMods(() => invoke("set_mod_enabled", { projectId: mod.projectId, enabled: !mod.enabled })),
     );
     control.append(remove, lamp);
