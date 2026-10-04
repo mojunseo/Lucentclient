@@ -12,6 +12,7 @@
 		"MinecraftMixin",
 		"MouseHandlerMixin",
 		"ParticleEngineMixin",
+		"ServerListMixin",
 		"ToggleKeyMappingMixin",
 		"WeatherEffectRendererMixin"
 	],
