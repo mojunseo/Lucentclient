@@ -62,11 +62,51 @@ button { cursor: pointer; }
     var(--void);
 }
 
-/* Groups stars, sun, terrain and blocks into one layer, sized a bit past the viewport so
-   nothing clips at the edges. No transform of its own — each child animates independently. */
+/* Groups stars, sun, aurora, terrain and blocks into one layer, sized a bit past the
+   viewport so nothing clips at the edges. No transform of its own — each child animates
+   independently. */
 .scene {
   position: absolute;
   inset: -4%;
+}
+
+/* Aurora curtains: wide, soft-edged ribbons of light drifting over the void. No filter/blur
+   and no mix-blend-mode: a gradient is soft on its own by construction, so it doesn't need
+   blurring, and plain alpha layering keeps it predictable across rendering engines. The only
+   animated property is a plain translate — the actual bugs turned out to be elsewhere
+   (.play::before's blur+opacity, and .backdrop's blobs drifting near clipped edges). */
+.aurora {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  top: -15%;
+  height: 140%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.3) 16%,
+    transparent 36%,
+    rgba(34, 211, 238, 0.26) 54%,
+    transparent 72%,
+    rgba(244, 114, 182, 0.24) 90%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+.aurora-1 { animation: auroraSway1 13s ease-in-out infinite; }
+.aurora-2 { animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
+.aurora-3 { animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
+@keyframes auroraSway1 {
+  0%, 100% { transform: translate(-6%, -3%); }
+  50% { transform: translate(6%, 4%); }
+}
+@keyframes auroraSway2 {
+  0%, 100% { transform: translate(7%, 2%); }
+  50% { transform: translate(-6%, -3%); }
+}
+@keyframes auroraSway3 {
+  0%, 100% { transform: translate(-4%, 3%); }
+  50% { transform: translate(5%, -4%); }
 }
 
 /* Stars: one tiled layer of point gradients repeated across the sky, cheaper than hundreds
