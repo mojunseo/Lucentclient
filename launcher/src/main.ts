@@ -25,11 +25,33 @@ type InstalledMod = { projectId: string; title: string; iconUrl: string | null; 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 let info: Info;
 
+/** Click and keyboard (Enter/Space) both trigger the same action, for row-as-control elements. */
+function onActivate(el: HTMLElement, handler: () => void) {
+  el.addEventListener("click", handler);
+  el.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handler();
+    }
+  });
+}
+
 // --- Navigation -------------------------------------------------------------------------------
 
 function show(view: string) {
   document.querySelectorAll<HTMLElement>(".view").forEach((el) => (el.hidden = el.id !== `view-${view}`));
-  document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) => el.classList.toggle("active", el.dataset.view === view));
+  document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) => {
+    const active = el.dataset.view === view;
+    el.classList.toggle("active", active);
+    if (active) moveNavIndicator(el);
+  });
+}
+
+/** Slides the shared highlight pill behind whichever nav button is active. */
+function moveNavIndicator(el: HTMLElement) {
+  const indicator = $("nav-indicator");
+  indicator.style.left = `${el.offsetLeft}px`;
+  indicator.style.width = `${el.offsetWidth}px`;
 }
 document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) =>
   el.addEventListener("click", () => {
@@ -47,23 +69,6 @@ function selectedAccount() {
 }
 
 function renderAccounts() {
-  const current = selectedAccount();
-  const chip = $("account-chip");
-  chip.replaceChildren();
-  if (current) {
-    const img = document.createElement("img");
-    img.src = avatar(current.uuid, 28);
-    img.alt = "";
-    const text = document.createElement("div");
-    text.textContent = current.name;
-    const small = document.createElement("small");
-    small.textContent = "계정 바꾸기";
-    text.append(small);
-    chip.append(img, text);
-  } else {
-    chip.textContent = "로그인하기";
-  }
-
   const list = $("account-list");
   list.replaceChildren();
   if (info.accounts.length === 0) {
@@ -85,7 +90,9 @@ function renderAccounts() {
       name.append(tag);
     }
     row.querySelector(".lamp")!.classList.toggle("on", account.uuid === info.selected);
-    row.addEventListener("click", async () => {
+    row.tabIndex = 0;
+    row.setAttribute("role", "button");
+    onActivate(row, async () => {
       await invoke("select_account", { uuid: account.uuid });
       await refresh();
     });
@@ -104,8 +111,6 @@ function renderAccounts() {
   note.textContent = "Microsoft 로그인은 아직 쓸 수 없어요. 런처의 Azure 앱이 Mojang 승인을 받으면 열립니다.";
   $("offline-form").hidden = !info.development;
 }
-
-$("account-chip").addEventListener("click", () => show("accounts"));
 
 $("offline-form").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -168,7 +173,9 @@ const STAGES: Record<Progress["stage"], { label: string; from: number; to: numbe
 function setPlaying(state: "idle" | "preparing" | "running") {
   const button = $<HTMLButtonElement>("play");
   button.disabled = state !== "idle" || !selectedAccount();
-  button.querySelector(".lamp")!.classList.toggle("on", state === "running");
+  const lamp = button.querySelector(".lamp")!;
+  lamp.classList.toggle("on", state === "running");
+  lamp.classList.toggle("loading", state === "preparing");
   $("play-label").textContent = { idle: "플레이", preparing: "준비 중", running: "실행 중" }[state];
   $("progress").hidden = state !== "preparing";
 }
@@ -245,6 +252,8 @@ function renderSettings() {
   $<HTMLInputElement>("jvm-args").value = info.settings.jvmArgs;
   $("hide-lamp").classList.toggle("on", info.settings.hideOnLaunch);
   $("perf-lamp").classList.toggle("on", info.settings.performanceMods);
+  $("hide-row").setAttribute("aria-checked", String(info.settings.hideOnLaunch));
+  $("perf-row").setAttribute("aria-checked", String(info.settings.performanceMods));
 }
 
 async function saveSettings(change: Partial<Settings>) {
@@ -263,8 +272,8 @@ $<HTMLInputElement>("memory").addEventListener("change", (event) =>
 $<HTMLInputElement>("jvm-args").addEventListener("change", (event) =>
   saveSettings({ jvmArgs: (event.target as HTMLInputElement).value.trim() }),
 );
-$("hide-row").addEventListener("click", () => saveSettings({ hideOnLaunch: !info.settings.hideOnLaunch }));
-$("perf-row").addEventListener("click", () => saveSettings({ performanceMods: !info.settings.performanceMods }));
+onActivate($("hide-row"), () => saveSettings({ hideOnLaunch: !info.settings.hideOnLaunch }));
+onActivate($("perf-row"), () => saveSettings({ performanceMods: !info.settings.performanceMods }));
 $("open-folder").addEventListener("click", () => invoke("open_game_directory"));
 
 // --- Versions ---------------------------------------------------------------------------------
@@ -404,7 +413,10 @@ async function renderInstalled() {
     const lamp = document.createElement("span");
     lamp.className = "lamp" + (mod.enabled ? " on" : "");
     lamp.title = mod.enabled ? "켜짐" : "꺼짐";
-    lamp.addEventListener("click", () =>
+    lamp.tabIndex = 0;
+    lamp.setAttribute("role", "switch");
+    lamp.setAttribute("aria-checked", String(mod.enabled));
+    onActivate(lamp, () =>
       changeMods(() => invoke("set_mod_enabled", { projectId: mod.projectId, enabled: !mod.enabled })),
     );
     control.append(remove, lamp);
