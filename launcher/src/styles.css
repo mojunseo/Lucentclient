@@ -213,7 +213,7 @@ h2 { font-size: 14px; font-weight: 600; color: var(--mist); letter-spacing: 0.01
 /* Play: the one view that isn't the centered column — it stays pinned bottom-left,
    flush with main's own padding. */
 #view-play { max-width: none; margin: 0; height: 100%; display: flex; }
-.stage { margin-top: auto; margin-bottom: 11%; width: min(560px, 100%); }
+.stage { margin-top: auto; margin-bottom: 3%; width: min(560px, 100%); }
 .version-line { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 13px; }
 .version-line label { color: var(--mist); }
 select {
