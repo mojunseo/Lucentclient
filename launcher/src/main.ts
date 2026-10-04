@@ -40,7 +40,18 @@ function onActivate(el: HTMLElement, handler: () => void) {
 
 function show(view: string) {
   document.querySelectorAll<HTMLElement>(".view").forEach((el) => (el.hidden = el.id !== `view-${view}`));
-  document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) => el.classList.toggle("active", el.dataset.view === view));
+  document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) => {
+    const active = el.dataset.view === view;
+    el.classList.toggle("active", active);
+    if (active) moveNavIndicator(el);
+  });
+}
+
+/** Slides the shared highlight pill behind whichever nav button is active. */
+function moveNavIndicator(el: HTMLElement) {
+  const indicator = $("nav-indicator");
+  indicator.style.top = `${el.offsetTop}px`;
+  indicator.style.height = `${el.offsetHeight}px`;
 }
 document.querySelectorAll<HTMLButtonElement>(".nav").forEach((el) =>
   el.addEventListener("click", () => {
@@ -181,7 +192,9 @@ const STAGES: Record<Progress["stage"], { label: string; from: number; to: numbe
 function setPlaying(state: "idle" | "preparing" | "running") {
   const button = $<HTMLButtonElement>("play");
   button.disabled = state !== "idle" || !selectedAccount();
-  button.querySelector(".lamp")!.classList.toggle("on", state === "running");
+  const lamp = button.querySelector(".lamp")!;
+  lamp.classList.toggle("on", state === "running");
+  lamp.classList.toggle("loading", state === "preparing");
   $("play-label").textContent = { idle: "플레이", preparing: "준비 중", running: "실행 중" }[state];
   $("progress").hidden = state !== "preparing";
 }

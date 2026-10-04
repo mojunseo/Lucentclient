@@ -56,17 +56,37 @@ button { cursor: pointer; }
     radial-gradient(680px 680px at 75% 95%, rgba(244, 114, 182, 0.3), transparent 60%),
     radial-gradient(520px 520px at 8% 90%, rgba(139, 92, 246, 0.24), transparent 60%),
     var(--void);
-  animation: drift 26s ease-in-out infinite alternate;
+  animation: drift 18s ease-in-out infinite alternate;
 }
 @keyframes drift {
   0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
-  100% { background-position: 40px -30px, -35px 30px, -20px -35px, 25px 20px, 0 0; }
+  100% { background-position: 60px -45px, -50px 45px, -30px -50px, 40px 30px, 0 0; }
 }
 
 .app { display: grid; grid-template-columns: 216px 1fr; height: 100vh; }
 
+/* View transitions: a section plays this the moment it stops being [hidden]. */
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.view { animation: viewIn 340ms cubic-bezier(0.22, 0.9, 0.3, 1) both; }
+
+/* List rows cascade in, newest-rendered batch first, capped so long lists don't crawl. */
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+.row { animation: rowIn 260ms ease both; }
+.row:nth-child(2) { animation-delay: 30ms; }
+.row:nth-child(3) { animation-delay: 60ms; }
+.row:nth-child(4) { animation-delay: 90ms; }
+.row:nth-child(5) { animation-delay: 120ms; }
+.row:nth-child(n + 6) { animation-delay: 140ms; }
+
 /* Sidebar */
 .sidebar {
+  position: relative;
   background: var(--glass-strong);
   -webkit-backdrop-filter: blur(24px) saturate(150%);
   backdrop-filter: blur(24px) saturate(150%);
@@ -87,8 +107,33 @@ button { cursor: pointer; }
   filter: drop-shadow(0 0 18px rgba(139, 92, 246, 0.45));
   width: fit-content;
 }
+/* A single pill that slides between nav buttons (positioned in JS via offsetTop/Height)
+   instead of each button drawing its own active state — the motion is what reads as "active". */
+.nav-indicator {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  border-radius: 10px;
+  background: linear-gradient(120deg, rgba(139, 92, 246, 0.25), rgba(34, 211, 238, 0.14));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  transition: top 320ms cubic-bezier(0.22, 1, 0.36, 1), height 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+.nav-indicator::before {
+  content: "";
+  position: absolute;
+  left: -11px;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--gradient);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.65);
+}
 .nav {
   position: relative;
+  z-index: 1;
   background: none;
   border: 0;
   text-align: left;
@@ -100,22 +145,7 @@ button { cursor: pointer; }
   transition: background 150ms, color 150ms;
 }
 .nav:hover { color: var(--paper); background: var(--glass); }
-.nav.active {
-  color: #fff;
-  background: linear-gradient(120deg, rgba(139, 92, 246, 0.25), rgba(34, 211, 238, 0.14));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
-}
-.nav.active::before {
-  content: "";
-  position: absolute;
-  left: -11px;
-  top: 7px;
-  bottom: 7px;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--gradient);
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.65);
-}
+.nav.active { color: #fff; }
 .account-chip {
   margin-top: auto;
   display: flex;
@@ -132,7 +162,9 @@ button { cursor: pointer; }
   border-radius: 8px;
   image-rendering: pixelated;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1), 0 0 14px rgba(139, 92, 246, 0.3);
+  transition: transform 160ms;
 }
+.account-chip:hover img { transform: scale(1.08) rotate(-2deg); }
 .account-chip small { display: block; color: var(--mist); font-size: 12px; }
 .version { color: var(--mist); opacity: 0.6; font-size: 12px; padding: 10px 24px 0; }
 
@@ -209,7 +241,24 @@ select:hover { border-color: rgba(255, 255, 255, 0.3); }
 .play-label { z-index: 1; }
 .progress { margin-top: 18px; }
 .bar { height: 3px; background: var(--glass); border-radius: 2px; overflow: hidden; }
-.fill { height: 100%; width: 0; background: var(--gradient); box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); transition: width 120ms linear; }
+.fill {
+  position: relative;
+  height: 100%;
+  width: 0;
+  background: var(--gradient);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  overflow: hidden;
+  transition: width 120ms linear;
+}
+.fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+@keyframes shimmer { to { transform: translateX(100%); } }
 .progress-text { color: var(--mist); margin: 10px 0 0; font-variant-numeric: tabular-nums; font-size: 13px; }
 .error { color: var(--danger); margin: 16px 0 0; user-select: text; white-space: pre-wrap; overflow-wrap: anywhere; }
 
@@ -233,6 +282,13 @@ select:hover { border-color: rgba(255, 255, 255, 0.3); }
   0%, 100% { box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.16), 0 0 10px rgba(139, 92, 246, 0.5); }
   50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.22), 0 0 18px rgba(139, 92, 246, 0.75); }
 }
+/* While the game is being prepared, the same dot spins instead of breathing. */
+.lamp.loading {
+  background: conic-gradient(from 0deg, var(--violet), var(--cyan), var(--pink), var(--violet));
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.55);
+  animation: spin 850ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Switch: the same .lamp, reinterpreted as a track + thumb where it's actually a toggle control. */
 .toggle-row .lamp, .mod-row .lamp {
@@ -320,9 +376,10 @@ input:not([type]), input[type="text"] {
   padding: 10px 20px;
   font-weight: 700;
   box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
-  transition: filter 120ms, box-shadow 160ms;
+  transition: filter 120ms, box-shadow 160ms, transform 120ms;
 }
 .button:hover { filter: brightness(1.08); box-shadow: 0 8px 26px rgba(139, 92, 246, 0.48); }
+.button:active:not(:disabled) { transform: scale(0.96); }
 .button.quiet {
   background: var(--glass);
   -webkit-backdrop-filter: blur(14px);
@@ -332,7 +389,7 @@ input:not([type]), input[type="text"] {
   box-shadow: none;
 }
 .button.quiet:hover { border-color: rgba(255, 255, 255, 0.3); background: var(--glass-strong); }
-.button:disabled { opacity: 0.5; cursor: default; filter: none; }
+.button:disabled { opacity: 0.5; cursor: default; filter: none; transform: none; }
 .note { color: var(--mist); font-size: 13px; margin: 10px 0 0; max-width: 560px; }
 .offline { margin-top: 34px; }
 .offline label { display: block; margin-bottom: 8px; }
@@ -367,8 +424,22 @@ dialog {
   padding: 32px 36px;
   width: 420px;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  animation: dialogIn 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-dialog::backdrop { background: rgba(5, 4, 12, 0.68); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+@keyframes dialogIn {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+dialog::backdrop {
+  background: rgba(5, 4, 12, 0.68);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: backdropIn 240ms ease;
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 .code {
   font: 700 36px/1.2 ui-monospace, "JetBrains Mono", monospace;
   letter-spacing: 0.13em;
@@ -404,9 +475,10 @@ dialog::backdrop { background: rgba(5, 4, 12, 0.68); -webkit-backdrop-filter: bl
   padding: 5px 14px;
   color: var(--mist);
   font-size: 13px;
-  transition: background 120ms, color 120ms, border-color 120ms;
+  transition: background 120ms, color 120ms, border-color 120ms, transform 120ms;
 }
 .category:hover { color: var(--paper); border-color: rgba(255, 255, 255, 0.28); }
+.category:active { transform: scale(0.94); }
 .category.active { background: var(--gradient); color: #fff; border-color: transparent; box-shadow: 0 0 12px rgba(139, 92, 246, 0.45); }
 .result-count { margin: 4px 0 8px; }
 .list-note { margin: -4px 0 10px; }
