@@ -69,23 +69,6 @@ function selectedAccount() {
 }
 
 function renderAccounts() {
-  const current = selectedAccount();
-  const chip = $("account-chip");
-  chip.replaceChildren();
-  if (current) {
-    const img = document.createElement("img");
-    img.src = avatar(current.uuid, 28);
-    img.alt = "";
-    const text = document.createElement("div");
-    text.textContent = current.name;
-    const small = document.createElement("small");
-    small.textContent = "계정 바꾸기";
-    text.append(small);
-    chip.append(img, text);
-  } else {
-    chip.textContent = "로그인하기";
-  }
-
   const list = $("account-list");
   list.replaceChildren();
   if (info.accounts.length === 0) {
@@ -128,8 +111,6 @@ function renderAccounts() {
   note.textContent = "Microsoft 로그인은 아직 쓸 수 없어요. 런처의 Azure 앱이 Mojang 승인을 받으면 열립니다.";
   $("offline-form").hidden = !info.development;
 }
-
-$("account-chip").addEventListener("click", () => show("accounts"));
 
 $("offline-form").addEventListener("submit", async (event) => {
   event.preventDefault();

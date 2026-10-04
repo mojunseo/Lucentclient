@@ -189,48 +189,15 @@ button { cursor: pointer; }
 .nav:hover { color: var(--paper); background: var(--glass); }
 .nav.active { color: #fff; }
 
-/* Account panel: floats in the bottom-left corner, independent of the top bar. */
-.account-panel {
-  position: fixed;
-  left: 20px;
-  bottom: 20px;
-  width: 208px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  background: var(--glass-strong);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  padding: 6px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-}
-.account-chip {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 10px;
-  border-radius: 9px;
-  color: var(--paper);
-  cursor: pointer;
-}
-.account-chip:hover { background: var(--glass); }
-.account-chip img {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  image-rendering: pixelated;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1), 0 0 14px rgba(139, 92, 246, 0.3);
-  transition: transform 160ms;
-}
-.account-chip:hover img { transform: scale(1.08) rotate(-2deg); }
-.account-chip small { display: block; color: var(--mist); font-size: 12px; }
-.version { color: var(--mist); opacity: 0.6; font-size: 12px; padding: 8px 10px 2px; }
+/* Status group: the top bar's right column — launcher version and update notice,
+   balancing the wordmark on the left so the nav group stays dead-centered. */
+.status-group { justify-self: end; display: flex; align-items: center; gap: 10px; }
+.version { color: var(--mist); opacity: 0.6; font-size: 12px; }
 
 main { flex: 1; min-height: 0; overflow: auto; padding: 38px 48px; }
-/* Every view is a centered column, echoing the centered top nav above it — logs gets a
-   wider one since log lines need the room; the play view centers its own hero inside. */
+/* Every other view is a centered column, echoing the centered top nav above it — logs
+   gets a wider one since log lines need the room. The play view is its own exception:
+   it stays bottom-left, flush with main's own padding, not boxed into that column. */
 .view { max-width: 760px; margin: 0 auto; }
 #view-logs { max-width: 920px; }
 h1 {
@@ -243,10 +210,10 @@ h1 {
 }
 h2 { font-size: 14px; font-weight: 600; color: var(--mist); letter-spacing: 0.01em; margin: 30px 0 12px; }
 
-/* Play */
-#view-play { height: 100%; display: flex; justify-content: center; }
-/* The 130px floor keeps the hero button clear of the floating account panel in a short window. */
-.stage { margin-top: auto; margin-bottom: max(11%, 130px); width: min(560px, 100%); }
+/* Play: the one view that isn't the centered column — it stays pinned bottom-left,
+   flush with main's own padding. */
+#view-play { max-width: none; margin: 0; height: 100%; display: flex; }
+.stage { margin-top: auto; margin-bottom: 11%; width: min(560px, 100%); }
 .version-line { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 13px; }
 .version-line label { color: var(--mist); }
 select {
@@ -550,12 +517,11 @@ dialog::backdrop {
 .list-note { margin: -4px 0 10px; }
 .missing { color: var(--warn); font-size: 12px; margin-left: 6px; }
 
-/* Launcher update notice, above the version line in the floating account panel. */
+/* Launcher update notice, next to the version text in the top bar's status group. */
 .update {
-  margin-top: 12px;
-  padding: 9px 11px;
+  padding: 7px 11px;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--paper);
   background: var(--glass);
   -webkit-backdrop-filter: blur(10px);
@@ -563,5 +529,6 @@ dialog::backdrop {
   border-left: 2px solid;
   border-image: var(--gradient) 1;
   border-radius: 0 8px 8px 0;
+  white-space: nowrap;
 }
 .update a { color: var(--cyan); }
