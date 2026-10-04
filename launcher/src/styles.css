@@ -95,20 +95,23 @@ button { cursor: pointer; }
   transform-origin: 50% 30%;
   will-change: transform, opacity;
 }
-.aurora-1 { animation: auroraSway1 13s ease-in-out infinite; }
-.aurora-2 { filter: blur(70px); animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
-.aurora-3 { filter: blur(50px); animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
+/* Fixed opacity per layer — animating opacity on a blurred, screen-blended shape makes its
+   soft edge visibly expand and contract as it brightens and dims, which reads as the whole
+   shape growing and shrinking even though nothing is actually being scaled. */
+.aurora-1 { opacity: 0.46; animation: auroraSway1 13s ease-in-out infinite; }
+.aurora-2 { opacity: 0.35; filter: blur(70px); animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
+.aurora-3 { opacity: 0.28; filter: blur(50px); animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
 @keyframes auroraSway1 {
-  0%, 100% { transform: translate(-6%, -3%); opacity: 0.36; }
-  50% { transform: translate(6%, 4%); opacity: 0.56; }
+  0%, 100% { transform: translate(-6%, -3%); }
+  50% { transform: translate(6%, 4%); }
 }
 @keyframes auroraSway2 {
-  0%, 100% { transform: translate(7%, 2%); opacity: 0.26; }
-  50% { transform: translate(-6%, -3%); opacity: 0.44; }
+  0%, 100% { transform: translate(7%, 2%); }
+  50% { transform: translate(-6%, -3%); }
 }
 @keyframes auroraSway3 {
-  0%, 100% { transform: translate(-4%, 3%); opacity: 0.2; }
-  50% { transform: translate(5%, -4%); opacity: 0.36; }
+  0%, 100% { transform: translate(-4%, 3%); }
+  50% { transform: translate(5%, -4%); }
 }
 
 /* Stars: one tiled layer of point gradients repeated across the sky, cheaper than hundreds
