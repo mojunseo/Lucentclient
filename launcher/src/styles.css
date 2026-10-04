@@ -104,16 +104,16 @@ button { cursor: pointer; }
 .aurora-2 { filter: blur(70px); animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
 .aurora-3 { filter: blur(50px); animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
 @keyframes auroraSway1 {
-  0%, 100% { transform: translate(-7%, -4%) rotate(-6deg) scaleY(1); opacity: 0.36; }
-  50% { transform: translate(7%, 5%) rotate(4deg) scaleY(1.22); opacity: 0.56; }
+  0%, 100% { transform: translate(-6%, -3%) scaleY(1); opacity: 0.36; }
+  50% { transform: translate(6%, 4%) scaleY(1.12); opacity: 0.56; }
 }
 @keyframes auroraSway2 {
-  0%, 100% { transform: translate(9%, 3%) rotate(7deg) scaleY(1.12); opacity: 0.26; }
-  50% { transform: translate(-8%, -4%) rotate(-5deg) scaleY(0.92); opacity: 0.44; }
+  0%, 100% { transform: translate(7%, 2%) scaleY(1.08); opacity: 0.26; }
+  50% { transform: translate(-6%, -3%) scaleY(0.95); opacity: 0.44; }
 }
 @keyframes auroraSway3 {
-  0%, 100% { transform: translate(-5%, 5%) rotate(4deg) scaleY(0.88); opacity: 0.2; }
-  50% { transform: translate(6%, -6%) rotate(-7deg) scaleY(1.25); opacity: 0.36; }
+  0%, 100% { transform: translate(-4%, 3%) scaleY(0.92); opacity: 0.2; }
+  50% { transform: translate(5%, -4%) scaleY(1.12); opacity: 0.36; }
 }
 
 /* Stars: one tiled layer of point gradients repeated across the sky, cheaper than hundreds
