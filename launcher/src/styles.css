@@ -1,8 +1,8 @@
 @import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 
 /*
- * Lucent, take two: glass over color. A drifting violet/cyan/pink gradient mesh sits fixed
- * behind the whole app; every surface on top of it is frosted glass (translucent + blurred)
+ * Lucent, take two: glass over color. A violet/cyan/pink gradient mesh sits fixed behind
+ * the whole app; every surface on top of it is frosted glass (translucent + blurred)
  * rather than a flat fill, so the color always shows through. One gradient (--gradient) is
  * the recurring "lit" signature — wordmark, active nav, the play button's glow, switches,
  * primary buttons — reused everywhere instead of inventing a new accent per element.
@@ -45,7 +45,10 @@ button { cursor: pointer; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 6px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
 
-/* Fixed gradient mesh behind the whole window; everything else is glass sitting on top of it. */
+/* Fixed gradient mesh behind the whole window; everything else is glass sitting on top of it.
+   Static on purpose: these blobs sit near the corners, and animating their background-position
+   shifted how much of each circle the viewport edge clipped off — which read as the blobs
+   themselves growing and shrinking, not just moving. */
 .backdrop {
   position: fixed;
   inset: 0;
@@ -57,11 +60,6 @@ button { cursor: pointer; }
     radial-gradient(680px 680px at 75% 95%, rgba(244, 114, 182, 0.3), transparent 60%),
     radial-gradient(520px 520px at 8% 90%, rgba(139, 92, 246, 0.24), transparent 60%),
     var(--void);
-  animation: drift 18s ease-in-out infinite alternate;
-}
-@keyframes drift {
-  0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
-  100% { background-position: 60px -45px, -50px 45px, -30px -50px, 40px 30px, 0 0; }
 }
 
 /* Groups stars, sun, terrain and blocks into one layer, sized a bit past the viewport so
