@@ -50,6 +50,7 @@ button { cursor: pointer; }
   position: fixed;
   inset: 0;
   z-index: -1;
+  overflow: hidden;
   background:
     radial-gradient(640px 640px at 12% 18%, rgba(139, 92, 246, 0.4), transparent 60%),
     radial-gradient(560px 560px at 88% 14%, rgba(34, 211, 238, 0.32), transparent 60%),
@@ -61,6 +62,45 @@ button { cursor: pointer; }
 @keyframes drift {
   0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
   100% { background-position: 60px -45px, -50px 45px, -30px -50px, 40px 30px, 0 0; }
+}
+
+/* Aurora curtains: wide, soft-edged ribbons of light drifting and billowing over the void,
+   screen-blended so colors brighten and mix like real auroral bands instead of sitting flat. */
+.aurora {
+  position: absolute;
+  left: -25%;
+  right: -25%;
+  top: -35%;
+  height: 170%;
+  background: linear-gradient(
+    100deg,
+    transparent 4%,
+    rgba(139, 92, 246, 0.55) 18%,
+    transparent 34%,
+    rgba(34, 211, 238, 0.5) 50%,
+    transparent 66%,
+    rgba(244, 114, 182, 0.45) 82%,
+    transparent 96%
+  );
+  mix-blend-mode: screen;
+  filter: blur(55px);
+  transform-origin: 50% 30%;
+  will-change: transform, opacity;
+}
+.aurora-1 { animation: auroraSway1 13s ease-in-out infinite; }
+.aurora-2 { filter: blur(70px); animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
+.aurora-3 { filter: blur(50px); animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
+@keyframes auroraSway1 {
+  0%, 100% { transform: translate(-7%, -4%) rotate(-6deg) scaleY(1); opacity: 0.5; }
+  50% { transform: translate(7%, 5%) rotate(4deg) scaleY(1.22); opacity: 0.78; }
+}
+@keyframes auroraSway2 {
+  0%, 100% { transform: translate(9%, 3%) rotate(7deg) scaleY(1.12); opacity: 0.38; }
+  50% { transform: translate(-8%, -4%) rotate(-5deg) scaleY(0.92); opacity: 0.62; }
+}
+@keyframes auroraSway3 {
+  0%, 100% { transform: translate(-5%, 5%) rotate(4deg) scaleY(0.88); opacity: 0.3; }
+  50% { transform: translate(6%, -6%) rotate(-7deg) scaleY(1.25); opacity: 0.52; }
 }
 
 .app { display: grid; grid-template-columns: 216px 1fr; height: 100vh; }
