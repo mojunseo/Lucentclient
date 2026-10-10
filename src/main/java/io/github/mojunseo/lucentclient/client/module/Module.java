@@ -50,7 +50,10 @@ public abstract class Module {
 	public void setEnabled(boolean enabled) {
 		if (this.enabled == enabled) return;
 		this.enabled = enabled;
-		if (!enabled) onDisable();
+		if (enabled) onEnable(); else onDisable();
+	}
+
+	protected void onEnable() {
 	}
 
 	protected void onDisable() {

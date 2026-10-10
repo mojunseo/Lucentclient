@@ -22,6 +22,10 @@ import java.util.function.Function;
  * Low-end preset: sets Minecraft's video options to their cheapest values for as long as the module
  * is on, and puts the player's own values back when it is turned off. The player's values are kept
  * in the module's config, so they come back even if the game was closed in between.
+ *
+ * It also pulls in the client's own culling and particle-dropping modules, since those cut real
+ * rendering and simulation work that no vanilla option touches. Whatever the player had those set
+ * to before is remembered and restored, the same way the vanilla options are.
  */
 public class LightweightModule extends Module {
 	private final NumberSetting renderDistance = setting(new NumberSetting("lite_render_distance", 6, 2, 12, 1, ""));
@@ -62,6 +66,11 @@ public class LightweightModule extends Module {
 	/** The player's own values of the options this preset changed, as saved by each option's codec. */
 	private JsonObject backup = new JsonObject();
 
+	/** Whether entity culling / particle dropping were on before this preset turned them on, so they
+	 *  can go back to that instead of just being force-disabled. Null means "not currently overridden". */
+	private Boolean entityCullingBackup;
+	private Boolean particlesBackup;
+
 	public LightweightModule() {
 		super("lightweight", Category.PERFORMANCE, false);
 	}
@@ -74,6 +83,16 @@ public class LightweightModule extends Module {
 			minecraft.options.save();
 			ModuleManager.save();
 		}
+	}
+
+	@Override
+	protected void onEnable() {
+		// Cut real rendering/simulation work the vanilla options can't reach, remembering whatever
+		// the player had these set to so onDisable() can give it back instead of just turning them off.
+		if (entityCullingBackup == null) entityCullingBackup = ModuleManager.ENTITY_CULLING.isEnabled();
+		if (particlesBackup == null) particlesBackup = ModuleManager.PARTICLES.isEnabled();
+		ModuleManager.ENTITY_CULLING.setEnabled(true);
+		ModuleManager.PARTICLES.setEnabled(true);
 	}
 
 	/** Sets one option to the preset's value, backing up the player's value the first time. */
@@ -102,19 +121,30 @@ public class LightweightModule extends Module {
 	@Override
 	protected void onDisable() {
 		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft == null || minecraft.options == null) return;
-		boolean changed = false;
-		for (Tweak<?> tweak : tweaks) changed |= restore(tweak.option().apply(minecraft.options), tweak.key());
-		if (changed) minecraft.options.save();
+		if (minecraft != null && minecraft.options != null) {
+			boolean changed = false;
+			for (Tweak<?> tweak : tweaks) changed |= restore(tweak.option().apply(minecraft.options), tweak.key());
+			if (changed) minecraft.options.save();
+		}
 		if (!backup.isEmpty()) {
 			LucentClient.LOGGER.warn("Lightweight mode: no option for saved values {}", new ArrayList<>(backup.keySet()));
 			backup = new JsonObject();
+		}
+		if (entityCullingBackup != null) {
+			ModuleManager.ENTITY_CULLING.setEnabled(entityCullingBackup);
+			entityCullingBackup = null;
+		}
+		if (particlesBackup != null) {
+			ModuleManager.PARTICLES.setEnabled(particlesBackup);
+			particlesBackup = null;
 		}
 	}
 
 	@Override
 	public void read(JsonObject json) {
 		if (json.get("backup") instanceof JsonObject saved) backup = saved.deepCopy();
+		if (json.has("entityCullingBackup")) entityCullingBackup = json.get("entityCullingBackup").getAsBoolean();
+		if (json.has("particlesBackup")) particlesBackup = json.get("particlesBackup").getAsBoolean();
 		super.read(json);
 	}
 
@@ -122,5 +152,7 @@ public class LightweightModule extends Module {
 	public void write(JsonObject json) {
 		super.write(json);
 		json.add("backup", backup.deepCopy());
+		if (entityCullingBackup != null) json.addProperty("entityCullingBackup", entityCullingBackup);
+		if (particlesBackup != null) json.addProperty("particlesBackup", particlesBackup);
 	}
 }
