@@ -1,7 +1,11 @@
 package io.github.mojunseo.lucentclient.client.gui.ui;
 
 import net.minecraft.client.gui.Font;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.util.Mth;
 
 /** Drawing helpers for the custom menus. */

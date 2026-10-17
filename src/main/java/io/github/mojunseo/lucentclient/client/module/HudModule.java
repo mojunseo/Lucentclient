@@ -7,7 +7,11 @@ import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.ColorSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
 import net.minecraft.client.Minecraft;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 

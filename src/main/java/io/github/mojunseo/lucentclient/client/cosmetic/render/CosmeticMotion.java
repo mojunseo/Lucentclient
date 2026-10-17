@@ -1,8 +1,16 @@
 package io.github.mojunseo.lucentclient.client.cosmetic.render;
 
+//? if >=26.1 {
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+//?} else {
+/*import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+*///?}
 import net.minecraft.util.Mth;
+//? if >=26.1 {
 import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,7 +40,11 @@ public record CosmeticMotion(float moving, float crouch, float wingPhase, float 
 	}
 
 	/** Advances the player's tracker to this frame. Calling it again in the same frame changes nothing. */
+	//? if >=26.1 {
 	public static CosmeticMotion update(AvatarRenderState state) {
+	//?} else {
+	/*public static CosmeticMotion update(PlayerRenderState state) {
+	*///?}
 		long now = Util.getMillis();
 		Tracker tracker = TRACKERS.computeIfAbsent(state.id, id -> new Tracker());
 		tracker.lastSeen = now;

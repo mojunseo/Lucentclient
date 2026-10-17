@@ -4,7 +4,11 @@ import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.network.chat.Component;
 
 /**

@@ -2,7 +2,11 @@ package io.github.mojunseo.lucentclient.client.module;
 
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import net.minecraft.client.Minecraft;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 

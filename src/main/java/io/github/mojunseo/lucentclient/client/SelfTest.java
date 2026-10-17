@@ -83,8 +83,13 @@ final class SelfTest {
 				LucentClient.LOGGER.error("[selftest] could not delete the old world", e);
 			}
 		}
+		//? if >=26.1 {
 		LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, new LevelSettings.DifficultySettings(Difficulty.PEACEFUL, false, false),
 				false, WorldDataConfiguration.DEFAULT);
+		//?} else {
+		/*LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, false, Difficulty.PEACEFUL, false,
+				new net.minecraft.world.level.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS), WorldDataConfiguration.DEFAULT);
+		*///?}
 		minecraft.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions("lucent".hashCode(), false, false),
 				WorldPresets::createNormalWorldDimensions, Mc.screen(minecraft));
 	}
@@ -180,7 +185,12 @@ final class SelfTest {
 
 	private static void shot(Minecraft minecraft, String step) {
 		String file = "selftest-" + NAME + "-" + step + ".png";
+		//? if >=26.1 {
 		Screenshot.grab(minecraft.gameDirectory, file, Mc.mainRenderTarget(minecraft), 1,
 				message -> LucentClient.LOGGER.info("[selftest] saved {}", file));
+		//?} else {
+		/*Screenshot.grab(minecraft.gameDirectory, file, Mc.mainRenderTarget(minecraft),
+				message -> LucentClient.LOGGER.info("[selftest] saved {}", file));
+		*///?}
 	}
 }

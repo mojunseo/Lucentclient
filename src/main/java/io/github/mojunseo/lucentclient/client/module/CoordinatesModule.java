@@ -3,11 +3,14 @@ package io.github.mojunseo.lucentclient.client.module;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
 import net.minecraft.client.Minecraft;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +49,11 @@ public class CoordinatesModule extends HudModule {
 		if (showBiome.enabled()) {
 			Component biome = minecraft.level.getBiome(player.blockPosition()).unwrapKey()
 					.map(key -> {
-						Identifier id = key.identifier();
+						//? if >=26.1 {
+						var id = key.identifier();
+						//?} else {
+						/*var id = key.location();
+						*///?}
 						return (Component) Component.translatable("biome." + id.getNamespace() + "." + id.getPath());
 					})
 					.orElse(Component.literal("?"));

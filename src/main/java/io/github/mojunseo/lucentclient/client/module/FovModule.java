@@ -1,11 +1,11 @@
 package io.github.mojunseo.lucentclient.client.module;
 
+import io.github.mojunseo.lucentclient.client.compat.Mc;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Items;
 
 /**
@@ -33,9 +33,9 @@ public class FovModule extends Module {
 		} else if (moving) {
 			modifier += walk.floatValue() / 100.0F;
 		}
-		MobEffectInstance speedEffect = player.getEffect(MobEffects.SPEED);
+		MobEffectInstance speedEffect = player.getEffect(Mc.SPEED);
 		if (speedEffect != null) modifier += (speedEffect.getAmplifier() + 1) * speed.floatValue() / 100.0F;
-		MobEffectInstance slownessEffect = player.getEffect(MobEffects.SLOWNESS);
+		MobEffectInstance slownessEffect = player.getEffect(Mc.SLOWNESS);
 		if (slownessEffect != null) modifier -= (slownessEffect.getAmplifier() + 1) * slowness.floatValue() / 100.0F;
 		if (player.getAbilities().flying) modifier += flying.floatValue() / 100.0F;
 

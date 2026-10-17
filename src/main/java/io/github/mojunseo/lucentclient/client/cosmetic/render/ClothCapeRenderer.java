@@ -2,7 +2,11 @@ package io.github.mojunseo.lucentclient.client.cosmetic.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+//? if >=26.1 {
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+//?} else {
+/*import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+*///?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 
@@ -24,7 +28,11 @@ public final class ClothCapeRenderer {
 
 	/** Values copied out of the render state, since drawing happens later than the layer's submit. */
 	public record Params(float phase, float lean, float moving, int light) {
+		//? if >=26.1 {
 		public static Params of(AvatarRenderState state, CosmeticMotion motion, int light) {
+		//?} else {
+		/*public static Params of(PlayerRenderState state, CosmeticMotion motion, int light) {
+		*///?}
 			return new Params(motion.clothPhase(), state.capeLean, motion.moving(), light);
 		}
 	}

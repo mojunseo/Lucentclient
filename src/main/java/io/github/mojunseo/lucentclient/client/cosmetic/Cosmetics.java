@@ -1,6 +1,10 @@
 package io.github.mojunseo.lucentclient.client.cosmetic;
 
+//? if >=26.1 {
 import org.jspecify.annotations.Nullable;
+//?} else {
+/*import org.jetbrains.annotations.Nullable;
+*///?}
 
 import java.util.List;
 

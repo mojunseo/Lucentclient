@@ -2,7 +2,11 @@ package io.github.mojunseo.lucentclient.client.cosmetic;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+//? if >=26.1 {
 import org.jspecify.annotations.Nullable;
+//?} else {
+/*import org.jetbrains.annotations.Nullable;
+*///?}
 
 import java.util.EnumMap;
 import java.util.Map;

@@ -1,7 +1,11 @@
 package io.github.mojunseo.lucentclient.client.module;
 
 import com.mojang.blaze3d.platform.InputConstants;
+//? if >=26.1 {
 import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
 
 import java.util.ArrayDeque;
 

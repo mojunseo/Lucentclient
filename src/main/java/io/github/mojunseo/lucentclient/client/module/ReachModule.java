@@ -3,16 +3,28 @@ package io.github.mojunseo.lucentclient.client.module;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
 import net.minecraft.client.Minecraft;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+//? if >=26.1 {
 import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+//? if >=26.1 {
 import org.jspecify.annotations.Nullable;
+//?} else {
+/*import org.jetbrains.annotations.Nullable;
+*///?}
 
 import java.util.Locale;
 

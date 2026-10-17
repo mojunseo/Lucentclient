@@ -6,7 +6,9 @@ import io.github.mojunseo.lucentclient.client.module.CpsTracker;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
+//? if >=26.1 {
 import net.minecraft.client.input.MouseButtonInfo;
+//?}
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,8 +27,15 @@ public class MouseHandlerMixin {
 		if (Mc.screen(minecraft) == null && ModuleManager.ZOOM.isEnabled() && ModuleManager.ZOOM.onScroll(scrollY)) ci.cancel();
 	}
 
+	//? if >=26.1 {
 	@Inject(method = "onButton", at = @At("HEAD"))
 	private void lucentclient$countClick(long window, MouseButtonInfo info, int action, CallbackInfo ci) {
 		if (action == InputConstants.PRESS && Mc.screen(minecraft) == null) CpsTracker.click(info.button());
 	}
+	//?} else {
+	/*@Inject(method = "onPress", at = @At("HEAD"))
+	private void lucentclient$countClick(long window, int button, int action, int mods, CallbackInfo ci) {
+		if (action == InputConstants.PRESS && Mc.screen(minecraft) == null) CpsTracker.click(button);
+	}
+	*///?}
 }

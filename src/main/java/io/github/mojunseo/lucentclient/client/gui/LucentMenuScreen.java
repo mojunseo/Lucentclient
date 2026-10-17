@@ -21,14 +21,26 @@ import io.github.mojunseo.lucentclient.client.module.setting.ColorSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.NumberSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.Setting;
 import net.fabricmc.loader.api.FabricLoader;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+//? if >=26.1 {
 import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
+//? if >=26.1 {
 import org.jspecify.annotations.Nullable;
+//?} else {
+/*import org.jetbrains.annotations.Nullable;
+*///?}
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,9 +146,23 @@ public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 		scroll = scrollTarget = 0;
 	}
 
+	//? if >=26.1 {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+		extractContent(graphics, mouseX, mouseY);
+	}
+	//?} else {
+	/*// There is no extractRenderState split before 26.1: super.render() gives the default
+	// background and widgets, matching the lack of an extractBackground override here.
+	@Override
+	public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+		super.render(guiGraphics, mouseX, mouseY, partialTick);
+		extractContent(new GuiGraphicsExtractor(guiGraphics), mouseX, mouseY);
+	}
+	*///?}
+
+	private void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		animations.frame();
 		hits.clear();
 		now = Util.getMillis();
@@ -470,44 +496,79 @@ public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 
 	// --- Input --------------------------------------------------------------------------------
 
+	//? if >=26.1 {
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) return super.mouseClicked(event, doubleClick);
-		clickX = event.x();
-		for (Hit hit : List.copyOf(hits)) {
-			if (Ui.inside(event.x(), event.y(), hit.x, hit.y, hit.w, hit.h)) {
-				hit.action.run();
-				return true;
-			}
-		}
-		if (tab == Tab.COSMETICS && Ui.inside(event.x(), event.y(), previewX, previewY, previewW, previewH)) {
-			draggingPreview = true;
-			return true;
-		}
+		if (click(event.x(), event.y())) return true;
 		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+		if (drag(event.x(), dragX, dragY)) return true;
+		return super.mouseDragged(event, dragX, dragY);
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		release();
+		return super.mouseReleased(event);
+	}
+	//?} else {
+	/*@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (button != InputConstants.MOUSE_BUTTON_LEFT) return super.mouseClicked(mouseX, mouseY, button);
+		if (click(mouseX, mouseY)) return true;
+		return super.mouseClicked(mouseX, mouseY, button);
+	}
+
+	@Override
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+		if (drag(mouseX, dragX, dragY)) return true;
+		return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+	}
+
+	@Override
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		release();
+		return super.mouseReleased(mouseX, mouseY, button);
+	}
+	*///?}
+
+	private boolean click(double mouseX, double mouseY) {
+		clickX = mouseX;
+		for (Hit hit : List.copyOf(hits)) {
+			if (Ui.inside(mouseX, mouseY, hit.x, hit.y, hit.w, hit.h)) {
+				hit.action.run();
+				return true;
+			}
+		}
+		if (tab == Tab.COSMETICS && Ui.inside(mouseX, mouseY, previewX, previewY, previewW, previewH)) {
+			draggingPreview = true;
+			return true;
+		}
+		return false;
+	}
+
+	private boolean drag(double mouseX, double dragX, double dragY) {
 		if (draggingSlider != null) {
-			draggingSlider.setFraction((event.x() - sliderX) / sliderW);
+			draggingSlider.setFraction((mouseX - sliderX) / sliderW);
 			return true;
 		}
 		if (draggingPreview) {
 			previewYaw += (float) dragX * 2.0F;
 			return true;
 		}
-		return super.mouseDragged(event, dragX, dragY);
+		return false;
 	}
 
-	@Override
-	public boolean mouseReleased(MouseButtonEvent event) {
+	private void release() {
 		draggingPreview = false;
 		if (draggingSlider != null) {
 			draggingSlider = null;
 			ModuleManager.save();
 		}
-		return super.mouseReleased(event);
 	}
 
 	@Override

@@ -1,12 +1,21 @@
 package io.github.mojunseo.lucentclient.client.cosmetic.render;
 
-import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.util.Mth;
+//? if >=26.1 {
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
+//?} else {
+/*import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import io.github.mojunseo.lucentclient.client.compat.CosmeticDataHolder;
+import org.jetbrains.annotations.Nullable;
+*///?}
 
 /**
  * A model whose only cubes are cosmetic parts, hanging off a head and a body that copy the player's
@@ -16,7 +25,11 @@ import org.jspecify.annotations.Nullable;
  * every PlayerModel, which drew a large skin overlay in the cosmetic's texture over the player. The
  * pose comes from a separate PlayerModel that is posed but never drawn.
  */
+//? if >=26.1 {
 public class CosmeticModel extends Model<AvatarRenderState> {
+//?} else {
+/*public class CosmeticModel extends EntityModel<PlayerRenderState> {
+*///?}
 	private final ModelPart head;
 	private final ModelPart body;
 	private final PlayerModel poser;
@@ -26,7 +39,11 @@ public class CosmeticModel extends Model<AvatarRenderState> {
 	private final String kind;
 
 	public CosmeticModel(ModelPart root, String kind, PlayerModel poser) {
+		//? if >=26.1 {
 		super(root, RenderTypes::entityCutout);
+		//?} else {
+		/*super(root, RenderType::entityCutoutNoCull);
+		*///?}
 		this.head = root.getChild("head");
 		this.body = root.getChild("body");
 		this.poser = poser;
@@ -51,14 +68,23 @@ public class CosmeticModel extends Model<AvatarRenderState> {
 		}
 	}
 
+	//? if >=26.1 {
 	@Override
 	public void setupAnim(AvatarRenderState state) {
+	//?} else {
+	/*@Override
+	public void setupAnim(PlayerRenderState state) {
+	*///?}
 		super.setupAnim(state);
 		poser.setupAnim(state);
 		head.loadPose(poser.head.storePose());
 		body.loadPose(poser.body.storePose());
 		float time = state.ageInTicks;
+		//? if >=26.1 {
 		CosmeticMotion motion = state.getData(CosmeticRenderState.MOTION);
+		//?} else {
+		/*CosmeticMotion motion = (CosmeticMotion) ((CosmeticDataHolder) state).lucentclient$getCosmeticData("motion");
+		*///?}
 		if (left != null && right != null && motion != null) {
 			switch (kind) {
 				case "feathered_wings" -> animateFeathered(motion);

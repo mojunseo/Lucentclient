@@ -3,7 +3,11 @@ package io.github.mojunseo.lucentclient.client.module;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.ChoiceSetting;
 import net.minecraft.client.Minecraft;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
