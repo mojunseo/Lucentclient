@@ -20,13 +20,14 @@ Press **Right Shift** in game to open the menu. Click a module's lamp to turn it
 
 ### Mod
 
-Supports Minecraft **26.1 to 26.3**.
+Supports Minecraft **1.21.4 and 26.1 to 26.3**.
 
 1. Install [Fabric Loader](https://fabricmc.net/use/) 0.19.5 or newer and [Fabric API](https://modrinth.com/mod/fabric-api).
 2. Download the jar for your Minecraft version from [Releases](https://github.com/mojunseo/Lucentclient/releases) and put it in your `mods` folder.
 
 | Minecraft | File |
 |---|---|
+| 1.21.4 | `lucentclient-<version>+1.21.4.jar` |
 | 26.1, 26.1.1, 26.1.2 | `lucentclient-<version>+26.1.2.jar` |
 | 26.2 | `lucentclient-<version>+26.2.jar` |
 | 26.3 | `lucentclient-<version>+26.3.jar` |
