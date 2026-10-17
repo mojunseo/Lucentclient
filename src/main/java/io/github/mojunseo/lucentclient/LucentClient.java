@@ -2,7 +2,11 @@ package io.github.mojunseo.lucentclient;
 
 import net.fabricmc.api.ModInitializer;
 
+//? if >=26.1 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +20,13 @@ public class LucentClient implements ModInitializer {
 		LOGGER.info("Lucent Client loading");
 	}
 
+	//? if >=26.1 {
 	public static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
+	//?} else {
+	/*public static ResourceLocation id(String path) {
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+	}
+	*///?}
 }

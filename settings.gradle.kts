@@ -18,7 +18,7 @@ plugins {
 stonecutter {
     create(rootProject) {
         // One build per range of versions with the same APIs; see stonecutter.properties.toml.
-        versions("26.1.2", "26.2", "26.3")
+        versions("1.21.4", "26.1.2", "26.2", "26.3")
         vcsVersion = "26.3"
     }
 }

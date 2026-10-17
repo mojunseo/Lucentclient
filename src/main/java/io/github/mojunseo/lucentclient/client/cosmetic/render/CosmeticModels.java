@@ -1,7 +1,11 @@
 package io.github.mojunseo.lucentclient.client.cosmetic.render;
 
 import io.github.mojunseo.lucentclient.LucentClient;
+//? if >=26.1 {
 import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
+//?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+*///?}
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -9,7 +13,11 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
+//? if >=26.1 {
 import net.minecraft.client.model.player.PlayerModel;
+//?} else {
+/*import net.minecraft.client.model.PlayerModel;
+*///?}
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -45,14 +53,34 @@ public final class CosmeticModels {
 				"top_hat", CosmeticModels::topHat,
 				"crown", CosmeticModels::crown,
 				"halo", CosmeticModels::halo);
+		//? if >=26.1 {
 		definitions.forEach((name, definition) -> ModelLayerRegistry.registerModelLayer(LAYERS.get(name), definition::get));
+		//?} else {
+		/*definitions.forEach((name, definition) -> EntityModelLayerRegistry.registerModelLayer(LAYERS.get(name), definition::get));
+		*///?}
 	}
 
 	private static MeshDefinition emptyPlayer() {
 		MeshDefinition mesh = PlayerModel.createMesh(CubeDeformation.NONE, false);
+		//? if >=26.1 {
 		mesh.getRoot().clearRecursively();
+		//?} else {
+		/*clearRecursively(mesh.getRoot());
+		*///?}
 		return mesh;
 	}
+
+	// PartDefinition.clearRecursively() only exists from 26.1 onward; this recreates it from the
+	// older, per-child-only clearChild(name), clearing cubes bottom-up so poses and the tree survive.
+	//? if >=26.1 {
+	//?} else {
+	/*private static void clearRecursively(PartDefinition part) {
+		for (String name : java.util.List.copyOf(part.getChildren().stream().map(java.util.Map.Entry::getKey).toList())) {
+			clearRecursively(part.getChild(name));
+			part.clearChild(name);
+		}
+	}
+	*///?}
 
 	private static PartPose pose(float x, float y, float z, float xRot, float yRot, float zRot, float scale) {
 		return new PartPose(x, y, z, xRot, yRot, zRot, scale, scale, 1.0F);

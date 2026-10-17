@@ -2,7 +2,11 @@ package io.github.mojunseo.lucentclient.client.discord;
 
 import com.google.gson.JsonObject;
 import io.github.mojunseo.lucentclient.LucentClient;
+//? if >=26.1 {
 import org.jspecify.annotations.Nullable;
+//?} else {
+/*import org.jetbrains.annotations.Nullable;
+*///?}
 
 import java.io.IOException;
 import java.util.Objects;

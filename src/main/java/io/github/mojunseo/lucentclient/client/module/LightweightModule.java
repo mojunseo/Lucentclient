@@ -11,8 +11,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.PrioritizeChunkUpdates;
-import net.minecraft.client.TextureFilteringMethod;
 import net.minecraft.server.level.ParticleStatus;
+//? if >=26.1 {
+import net.minecraft.client.TextureFilteringMethod;
+//?}
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,27 +43,35 @@ public class LightweightModule extends Module {
 		}
 	}
 
-	private final List<Tweak<?>> tweaks = List.of(
-			new Tweak<>("renderDistance", Options::renderDistance, m -> m.renderDistance.intValue()),
-			new Tweak<>("simulationDistance", Options::simulationDistance, m -> Math.max(5, Math.min(8, m.renderDistance.intValue()))),
-			new Tweak<>("entityDistanceScaling", Options::entityDistanceScaling, m -> 0.5),
-			new Tweak<>("biomeBlendRadius", Options::biomeBlendRadius, m -> 0),
-			new Tweak<>("mipmapLevels", Options::mipmapLevels, m -> 0),
-			new Tweak<>("maxAnisotropyBit", Options::maxAnisotropyBit, m -> 1),
-			new Tweak<>("textureFiltering", Options::textureFiltering, m -> TextureFilteringMethod.NONE),
-			new Tweak<>("entityShadows", Options::entityShadows, m -> false),
-			new Tweak<>("cutoutLeaves", Options::cutoutLeaves, m -> false),
-			new Tweak<>("improvedTransparency", Options::improvedTransparency, m -> false),
-			new Tweak<>("weatherRadius", Options::weatherRadius, m -> 3),
-			new Tweak<>("chunkSectionFadeInTime", Options::chunkSectionFadeInTime, m -> 0.0),
-			new Tweak<>("prioritizeChunkUpdates", Options::prioritizeChunkUpdates, m -> PrioritizeChunkUpdates.NONE),
-			new Tweak<>("menuBackgroundBlurriness", Options::menuBackgroundBlurriness, m -> 0),
-			new Tweak<>("vignette", Options::vignette, m -> false),
-			new Tweak<>("framerateLimit", Options::framerateLimit, m -> m.uncapFps.enabled() ? Options.UNLIMITED_FRAMERATE_CUTOFF : null),
-			new Tweak<>("enableVsync", Options::enableVsync, m -> m.uncapFps.enabled() ? false : null),
-			new Tweak<>("cloudStatus", Options::cloudStatus, m -> m.noClouds.enabled() ? CloudStatus.OFF : null),
-			new Tweak<>("particles", Options::particles, m -> m.minimalParticles.enabled() ? ParticleStatus.MINIMAL : null),
-			new Tweak<>("ambientOcclusion", Options::ambientOcclusion, m -> m.flatLighting.enabled() ? false : null));
+	private final List<Tweak<?>> tweaks = buildTweaks();
+
+	// A few of these tweaks reach options that only exist from 26.1 onward; older versions just skip them.
+	private static List<Tweak<?>> buildTweaks() {
+		List<Tweak<?>> list = new ArrayList<>(List.of(
+				new Tweak<>("renderDistance", Options::renderDistance, m -> m.renderDistance.intValue()),
+				new Tweak<>("simulationDistance", Options::simulationDistance, m -> Math.max(5, Math.min(8, m.renderDistance.intValue()))),
+				new Tweak<>("entityDistanceScaling", Options::entityDistanceScaling, m -> 0.5),
+				new Tweak<>("biomeBlendRadius", Options::biomeBlendRadius, m -> 0),
+				new Tweak<>("mipmapLevels", Options::mipmapLevels, m -> 0),
+				new Tweak<>("entityShadows", Options::entityShadows, m -> false),
+				new Tweak<>("prioritizeChunkUpdates", Options::prioritizeChunkUpdates, m -> PrioritizeChunkUpdates.NONE),
+				new Tweak<>("menuBackgroundBlurriness", Options::menuBackgroundBlurriness, m -> 0),
+				new Tweak<>("framerateLimit", Options::framerateLimit, m -> m.uncapFps.enabled() ? Options.UNLIMITED_FRAMERATE_CUTOFF : null),
+				new Tweak<>("enableVsync", Options::enableVsync, m -> m.uncapFps.enabled() ? false : null),
+				new Tweak<>("cloudStatus", Options::cloudStatus, m -> m.noClouds.enabled() ? CloudStatus.OFF : null),
+				new Tweak<>("particles", Options::particles, m -> m.minimalParticles.enabled() ? ParticleStatus.MINIMAL : null),
+				new Tweak<>("ambientOcclusion", Options::ambientOcclusion, m -> m.flatLighting.enabled() ? false : null)));
+		//? if >=26.1 {
+		list.add(new Tweak<>("maxAnisotropyBit", Options::maxAnisotropyBit, m -> 1));
+		list.add(new Tweak<>("textureFiltering", Options::textureFiltering, m -> TextureFilteringMethod.NONE));
+		list.add(new Tweak<>("cutoutLeaves", Options::cutoutLeaves, m -> false));
+		list.add(new Tweak<>("improvedTransparency", Options::improvedTransparency, m -> false));
+		list.add(new Tweak<>("weatherRadius", Options::weatherRadius, m -> 3));
+		list.add(new Tweak<>("chunkSectionFadeInTime", Options::chunkSectionFadeInTime, m -> 0.0));
+		list.add(new Tweak<>("vignette", Options::vignette, m -> false));
+		//?}
+		return list;
+	}
 
 	/** The player's own values of the options this preset changed, as saved by each option's codec. */
 	private JsonObject backup = new JsonObject();

@@ -8,8 +8,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+//? if >=26.1 {
 import org.jspecify.annotations.Nullable;
+//?} else {
+/*import org.jetbrains.annotations.Nullable;
+*///?}
 
 /** Shows what you're playing on your Discord profile (Rich Presence). */
 public class DiscordModule extends Module {
@@ -98,7 +101,11 @@ public class DiscordModule extends Module {
 				.map(mod -> mod.getMetadata().getVersion().getFriendlyString()).orElse("");
 		assets.addProperty("large_text", "Lucent Client " + version);
 		if (showDimension.enabled() && minecraft.level != null) {
-			Identifier dimension = minecraft.level.dimension().identifier();
+			//? if >=26.1 {
+			var dimension = minecraft.level.dimension().identifier();
+			//?} else {
+			/*var dimension = minecraft.level.dimension().location();
+			*///?}
 			assets.addProperty("small_text", Component.translatable("discord.lucentclient.dimension."
 					+ dimension.getNamespace() + "." + dimension.getPath()).getString());
 		}

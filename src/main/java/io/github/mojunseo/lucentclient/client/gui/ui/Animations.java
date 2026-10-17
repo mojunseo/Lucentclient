@@ -1,6 +1,10 @@
 package io.github.mojunseo.lucentclient.client.gui.ui;
 
+//? if >=26.1 {
 import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
 
 import java.util.HashMap;
 import java.util.Map;

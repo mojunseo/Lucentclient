@@ -3,9 +3,17 @@ package io.github.mojunseo.lucentclient.client.module;
 import io.github.mojunseo.lucentclient.client.compat.Mc;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import net.minecraft.client.Minecraft;
+//? if >=26.1 {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?} else {
+/*import io.github.mojunseo.lucentclient.client.compat.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.client.player.LocalPlayer;
+//? if >=26.1 {
 import net.minecraft.client.renderer.RenderPipelines;
+//?} else {
+/*import net.minecraft.client.renderer.RenderType;
+*///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -38,7 +46,7 @@ public class PotionsModule extends HudModule {
 			}
 		}
 		if (effects.isEmpty() && previewing(minecraft)) {
-			effects.add(new MobEffectInstance(MobEffects.SPEED, 1800, 1));
+			effects.add(new MobEffectInstance(Mc.SPEED, 1800, 1));
 			effects.add(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 4200, 0));
 		}
 		return effects;
@@ -81,7 +89,11 @@ public class PotionsModule extends HudModule {
 			MobEffectInstance effect = effects.get(i);
 			int y = 2 + i * ROW;
 			if (showIcons.enabled()) {
+				//? if >=26.1 {
 				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, Mc.mobEffectSprite(effect.getEffect()), 2, y, ICON, ICON);
+				//?} else {
+				/*graphics.delegate().blitSprite(RenderType::guiTextured, Mc.mobEffectSprite(effect.getEffect()), 2, y, ICON, ICON);
+				*///?}
 			}
 			text(minecraft, graphics, name(effect), textLeft(), y);
 			// Time left in a dimmer shade of the text color.
