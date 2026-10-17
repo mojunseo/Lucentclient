@@ -3,6 +3,9 @@
 Lucent Client는 Minecraft: Java Edition용 Fabric 클라이언트 모드와 데스크톱 런처입니다. 기능은 [README](https://github.com/mojunseo/Lucentclient#readme)를 참고하세요.
 
 ### 이번 버전에서 바뀐 것
+- **Minecraft 1.21.4 지원 추가**: 최신 버전뿐 아니라 1.21.4에서도 모드를 쓸 수 있습니다.
+
+v0.1.4에서 바뀐 것:
 - **모드 화면을 둘로 나눴습니다**: 왼쪽에는 설치한 모드, 오른쪽에는 Modrinth 검색이 함께 보여서 더 이상 아래로 오르내리지 않아도 됩니다.
 
 v0.1.3에서 바뀐 것:
@@ -21,10 +24,11 @@ v0.1.1에서 바뀐 것:
 - 새 로고
 
 ### 모드
-Minecraft 26.1 ~ 26.3을 지원합니다. Fabric Loader 0.19.5 이상과 Fabric API를 설치하고, 버전에 맞는 jar를 `mods` 폴더에 넣으세요. 게임에서 오른쪽 Shift를 누르면 메뉴가 열립니다.
+Minecraft 1.21.4, 26.1 ~ 26.3을 지원합니다. Fabric Loader 0.19.5 이상과 Fabric API를 설치하고, 버전에 맞는 jar를 `mods` 폴더에 넣으세요. 게임에서 오른쪽 Shift를 누르면 메뉴가 열립니다.
 
 | Minecraft | 파일 |
 |---|---|
+| 1.21.4 | `lucentclient-*+1.21.4.jar` |
 | 26.1, 26.1.1, 26.1.2 | `lucentclient-*+26.1.2.jar` |
 | 26.2 | `lucentclient-*+26.2.jar` |
 | 26.3 | `lucentclient-*+26.3.jar` |
@@ -40,7 +44,9 @@ Windows: `*_x64-setup.exe` 또는 `.msi` · macOS(Apple Silicon과 Intel): `*_un
 
 Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop launcher. See the [README](https://github.com/mojunseo/Lucentclient/blob/main/README.en.md) for features.
 
-**What's new**: the Mods screen is now split in two — installed mods on the left, Modrinth search on the right — side by side instead of stacked.
+**What's new**: added support for Minecraft 1.21.4, alongside the newer versions.
+
+**From v0.1.4**: the Mods screen is now split in two — installed mods on the left, Modrinth search on the right — side by side instead of stacked.
 
 **From v0.1.3**: the launcher has a new look — glassmorphic panels over a night-sky background with a drifting violet/cyan/pink aurora, stars, floating blocks, a block skyline and a glowing sun. The menu moved to the top of the window and is centered, and screens and lists now animate. PurityMC (puritymc.kr) is now pinned to the top of your server list automatically and can't be removed.
 
@@ -48,7 +54,7 @@ Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop
 
 **From v0.1.1**: Lightweight Mode (the lightest graphics settings while it's on, your own settings back when it's off); the launcher installs Sodium, Lithium, FerriteCore, ImmediatelyFast, Entity Culling and More Culling for your version (can be turned off in Settings); fixed a large overlay on the player with wings, hats or halos on 26.1 and 26.2 alongside 3D Skin Layers; fixed Discord status on Windows; empty armor and effect boxes are no longer drawn; new logo.
 
-**Mod**: supports Minecraft 26.1 to 26.3. Install Fabric Loader 0.19.5 or newer and Fabric API, then put the jar for your version into `mods` (see the table above). Press Right Shift in game to open the menu.
+**Mod**: supports Minecraft 1.21.4 and 26.1 to 26.3. Install Fabric Loader 0.19.5 or newer and Fabric API, then put the jar for your version into `mods` (see the table above). Press Right Shift in game to open the menu.
 
 **Launcher**: Windows `*_x64-setup.exe` or `.msi`, macOS (Apple silicon and Intel) `*_universal.dmg`, Linux `.AppImage`, `.deb` or `.rpm`.
 
@@ -60,7 +66,9 @@ The launcher signs in with your Microsoft account and starts the game. It isn't 
 
 Lucent Client は Minecraft: Java Edition 向けの Fabric クライアント MOD とデスクトップランチャーです。機能は [README](https://github.com/mojunseo/Lucentclient/blob/main/README.ja.md) をご覧ください。
 
-**今回の変更**: MOD画面を左右に分けました。左に導入済みMOD、右に Modrinth 検索が並んで表示され、上下にスクロールしなくて済みます。
+**今回の変更**: 最新バージョンに加えて、Minecraft 1.21.4 にも対応しました。
+
+**v0.1.4 の変更**: MOD画面を左右に分けました。左に導入済みMOD、右に Modrinth 検索が並んで表示され、上下にスクロールしなくて済みます。
 
 **v0.1.3 の変更**: ランチャーのデザインを一新しました。ガラス風(グラスモーフィズム)のパネルに、紫・シアン・ピンクのオーロラが漂う夜空の背景(星、浮かぶブロック、ブロックのスカイライン、光る太陽)を重ねています。メニューはウィンドウ上部中央に移動し、画面切り替えやリストにも動きを加えました。サーバー一覧には PurityMC(puritymc.kr)が自動で一番上に固定されるようになり、削除できません。
 
@@ -68,7 +76,7 @@ Lucent Client は Minecraft: Java Edition 向けの Fabric クライアント MO
 
 **v0.1.1 の変更**: 軽量モードを追加（オンの間はグラフィック設定を最も軽くし、オフで元の設定に戻ります）。ランチャーが Sodium、Lithium、FerriteCore、ImmediatelyFast、Entity Culling、More Culling をバージョンに合わせて一緒にインストールします（設定でオフにできます）。26.1・26.2 で 3D Skin Layers と併用時に翼・帽子・ヘイローを付けるとプレイヤーに大きな重なりが出る問題を修正。Windows で Discord のステータスが表示されない問題を修正。防具・効果 HUD が空のとき空の枠が残る問題を修正。新しいロゴ。
 
-**MOD**: Minecraft 26.1〜26.3 に対応しています。Fabric Loader 0.19.5 以降と Fabric API をインストールし、バージョンに合った jar を `mods` フォルダに入れてください（ファイルは上の表をご覧ください）。ゲーム内で右 Shift を押すとメニューが開きます。
+**MOD**: Minecraft 1.21.4、26.1〜26.3 に対応しています。Fabric Loader 0.19.5 以降と Fabric API をインストールし、バージョンに合った jar を `mods` フォルダに入れてください（ファイルは上の表をご覧ください）。ゲーム内で右 Shift を押すとメニューが開きます。
 
 **ランチャー**: Windows は `*_x64-setup.exe` または `.msi`、macOS（Apple シリコンと Intel）は `*_universal.dmg`、Linux は `.AppImage`、`.deb`、`.rpm` です。
 

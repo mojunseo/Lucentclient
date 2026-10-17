@@ -20,13 +20,14 @@ Minecraft: Java Edition 向けの Fabric クライアント MOD と、専用の�
 
 ### MOD
 
-Minecraft **26.1〜26.3** に対応しています。
+Minecraft **1.21.4、26.1〜26.3** に対応しています。
 
 1. [Fabric Loader](https://fabricmc.net/use/) 0.19.5 以降と [Fabric API](https://modrinth.com/mod/fabric-api) をインストールします。
 2. [Releases](https://github.com/mojunseo/Lucentclient/releases) から使用する Minecraft のバージョンに合った jar をダウンロードし、`mods` フォルダに入れます。
 
 | Minecraft | ファイル |
 |---|---|
+| 1.21.4 | `lucentclient-<バージョン>+1.21.4.jar` |
 | 26.1, 26.1.1, 26.1.2 | `lucentclient-<バージョン>+26.1.2.jar` |
 | 26.2 | `lucentclient-<バージョン>+26.2.jar` |
 | 26.3 | `lucentclient-<バージョン>+26.3.jar` |

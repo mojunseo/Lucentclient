@@ -20,13 +20,14 @@ Minecraft: Java Edition용 Fabric 클라이언트 모드와 전용 데스크톱 
 
 ### 모드
 
-Minecraft **26.1 ~ 26.3**을 지원합니다.
+Minecraft **1.21.4, 26.1 ~ 26.3**을 지원합니다.
 
 1. [Fabric Loader](https://fabricmc.net/use/) 0.19.5 이상과 [Fabric API](https://modrinth.com/mod/fabric-api)를 설치합니다.
 2. [Releases](https://github.com/mojunseo/Lucentclient/releases)에서 사용하는 Minecraft 버전에 맞는 jar를 받아 `mods` 폴더에 넣습니다.
 
 | Minecraft | 파일 |
 |---|---|
+| 1.21.4 | `lucentclient-<버전>+1.21.4.jar` |
 | 26.1, 26.1.1, 26.1.2 | `lucentclient-<버전>+26.1.2.jar` |
 | 26.2 | `lucentclient-<버전>+26.2.jar` |
 | 26.3 | `lucentclient-<버전>+26.3.jar` |
