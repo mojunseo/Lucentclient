@@ -154,5 +154,11 @@
 	"setting.lucentclient.lite_uncap_fps": "No FPS limit or VSync",
 	"setting.lucentclient.lite_no_clouds": "No clouds",
 	"setting.lucentclient.lite_minimal_particles": "Minimal particles",
-	"setting.lucentclient.lite_flat_lighting": "No smooth lighting"
+	"setting.lucentclient.lite_flat_lighting": "No smooth lighting",
+	"category.lucentclient.waypoints": "Waypoints",
+	"module.lucentclient.waypoints": "Waypoints",
+	"module.lucentclient.waypoints.desc": "Mark locations with a beam and see them nearby",
+	"setting.lucentclient.waypoint_show_beam": "Show beam",
+	"setting.lucentclient.waypoint_render_distance": "Render distance",
+	"screen.lucentclient.waypoints.add": "+ Add waypoint here"
 }

@@ -15,6 +15,8 @@ import io.github.mojunseo.lucentclient.client.module.Category;
 import io.github.mojunseo.lucentclient.client.module.HudModule;
 import io.github.mojunseo.lucentclient.client.module.Module;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
+import io.github.mojunseo.lucentclient.client.module.Waypoint;
+import io.github.mojunseo.lucentclient.client.module.WaypointModule;
 import io.github.mojunseo.lucentclient.client.module.setting.BooleanSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.ChoiceSetting;
 import io.github.mojunseo.lucentclient.client.module.setting.ColorSetting;
@@ -343,11 +345,15 @@ public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 
 		List<Setting<?>> settings = module.settings();
 		int y0 = beginScroll(graphics, cx - 6, top, cw + 12, py + ph - PAD - top);
+		int listTop = y0;
+		if (module instanceof WaypointModule waypointModule) {
+			listTop = extractWaypointRows(graphics, mouseX, mouseY, waypointModule, cx, y0, cw);
+		}
 		for (int i = 0; i < settings.size(); i++) {
-			extractSettingRow(graphics, mouseX, mouseY, settings.get(i), cx, y0 + i * ROW_HEIGHT, cw, i);
+			extractSettingRow(graphics, mouseX, mouseY, settings.get(i), cx, listTop + i * ROW_HEIGHT, cw, i);
 		}
 		// Reset, after the last setting.
-		int resetY = y0 + settings.size() * ROW_HEIGHT + 6;
+		int resetY = listTop + settings.size() * ROW_HEIGHT + 6;
 		Component reset = Component.translatable("screen.lucentclient.settings.reset");
 		boolean resetHovered = hovered(mouseX, mouseY, cx - 2, resetY, font.width(reset) + 4, 14);
 		graphics.text(font, reset, cx, resetY + 3, color(resetHovered ? Theme.CALCITE : Theme.TUFF), false);
@@ -355,7 +361,53 @@ public class LucentMenuScreen extends Screen implements HudPreviewScreen {
 			for (Setting<?> setting : module.settings()) setting.reset();
 			ModuleManager.save();
 		});
-		endScroll(graphics, settings.size() * ROW_HEIGHT + 26);
+		endScroll(graphics, (listTop - y0) + settings.size() * ROW_HEIGHT + 26);
+	}
+
+	// --- Waypoints ------------------------------------------------------------------------------
+
+	/** The "add waypoint here" row, then one row per waypoint. Returns the y just past them. */
+	private int extractWaypointRows(GuiGraphicsExtractor graphics, int mouseX, int mouseY, WaypointModule module, int cx, int y, int cw) {
+		Component add = Component.translatable("screen.lucentclient.waypoints.add");
+		boolean addHovered = hovered(mouseX, mouseY, cx - 6, y, cw + 12, ROW_HEIGHT);
+		if (addHovered) graphics.fill(cx - 6, y, cx + cw + 6, y + ROW_HEIGHT, color(Theme.SEAM));
+		graphics.text(font, add, cx, y + (ROW_HEIGHT - 8) / 2, color(addHovered ? Theme.CALCITE : Theme.TUFF), false);
+		scrolledHit(cx - 6, y, cw + 12, ROW_HEIGHT, () -> {
+			module.addAtPlayer(minecraft);
+			ModuleManager.save();
+		});
+		y += ROW_HEIGHT;
+
+		List<Waypoint> waypoints = module.waypoints();
+		int swatch = 8;
+		for (int i = 0; i < waypoints.size(); i++) {
+			Waypoint waypoint = waypoints.get(i);
+			int rowY = y + i * ROW_HEIGHT;
+			boolean hovered = hovered(mouseX, mouseY, cx - 6, rowY, cw + 12, ROW_HEIGHT);
+			if (hovered) graphics.fill(cx - 6, rowY, cx + cw + 6, rowY + ROW_HEIGHT, color(Theme.SEAM));
+
+			int swatchY = rowY + (ROW_HEIGHT - swatch) / 2;
+			graphics.fill(cx, swatchY, cx + swatch, swatchY + swatch, color(waypoint.color()));
+			int index = i;
+			scrolledHit(cx - 2, rowY, swatch + 4, ROW_HEIGHT, () -> {
+				module.cycleColor(index);
+				ModuleManager.save();
+			});
+
+			int textY = rowY + (ROW_HEIGHT - 8) / 2;
+			int nameWidth = cw - swatch - 10 - 16;
+			graphics.text(font, Ui.ellipsize(font, waypoint.name(), nameWidth), cx + swatch + 6, textY, color(Theme.CALCITE), false);
+
+			Component delete = Component.literal("×");
+			int deleteX = cx + cw - 10;
+			boolean deleteHovered = hovered(mouseX, mouseY, deleteX - 4, rowY, 14, ROW_HEIGHT);
+			graphics.text(font, delete, deleteX, textY, color(deleteHovered ? Theme.CALCITE : Theme.TUFF), false);
+			scrolledHit(deleteX - 4, rowY, 14, ROW_HEIGHT, () -> {
+				module.remove(index);
+				ModuleManager.save();
+			});
+		}
+		return y + waypoints.size() * ROW_HEIGHT;
 	}
 
 	private void extractSettingRow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, Setting<?> setting, int cx, int y, int cw, int order) {

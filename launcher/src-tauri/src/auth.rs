@@ -3,6 +3,8 @@
 use anyhow::{anyhow, bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::io::Write;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// The Azure application the launcher signs in as. Register a public client app in Azure
@@ -37,6 +39,27 @@ impl Account {
 
 fn now() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
+}
+
+/// Appends a failed sign-in's full error chain to `<root>/logs/auth.log`, so the player has
+/// something concrete to attach when reporting it, and returns the log file's path. None of the
+/// error messages built in this module include the Microsoft, Xbox or Minecraft tokens, so this
+/// is safe to write and to show the path of, unlike the account itself.
+pub fn log_error(root: &Path, error: &anyhow::Error) -> std::io::Result<PathBuf> {
+    let dir = root.join("logs");
+    std::fs::create_dir_all(&dir)?;
+    let path = dir.join("auth.log");
+    let mut file = std::fs::OpenOptions::new().create(true).append(true).open(&path)?;
+    writeln!(file, "[{}] Microsoft sign-in failed:\n{error:?}\n", now())?;
+    Ok(path)
+}
+
+/// The message to show the player: the error itself, plus where it was logged if logging worked.
+pub fn error_message(error: &anyhow::Error, log_path: Option<&Path>) -> String {
+    match log_path {
+        Some(path) => format!("{error:#} (logged to {} — attach this if you report it)", path.display()),
+        None => format!("{error:#}"),
+    }
 }
 
 pub fn configured() -> bool {
