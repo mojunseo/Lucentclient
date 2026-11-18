@@ -3,6 +3,11 @@
 Lucent Client는 Minecraft: Java Edition용 Fabric 클라이언트 모드와 데스크톱 런처입니다. 기능은 [README](https://github.com/mojunseo/Lucentclient#readme)를 참고하세요.
 
 ### 이번 버전에서 바뀐 것
+- **웨이포인트 모듈 추가**: 원하는 위치에 이름 붙은 지점을 찍으면 월드에 색깔 빛줄기와 이름표로 표시되고, HUD에 가까운 순서로 목록이 뜹니다.
+- **모드 종속성 검사**: 게임을 켜기 전에 설치된 모드가 필요로 하는 다른 모드가 빠져 있는지 확인하고 알려줍니다.
+- **로그인 실패 로그**: Microsoft 로그인이 안 되면 자세한 내용을 로그 파일에 남겨서, 제보할 때 첨부할 수 있어요.
+
+v0.1.5에서 바뀐 것:
 - **Minecraft 1.21.4 지원 추가**: 최신 버전뿐 아니라 1.21.4에서도 모드를 쓸 수 있습니다.
 
 v0.1.4에서 바뀐 것:
@@ -44,7 +49,9 @@ Windows: `*_x64-setup.exe` 또는 `.msi` · macOS(Apple Silicon과 Intel): `*_un
 
 Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop launcher. See the [README](https://github.com/mojunseo/Lucentclient/blob/main/README.en.md) for features.
 
-**What's new**: added support for Minecraft 1.21.4, alongside the newer versions.
+**What's new**: a Waypoints module — mark named spots in the world, shown as a colored beam and a floating name, plus a nearby list on the HUD; a dependency check before launch that warns about an installed mod missing one it needs; and a log file for failed Microsoft sign-ins to attach when reporting one.
+
+**From v0.1.5**: added support for Minecraft 1.21.4, alongside the newer versions.
 
 **From v0.1.4**: the Mods screen is now split in two — installed mods on the left, Modrinth search on the right — side by side instead of stacked.
 
@@ -66,7 +73,9 @@ The launcher signs in with your Microsoft account and starts the game. It isn't 
 
 Lucent Client は Minecraft: Java Edition 向けの Fabric クライアント MOD とデスクトップランチャーです。機能は [README](https://github.com/mojunseo/Lucentclient/blob/main/README.ja.md) をご覧ください。
 
-**今回の変更**: 最新バージョンに加えて、Minecraft 1.21.4 にも対応しました。
+**今回の変更**: ウェイポイントモジュールを追加しました。ワールドに名前付きの地点を置くと、色付きの光の柱と名前で表示され、HUD には近い順のリストが出ます。また、起動前に導入済み MOD が必要とする MOD が欠けていないか確認して警告するようになりました。さらに、Microsoft サインインに失敗した際は詳細をログファイルに残すので、不具合報告のときに添付できます。
+
+**v0.1.5 の変更**: 最新バージョンに加えて、Minecraft 1.21.4 にも対応しました。
 
 **v0.1.4 の変更**: MOD画面を左右に分けました。左に導入済みMOD、右に Modrinth 検索が並んで表示され、上下にスクロールしなくて済みます。
 
