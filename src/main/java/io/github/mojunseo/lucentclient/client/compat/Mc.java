@@ -6,10 +6,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.level.Level;
 //? if >=26.1 {
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 //?} else {
@@ -96,4 +98,22 @@ public final class Mc {
 		model.renderToBuffer(poseStack, buffer, light, overlay, tint);
 	}
 	*///?}
+
+	/** The built-in colored-line render type, for simple world-space markers like waypoint beams. */
+	public static RenderType linesRenderType() {
+		//? if >=26.1 {
+		return RenderTypes.lines();
+		//?} else {
+		/*return RenderType.lines();
+		*///?}
+	}
+
+	// A dimension's resource key holds its id as "identifier()" from 26.1 on, "location()" before.
+	public static String dimensionId(Level level) {
+		//? if >=26.1 {
+		return level.dimension().identifier().toString();
+		//?} else {
+		/*return level.dimension().location().toString();
+		*///?}
+	}
 }

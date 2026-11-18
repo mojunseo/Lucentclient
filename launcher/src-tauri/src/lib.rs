@@ -1,4 +1,5 @@
 mod auth;
+mod deps;
 mod download;
 mod install;
 mod java;
@@ -248,11 +249,19 @@ fn add_offline_account(app: State<'_, Arc<App>>, name: String) -> Result<(), Str
     app.save_accounts()
 }
 
-/// Starts Microsoft sign-in. Emits `auth-code` with the code to enter, then `auth-done` or `auth-error`.
+/// Starts Microsoft sign-in. Emits `auth-code` with the code to enter, then `auth-done` or
+/// `auth-error`. Either way a failure is also logged to `logs/auth.log`, so the player can attach
+/// it when reporting a sign-in problem.
 #[tauri::command]
 async fn sign_in(handle: AppHandle, app: State<'_, Arc<App>>) -> Result<(), String> {
     let app = app.inner().clone();
-    let code = auth::start_device_code(&app.client).await.map_err(|e| e.to_string())?;
+    let code = match auth::start_device_code(&app.client).await {
+        Ok(code) => code,
+        Err(error) => {
+            let log_path = auth::log_error(&app.layout.root, &error).ok();
+            return Err(auth::error_message(&error, log_path.as_deref()));
+        }
+    };
     handle.emit("auth-code", &code).ok();
     tauri::async_runtime::spawn(async move {
         match auth::finish_device_code(&app.client, &code).await {
@@ -262,7 +271,8 @@ async fn sign_in(handle: AppHandle, app: State<'_, Arc<App>>) -> Result<(), Stri
                 handle.emit("auth-done", ()).ok();
             }
             Err(error) => {
-                handle.emit("auth-error", error.to_string()).ok();
+                let log_path = auth::log_error(&app.layout.root, &error).ok();
+                handle.emit("auth-error", auth::error_message(&error, log_path.as_deref())).ok();
             }
         }
     });
@@ -336,7 +346,13 @@ async fn play(handle: AppHandle, app: State<'_, Arc<App>>) -> Result<(), String>
 async fn run_game(handle: &AppHandle, app: &Arc<App>) -> anyhow::Result<()> {
     let mut account = app.accounts.lock().unwrap().selected().cloned().ok_or_else(|| anyhow::anyhow!("Sign in first"))?;
     if account.needs_refresh() {
-        account = auth::refresh(&app.client, &account).await?;
+        account = match auth::refresh(&app.client, &account).await {
+            Ok(account) => account,
+            Err(error) => {
+                let log_path = auth::log_error(&app.layout.root, &error).ok();
+                return Err(anyhow::anyhow!(auth::error_message(&error, log_path.as_deref())));
+            }
+        };
         app.accounts.lock().unwrap().upsert(account.clone());
         app.save_accounts().map_err(anyhow::Error::msg)?;
     }
@@ -354,6 +370,13 @@ async fn run_game(handle: &AppHandle, app: &Arc<App>) -> anyhow::Result<()> {
         Err(error) => {
             handle.emit("mods-warning", format!("{error:#}")).ok();
         }
+    }
+
+    // Catches a dependency missing entirely (e.g. a jar the player dropped in by hand) before
+    // Fabric Loader would refuse to start over it; doesn't block the launch either way.
+    let issues = deps::check(&app.instance_dir().join("mods"));
+    if !issues.is_empty() {
+        handle.emit("mods-dependency-warning", &issues).ok();
     }
 
     let settings = app.settings.lock().unwrap().clone();

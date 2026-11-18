@@ -36,10 +36,11 @@ public final class ModuleManager {
 	public static final LightweightModule LIGHTWEIGHT = new LightweightModule();
 	public static final FullbrightModule FULLBRIGHT = new FullbrightModule();
 	public static final DiscordModule DISCORD = new DiscordModule();
+	public static final WaypointModule WAYPOINTS = new WaypointModule();
 
 	private static final List<Module> MODULES = List.of(
 			FPS, COORDINATES, KEYSTROKES, ARMOR, POTIONS, PING, CLOCK, REACH, TOGGLE_SPRINT, ZOOM, FOV,
-			LIGHTWEIGHT, ENTITY_CULLING, PARTICLES, WEATHER, FULLBRIGHT, DISCORD);
+			LIGHTWEIGHT, ENTITY_CULLING, PARTICLES, WEATHER, FULLBRIGHT, DISCORD, WAYPOINTS);
 
 	private ModuleManager() {
 	}

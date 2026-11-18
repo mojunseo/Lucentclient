@@ -14,6 +14,7 @@ import io.github.mojunseo.lucentclient.client.gui.LucentMenuScreen;
 import io.github.mojunseo.lucentclient.client.module.HudModule;
 import io.github.mojunseo.lucentclient.client.module.Module;
 import io.github.mojunseo.lucentclient.client.module.ModuleManager;
+import io.github.mojunseo.lucentclient.client.module.WaypointRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -49,6 +50,7 @@ public class LucentClientClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ModuleManager.load();
 		CosmeticsManager.load();
+		WaypointRenderer.register();
 
 		CosmeticModels.register();
 		//? if >=26.1 {

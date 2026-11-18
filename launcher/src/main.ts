@@ -215,6 +215,10 @@ listen<string[]>("mods-skipped", ({ payload }) => {
 listen<string>("mods-warning", () => {
   showPlayNote("모드를 최신으로 맞추지 못해서, 이미 받아 둔 모드로 실행했어요. 인터넷 연결을 확인하세요.");
 });
+listen<{ modName: string; missing: string[] }[]>("mods-dependency-warning", ({ payload }) => {
+  const summary = payload.map((issue) => `${issue.modName} (${issue.missing.join(", ")} 필요)`).join(", ");
+  showPlayNote(`일부 모드에 필요한 다른 모드가 빠져 있어요: ${summary}`);
+});
 
 function showPlayNote(message: string) {
   const note = $("play-note");

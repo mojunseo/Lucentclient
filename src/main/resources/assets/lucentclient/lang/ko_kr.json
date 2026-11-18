@@ -154,5 +154,11 @@
 	"setting.lucentclient.lite_uncap_fps": "FPS 제한과 수직 동기화 끄기",
 	"setting.lucentclient.lite_no_clouds": "구름 끄기",
 	"setting.lucentclient.lite_minimal_particles": "파티클 최소",
-	"setting.lucentclient.lite_flat_lighting": "부드러운 조명 끄기"
+	"setting.lucentclient.lite_flat_lighting": "부드러운 조명 끄기",
+	"category.lucentclient.waypoints": "웨이포인트",
+	"module.lucentclient.waypoints": "웨이포인트",
+	"module.lucentclient.waypoints.desc": "위치를 빛줄기로 표시하고 근처에서 확인",
+	"setting.lucentclient.waypoint_show_beam": "빛줄기 표시",
+	"setting.lucentclient.waypoint_render_distance": "표시 거리",
+	"screen.lucentclient.waypoints.add": "+ 여기에 웨이포인트 추가"
 }
