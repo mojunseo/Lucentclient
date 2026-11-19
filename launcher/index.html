@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lucent Launcher</title>
-    <link rel="stylesheet" href="/src/styles.css" />
-    <script type="module" src="/src/main.ts" defer></script>
+    <script type="module" src="/src/main.tsx" defer></script>
   </head>
   <body>
     <div class="backdrop" aria-hidden="true">
@@ -24,135 +23,6 @@
         <div class="terrain terrain-near"></div>
       </div>
     </div>
-    <div class="app">
-      <header class="topbar">
-        <div class="wordmark">Lucent</div>
-        <div class="nav-group">
-          <div class="nav-indicator" id="nav-indicator" aria-hidden="true"></div>
-          <button class="nav" data-view="play">플레이</button>
-          <button class="nav" data-view="mods">모드</button>
-          <button class="nav" data-view="accounts">계정</button>
-          <button class="nav" data-view="settings">설정</button>
-          <button class="nav" data-view="logs">게임 로그</button>
-        </div>
-        <div class="status-group">
-          <div class="update" id="update" hidden></div>
-          <div class="version" id="launcher-version"></div>
-        </div>
-      </header>
-
-      <main>
-        <section class="view" id="view-play">
-          <div class="stage">
-            <div class="version-line">
-              <label for="version">버전</label>
-              <select id="version"></select>
-            </div>
-            <p class="stack" id="stack"></p>
-            <button class="play" id="play">
-              <span class="lamp" aria-hidden="true"></span>
-              <span class="play-label" id="play-label">플레이</span>
-            </button>
-            <div class="progress" id="progress" hidden>
-              <div class="bar"><div class="fill" id="progress-fill"></div></div>
-              <p class="progress-text" id="progress-text"></p>
-            </div>
-            <p class="note" id="play-note" hidden></p>
-            <p class="error" id="play-error" hidden></p>
-          </div>
-        </section>
-
-        <section class="view" id="view-mods" hidden>
-          <h1>모드</h1>
-          <div class="mods-layout">
-            <div class="mods-installed">
-              <h2>내 모드</h2>
-              <p class="note list-note">모든 버전이 함께 쓰는 목록이에요. 플레이할 때 고른 버전에 맞는 파일을 자동으로 받아 넣습니다.</p>
-              <ul class="rows" id="installed-mods"></ul>
-            </div>
-            <div class="mods-search">
-              <h2 id="mods-search-title">Modrinth에서 찾기</h2>
-              <form class="inline search" id="mod-search">
-                <input id="mod-query" placeholder="모드 이름" autocomplete="off" />
-                <select id="mod-sort" aria-label="정렬">
-                  <option value="relevance">관련도순</option>
-                  <option value="downloads">인기순</option>
-                  <option value="follows">팔로우 많은 순</option>
-                  <option value="newest">새로 나온 순</option>
-                  <option value="updated">최근 업데이트순</option>
-                </select>
-                <button class="button quiet" type="submit">검색</button>
-              </form>
-              <div class="categories" id="mod-categories"></div>
-              <p class="note result-count" id="mod-count"></p>
-              <ul class="rows" id="mod-results"></ul>
-              <div class="actions"><button class="button quiet" id="more-mods" hidden>더 보기</button></div>
-              <p class="error" id="mods-error" hidden></p>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-accounts" hidden>
-          <h1>계정</h1>
-          <ul class="rows" id="account-list"></ul>
-          <div class="actions">
-            <button class="button" id="sign-in">Microsoft 계정으로 로그인</button>
-          </div>
-          <p class="note" id="sign-in-note" hidden></p>
-          <form class="offline" id="offline-form" hidden>
-            <label for="offline-name">개발용 오프라인 계정</label>
-            <div class="inline">
-              <input id="offline-name" maxlength="16" placeholder="닉네임" autocomplete="off" />
-              <button class="button quiet" type="submit">추가</button>
-            </div>
-            <p class="note">개발 빌드에서만 보입니다. 싱글플레이와 오프라인 서버에서만 쓸 수 있어요.</p>
-          </form>
-        </section>
-
-        <section class="view" id="view-settings" hidden>
-          <h1>설정</h1>
-          <ul class="rows">
-            <li class="row">
-              <label for="memory">메모리</label>
-              <div class="control">
-                <input type="range" id="memory" min="1024" max="16384" step="512" />
-                <output id="memory-value"></output>
-              </div>
-            </li>
-            <li class="row">
-              <label for="jvm-args">추가 JVM 인자</label>
-              <div class="control"><input id="jvm-args" placeholder="-XX:+UseZGC" autocomplete="off" /></div>
-            </li>
-            <li class="row toggle-row" id="perf-row" role="switch" tabindex="0" aria-checked="false">
-              <span>성능 모드 함께 설치<small class="hint">Sodium, Lithium, FerriteCore, ImmediatelyFast, Entity Culling, More Culling</small></span>
-              <span class="lamp" id="perf-lamp" aria-hidden="true"></span>
-            </li>
-            <li class="row toggle-row" id="hide-row" role="switch" tabindex="0" aria-checked="false">
-              <span>게임 중에는 런처 숨기기</span>
-              <span class="lamp" id="hide-lamp" aria-hidden="true"></span>
-            </li>
-          </ul>
-          <div class="actions">
-            <button class="button quiet" id="open-folder">게임 폴더 열기</button>
-          </div>
-        </section>
-
-        <section class="view" id="view-logs" hidden>
-          <h1>게임 로그</h1>
-          <pre class="log" id="log"></pre>
-        </section>
-      </main>
-    </div>
-
-    <dialog id="code-dialog">
-      <p>브라우저에서 아래 코드를 입력하세요.</p>
-      <p class="code" id="device-code"></p>
-      <p class="note" id="device-url"></p>
-      <div class="actions">
-        <button class="button" id="copy-open">코드 복사하고 페이지 열기</button>
-        <button class="button quiet" id="close-dialog">닫기</button>
-      </div>
-      <p class="note" id="dialog-status">로그인을 기다리는 중…</p>
-    </dialog>
+    <div id="root"></div>
   </body>
 </html>
