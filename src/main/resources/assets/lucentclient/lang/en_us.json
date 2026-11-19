@@ -161,5 +161,5 @@
 	"setting.lucentclient.waypoint_show_beam": "Show beam",
 	"setting.lucentclient.waypoint_render_distance": "Render distance",
 	"screen.lucentclient.waypoints.add": "+ Add waypoint here",
-	"message.lucentclient.unbound_key_event": "[Lucent Client] A key press wasn't recognized (this can happen with an IME, like Microsoft's Japanese/Chinese input, turned on). If Right Shift stops opening the menu, try turning the IME off."
+	"message.lucentclient.unbound_key_event": "[Lucent Client] A key press wasn't recognized. Try binding it to a different key in Options."
 }
