@@ -1,25 +1,43 @@
 @import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 
 /*
- * Lucent, take two: glass over color. A violet/cyan/pink gradient mesh sits fixed behind
- * the whole app; every surface on top of it is frosted glass (translucent + blurred)
- * rather than a flat fill, so the color always shows through. One gradient (--gradient) is
- * the recurring "lit" signature — wordmark, active nav, the play button's glow, switches,
- * primary buttons — reused everywhere instead of inventing a new accent per element.
+ * Lucent, take three: flat and quiet. No gradient mesh, no frosted glass, no ambient
+ * motion — every surface is a plain fill with a 1px border. One restrained accent color
+ * is reserved for interactive/stateful elements (the nav indicator, primary buttons,
+ * switches, progress fill, the active category pill); everything else stays neutral, so
+ * typography and spacing carry the hierarchy instead of color or decoration.
  */
 :root {
-  --void: #0a0914;
-  --glass: rgba(255, 255, 255, 0.055);
-  --glass-strong: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.14);
-  --mist: #b7bad8;
-  --paper: #f5f3fc;
-  --violet: #8b5cf6;
-  --cyan: #22d3ee;
-  --pink: #f472b6;
-  --gradient: linear-gradient(135deg, var(--violet), var(--cyan) 55%, var(--pink));
-  --warn: #ffb86b;
-  --danger: #ff5a6e;
+  --bg: #0b0c0f;
+  --surface: #141519;
+  --surface-raised: #1b1d22;
+  --border: #26282f;
+  --border-hover: #34363e;
+
+  --text: #e9eaee;
+  --text-secondary: #8b8d98;
+
+  --accent: #3f5bef;
+  --accent-hover: #5b76f2;
+  --accent-press: #2f49c9;
+
+  --warn: #d99a3d;
+  --danger: #e5484d;
+
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
   color-scheme: dark;
 }
 
@@ -29,250 +47,65 @@
 html, body {
   margin: 0;
   height: 100%;
-  background: var(--void);
-  color: var(--paper);
-  font: 15px/1.55 "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.6 "Pretendard Variable", Pretendard, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   user-select: none;
 }
 
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 4px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 6px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.14); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
 
-/* Fixed gradient mesh behind the whole window; everything else is glass sitting on top of it.
-   Static on purpose: these blobs sit near the corners, and animating their background-position
-   shifted how much of each circle the viewport edge clipped off — which read as the blobs
-   themselves growing and shrinking, not just moving. */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  background:
-    radial-gradient(640px 640px at 12% 18%, rgba(139, 92, 246, 0.4), transparent 60%),
-    radial-gradient(560px 560px at 88% 14%, rgba(34, 211, 238, 0.32), transparent 60%),
-    radial-gradient(680px 680px at 75% 95%, rgba(244, 114, 182, 0.3), transparent 60%),
-    radial-gradient(520px 520px at 8% 90%, rgba(139, 92, 246, 0.24), transparent 60%),
-    var(--void);
-}
+.app { display: flex; flex-direction: column; height: 100vh; }
 
-/* Groups stars, sun, aurora, terrain and blocks into one layer, sized a bit past the
-   viewport so nothing clips at the edges. No transform of its own — each child animates
-   independently. */
-.scene {
-  position: absolute;
-  inset: -4%;
-}
-
-/* Aurora curtains: wide, soft-edged ribbons of light drifting over the void. No filter/blur
-   and no mix-blend-mode: a gradient is soft on its own by construction, so it doesn't need
-   blurring, and plain alpha layering keeps it predictable across rendering engines. The only
-   animated property is a plain translate — the actual bugs turned out to be elsewhere
-   (.play::before's blur+opacity, and .backdrop's blobs drifting near clipped edges). */
-.aurora {
-  position: absolute;
-  left: -15%;
-  right: -15%;
-  top: -15%;
-  height: 140%;
-  background: linear-gradient(
-    100deg,
-    transparent 0%,
-    rgba(139, 92, 246, 0.3) 16%,
-    transparent 36%,
-    rgba(34, 211, 238, 0.26) 54%,
-    transparent 72%,
-    rgba(244, 114, 182, 0.24) 90%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-.aurora-1 { animation: auroraSway1 13s ease-in-out infinite; }
-.aurora-2 { animation: auroraSway2 18s ease-in-out infinite; animation-delay: -5s; }
-.aurora-3 { animation: auroraSway3 23s ease-in-out infinite; animation-delay: -11s; }
-@keyframes auroraSway1 {
-  0%, 100% { transform: translate(-6%, -3%); }
-  50% { transform: translate(6%, 4%); }
-}
-@keyframes auroraSway2 {
-  0%, 100% { transform: translate(7%, 2%); }
-  50% { transform: translate(-6%, -3%); }
-}
-@keyframes auroraSway3 {
-  0%, 100% { transform: translate(-4%, 3%); }
-  50% { transform: translate(5%, -4%); }
-}
-
-/* Stars: one tiled layer of point gradients repeated across the sky, cheaper than hundreds
-   of individual elements. Two copies at different tile sizes/phases keep the twinkle from
-   looking like a single uniform pulse. */
-.stars {
-  position: absolute;
-  inset: 0;
-  background-repeat: repeat;
-  background-image:
-    radial-gradient(1.6px 1.6px at 8% 12%, #fff, transparent),
-    radial-gradient(1px 1px at 22% 28%, #fff, transparent),
-    radial-gradient(1.3px 1.3px at 38% 8%, #fff, transparent),
-    radial-gradient(1px 1px at 52% 32%, #fff, transparent),
-    radial-gradient(1.8px 1.8px at 67% 18%, #fff, transparent),
-    radial-gradient(1px 1px at 80% 6%, #fff, transparent),
-    radial-gradient(1.3px 1.3px at 91% 26%, #fff, transparent),
-    radial-gradient(1px 1px at 15% 42%, #fff, transparent),
-    radial-gradient(1.5px 1.5px at 46% 46%, #fff, transparent),
-    radial-gradient(1px 1px at 73% 44%, #fff, transparent);
-}
-.stars-a { background-size: 340px 260px; opacity: 0.55; animation: twinkle 5s ease-in-out infinite; }
-.stars-b { background-size: 480px 360px; background-position: 120px 60px; opacity: 0.35; animation: twinkle 7s ease-in-out infinite reverse; }
-@keyframes twinkle {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 0.7; }
-}
-
-/* A distant glowing sun/moon near the horizon — the one warm, steady focal point the rest
-   of the scene is staged around. */
-.sun {
-  position: absolute;
-  left: 70%;
-  top: 54%;
-  width: 190px;
-  height: 190px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff, rgba(169, 231, 255, 0.85) 32%, rgba(139, 92, 246, 0.4) 58%, transparent 74%);
-  box-shadow: 0 0 140px 50px rgba(139, 92, 246, 0.22);
-}
-
-/* Small floating crystal blocks drifting through the scene — voxel-shaped, but built from
-   the same lucent glass language as the UI rather than mimicking any specific game texture. */
-.block {
-  position: absolute;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.55), rgba(34, 211, 238, 0.4));
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 4px;
-  box-shadow: 0 0 18px rgba(139, 92, 246, 0.35);
-  animation: blockFloat 16s ease-in-out infinite;
-}
-/* Kept off to the sides (not under the centered 760px content column) so they stay in the
-   background rather than floating in front of text. */
-.block-1 { left: 4%; top: 20%; width: 34px; height: 34px; animation-duration: 17s; }
-.block-2 { left: 80%; top: 10%; width: 22px; height: 22px; animation-duration: 12s; animation-delay: -4s; }
-.block-3 { left: 91%; top: 30%; width: 27px; height: 27px; animation-duration: 20s; animation-delay: -9s; }
-@keyframes blockFloat {
-  0%, 100% { transform: translateY(0) rotate(-6deg); }
-  50% { transform: translateY(-22px) rotate(6deg); }
-}
-
-/* Blocky terrain skyline in three parallax layers — stepped clip-paths stand in for a
-   voxel landscape without needing any actual game assets. */
-.terrain {
-  position: absolute;
-  left: -5%;
-  right: -5%;
-  bottom: 0;
-  animation: terrainDrift 50s ease-in-out infinite alternate;
-}
-.terrain-far {
-  height: 34%;
-  background: #15132a;
-  opacity: 0.8;
-  clip-path: polygon(0% 100%, 0% 62%, 7% 62%, 7% 50%, 15% 50%, 15% 58%, 24% 58%, 24% 42%, 33% 42%, 33% 54%, 42% 54%, 42% 38%, 51% 38%, 51% 48%, 60% 48%, 60% 56%, 69% 56%, 69% 44%, 78% 44%, 78% 60%, 87% 60%, 87% 52%, 95% 52%, 95% 66%, 100% 66%, 100% 100%);
-  animation-duration: 60s;
-}
-.terrain-mid {
-  height: 24%;
-  background: #0e0c1e;
-  opacity: 0.92;
-  clip-path: polygon(0% 100%, 0% 70%, 10% 70%, 10% 55%, 20% 55%, 20% 68%, 30% 68%, 30% 48%, 40% 48%, 40% 64%, 50% 64%, 50% 42%, 60% 42%, 60% 60%, 70% 60%, 70% 50%, 80% 50%, 80% 66%, 90% 66%, 90% 56%, 100% 56%, 100% 100%);
-  animation-duration: 42s;
-  animation-direction: alternate-reverse;
-}
-.terrain-near {
-  height: 15%;
-  background: var(--void);
-  clip-path: polygon(0% 100%, 0% 76%, 9% 76%, 9% 60%, 18% 60%, 18% 72%, 28% 72%, 28% 52%, 38% 52%, 38% 70%, 48% 70%, 48% 58%, 58% 58%, 58% 74%, 68% 74%, 68% 62%, 78% 62%, 78% 78%, 88% 78%, 88% 66%, 100% 66%, 100% 100%);
-  animation-duration: 30s;
-}
-@keyframes terrainDrift {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-3%); }
-}
-
-.app { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100vh; }
-
-/* View transitions: a section plays this the moment it stops being [hidden]. */
+/* View transitions: a section plays this the moment it stops being [hidden]. Opacity only
+   — no translate, no scale, just a quick fade in keeping with a flat, still interface. */
 @keyframes viewIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.view { animation: viewIn 340ms cubic-bezier(0.22, 0.9, 0.3, 1) both; }
-
-/* List rows cascade in, newest-rendered batch first, capped so long lists don't crawl. */
-@keyframes rowIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: none; }
-}
-.row { animation: rowIn 260ms ease both; }
-.row:nth-child(2) { animation-delay: 30ms; }
-.row:nth-child(3) { animation-delay: 60ms; }
-.row:nth-child(4) { animation-delay: 90ms; }
-.row:nth-child(5) { animation-delay: 120ms; }
-.row:nth-child(n + 6) { animation-delay: 140ms; }
+.view { animation: viewIn 140ms ease both; }
 
 /* Top bar: wordmark left, nav group dead-centered in its own 1fr/auto/1fr track regardless
    of how wide the wordmark is, with the empty third column balancing it. */
 .topbar {
   flex: none;
-  height: 72px;
+  height: 56px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: 0 22px;
-  background: var(--glass-strong);
-  -webkit-backdrop-filter: blur(10px) saturate(150%);
-  backdrop-filter: blur(10px) saturate(150%);
-  border-bottom: 1px solid var(--glass-border);
+  padding: 0 var(--space-5);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 .wordmark {
-  font-size: 26px;
-  font-weight: 200;
-  letter-spacing: 0.015em;
-  background: var(--gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.45));
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
   width: fit-content;
 }
 .nav-group { position: relative; display: flex; align-items: center; gap: 4px; }
-/* A single pill that slides between nav buttons (positioned in JS via offsetLeft/Width)
+/* A thin underline that slides between nav buttons (positioned in JS via offsetLeft/Width)
    instead of each button drawing its own active state — the motion is what reads as "active". */
 .nav-indicator {
   position: absolute;
-  top: 12px;
-  bottom: 12px;
-  border-radius: 10px;
-  background: linear-gradient(120deg, rgba(139, 92, 246, 0.25), rgba(34, 211, 238, 0.14));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
-  transition: left 320ms cubic-bezier(0.22, 1, 0.36, 1), width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  border-radius: 1px;
+  background: var(--accent);
+  transition: left 280ms cubic-bezier(0.22, 1, 0.36, 1), width 280ms cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
   z-index: 0;
-}
-.nav-indicator::before {
-  content: "";
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: -9px;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--gradient);
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.65);
 }
 .nav {
   position: relative;
@@ -281,20 +114,20 @@ button { cursor: pointer; }
   border: 0;
   margin: 0 2px;
   padding: 10px 16px;
-  border-radius: 10px;
   font-weight: 500;
-  color: var(--mist);
-  transition: background 150ms, color 150ms;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: color 150ms;
 }
-.nav:hover { color: var(--paper); background: var(--glass); }
-.nav.active { color: #fff; }
+.nav:hover { color: var(--text); }
+.nav.active { color: var(--text); }
 
 /* Status group: the top bar's right column — launcher version and update notice,
    balancing the wordmark on the left so the nav group stays dead-centered. */
 .status-group { justify-self: end; display: flex; align-items: center; gap: 10px; }
-.version { color: var(--mist); opacity: 0.6; font-size: 12px; }
+.version { color: var(--text-secondary); font-size: 11.5px; font-weight: 500; letter-spacing: 0.01em; }
 
-main { flex: 1; min-height: 0; overflow: auto; padding: 38px 48px; }
+main { flex: 1; min-height: 0; overflow: auto; padding: var(--space-6) var(--space-7); }
 /* Every other view is a centered column, echoing the centered top nav above it — logs
    gets a wider one since log lines need the room. The play view is its own exception:
    it stays bottom-left, flush with main's own padding, not boxed into that column. */
@@ -303,129 +136,94 @@ main { flex: 1; min-height: 0; overflow: auto; padding: 38px 48px; }
 #view-mods { max-width: 1040px; }
 /* Installed mods on the left (narrower — it's a flat list of what you already have), the
    Modrinth search on the right (wider — it's the browsing/discovery surface). */
-.mods-layout { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 36px; align-items: start; }
+.mods-layout { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: var(--space-6); align-items: start; }
 .mods-layout h2:first-child { margin-top: 0; }
 h1 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin: 0 0 22px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--glass-border);
+  margin: 0 0 var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
 }
-h2 { font-size: 14px; font-weight: 600; color: var(--mist); letter-spacing: 0.01em; margin: 30px 0 12px; }
+h2 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: var(--space-6) 0 var(--space-3);
+}
 
 /* Play: the one view that isn't the centered column — it stays pinned bottom-left,
    flush with main's own padding. */
 #view-play { max-width: none; margin: 0; height: 100%; display: flex; }
 .stage { margin-top: auto; margin-bottom: 3%; width: min(560px, 100%); }
-.version-line { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 13px; }
-.version-line label { color: var(--mist); }
+.version-line { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); font-size: 13px; }
+.version-line label { color: var(--text-secondary); }
 select {
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color: var(--paper);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 6px 10px;
+  transition: border-color 120ms;
 }
-select:hover { border-color: rgba(255, 255, 255, 0.3); }
-.stack { color: var(--mist); margin: 0 0 22px; font-size: 14px; }
+select:hover { border-color: var(--border-hover); }
+select:focus { border-color: var(--accent); }
+.stack { color: var(--text-secondary); margin: 0 0 var(--space-5); font-size: 13px; }
 .play {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-5);
   width: 100%;
-  padding: 28px 32px;
-  background: var(--glass-strong);
-  -webkit-backdrop-filter: blur(10px) saturate(160%);
-  backdrop-filter: blur(10px) saturate(160%);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  font-size: 23px;
+  padding: var(--space-5) var(--space-6);
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: var(--radius-lg);
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.01em;
   text-align: left;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.18);
-  transition: border-color 160ms, box-shadow 220ms, transform 100ms;
+  transition: background 120ms, transform 100ms;
 }
-/* No filter: blur() and no animated opacity here — see the note by .scene: that combo is
-   what made the aurora layer visibly pulse in size on the real app's WebKit engine. The
-   radial-gradient's own closest-side falloff is already soft, so it doesn't need blurring,
-   and the only thing animated is a plain translateX. */
-.play::before {
-  content: "";
-  position: absolute;
-  inset: -70% -15%;
-  background:
-    radial-gradient(closest-side, rgba(139, 92, 246, 0.35), transparent),
-    radial-gradient(closest-side, rgba(34, 211, 238, 0.24), transparent);
-  background-repeat: no-repeat;
-  background-size: 60% 220%, 55% 220%;
-  background-position: 10% 50%, 88% 35%;
-  animation: playGlow 6s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-@keyframes playGlow {
-  0% { transform: translateX(-2%); }
-  100% { transform: translateX(2%); }
-}
-.play:hover:not(:disabled) { border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 24px 70px rgba(34, 211, 238, 0.25); }
-.play:active:not(:disabled) { transform: scale(0.996); }
-.play:disabled { cursor: default; opacity: 0.65; }
+.play:hover:not(:disabled) { background: var(--accent-hover); }
+.play:active:not(:disabled) { background: var(--accent-press); transform: scale(0.98); }
+.play:disabled { cursor: default; opacity: 0.4; }
 .play .lamp { width: 13px; height: 13px; z-index: 1; }
 .play-label { z-index: 1; }
-.progress { margin-top: 18px; }
-.bar { height: 3px; background: var(--glass); border-radius: 2px; overflow: hidden; }
+.progress { margin-top: var(--space-4); }
+.bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .fill {
-  position: relative;
   height: 100%;
   width: 0;
-  background: var(--gradient);
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-  overflow: hidden;
+  background: var(--accent);
   transition: width 120ms linear;
 }
-.fill::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
-  transform: translateX(-100%);
-  animation: shimmer 1.3s ease-in-out infinite;
-}
-@keyframes shimmer { to { transform: translateX(100%); } }
-.progress-text { color: var(--mist); margin: 10px 0 0; font-variant-numeric: tabular-nums; font-size: 13px; }
-.error { color: var(--danger); margin: 16px 0 0; user-select: text; white-space: pre-wrap; overflow-wrap: anywhere; }
+.progress-text { color: var(--text-secondary); margin: 10px 0 0; font-variant-numeric: tabular-nums; font-size: 13px; }
+.error { color: var(--danger); margin: var(--space-4) 0 0; font-size: 13px; user-select: text; white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* Status dot: the default reading of .lamp — a small light that is either lit or not. */
 .lamp {
   position: relative;
   display: inline-block;
   flex: none;
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--glass-border);
-  transition: background 160ms, box-shadow 160ms;
+  background: var(--border);
+  transition: background 150ms;
 }
-.lamp.on {
-  background: var(--gradient);
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.18), 0 0 14px rgba(139, 92, 246, 0.6);
-  animation: breathe 2.6s ease-in-out infinite;
-}
-@keyframes breathe {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.16), 0 0 10px rgba(139, 92, 246, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.22), 0 0 18px rgba(139, 92, 246, 0.75); }
-}
-/* While the game is being prepared, the same dot spins instead of breathing. */
+.lamp.on { background: var(--accent); }
+/* While the game is being prepared, the same dot becomes a flat ring spinner instead. */
 .lamp.loading {
-  background: conic-gradient(from 0deg, var(--violet), var(--cyan), var(--pink), var(--violet));
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.55);
-  animation: spin 850ms linear infinite;
+  background: transparent;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 700ms linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -434,8 +232,7 @@ select:hover { border-color: rgba(255, 255, 255, 0.3); }
   width: 38px;
   height: 22px;
   border-radius: 11px;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: var(--border);
   cursor: pointer;
 }
 .toggle-row .lamp::after, .mod-row .lamp::after {
@@ -446,109 +243,93 @@ select:hover { border-color: rgba(255, 255, 255, 0.3); }
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--mist);
-  transition: transform 160ms, background 160ms;
-}
-.toggle-row .lamp.on, .mod-row .lamp.on {
-  background: var(--gradient);
-  border-color: transparent;
-  box-shadow: 0 0 14px rgba(139, 92, 246, 0.55);
-  animation: none;
-}
-.toggle-row .lamp.on::after, .mod-row .lamp.on::after {
-  transform: translateX(16px);
   background: #fff;
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  transition: transform 160ms;
 }
+.toggle-row .lamp.on, .mod-row .lamp.on { background: var(--accent); }
+.toggle-row .lamp.on::after, .mod-row .lamp.on::after { transform: translateX(16px); }
 
 /* Rows, buttons, inputs */
 .rows {
   list-style: none;
   margin: 0;
-  padding: 2px 18px;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  backdrop-filter: blur(10px) saturate(140%);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
+  padding: 2px var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 .row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-4);
   min-height: 52px;
-  border-bottom: 1px solid var(--glass-border);
-  padding: 8px 2px;
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-2) 2px;
 }
 .row:last-child { border-bottom: 0; }
 .rows:empty { display: none; }
-.toggle-row, .account-row { cursor: pointer; border-radius: 8px; }
-.toggle-row:hover, .account-row:hover { background: rgba(255, 255, 255, 0.04); }
-.toggle-row .hint { display: block; margin-top: 4px; font-size: 12px; color: var(--mist); }
-.account-row img { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--glass-border); image-rendering: pixelated; }
-.account-row .who { display: flex; align-items: center; gap: 12px; }
-.account-row small { color: var(--mist); margin-left: 6px; }
-.account-row .remove { background: none; border: 0; color: var(--mist); padding: 5px 10px; border-radius: 6px; }
-.account-row .remove:hover { color: var(--danger); background: rgba(255, 90, 110, 0.1); }
-.control { display: flex; align-items: center; gap: 14px; }
-.control output { color: var(--mist); min-width: 58px; text-align: right; font-variant-numeric: tabular-nums; }
-input[type="range"] { accent-color: var(--violet); width: 220px; }
+.toggle-row, .account-row { cursor: pointer; border-radius: var(--radius-sm); }
+.toggle-row:hover, .account-row:hover { background: var(--surface-raised); }
+.toggle-row .hint { display: block; margin-top: 4px; font-size: 11.5px; color: var(--text-secondary); }
+.account-row img { width: 24px; height: 24px; border-radius: var(--radius-sm); border: 1px solid var(--border); image-rendering: pixelated; }
+.account-row .who { display: flex; align-items: center; gap: var(--space-3); }
+.account-row small { color: var(--text-secondary); margin-left: var(--space-2); }
+.account-row .remove { background: none; border: 0; color: var(--text-secondary); padding: 5px 10px; border-radius: var(--radius-sm); }
+.account-row .remove:hover { color: var(--danger); background: rgba(229, 72, 77, 0.1); }
+.control { display: flex; align-items: center; gap: var(--space-3); }
+.control output { color: var(--text-secondary); min-width: 58px; text-align: right; font-variant-numeric: tabular-nums; }
+input[type="range"] { accent-color: var(--accent); width: 220px; }
 input:not([type]), input[type="text"] {
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 9px 11px;
   width: 280px;
-  color: var(--paper);
+  color: var(--text);
   user-select: text;
+  transition: border-color 120ms;
 }
-.actions { display: flex; gap: 10px; margin-top: 22px; }
+input:not([type]):focus, input[type="text"]:focus { border-color: var(--accent); }
+.actions { display: flex; gap: var(--space-3); margin-top: var(--space-5); }
 .button {
-  background: var(--gradient);
+  background: var(--accent);
   color: #fff;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 10px 20px;
-  font-weight: 700;
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
-  transition: filter 120ms, box-shadow 160ms, transform 120ms;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 120ms, transform 100ms;
 }
-.button:hover { filter: brightness(1.08); box-shadow: 0 8px 26px rgba(139, 92, 246, 0.48); }
-.button:active:not(:disabled) { transform: scale(0.96); }
+.button:hover { background: var(--accent-hover); }
+.button:active:not(:disabled) { background: var(--accent-press); transform: scale(0.97); }
 .button.quiet {
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color: var(--paper);
-  border: 1px solid var(--glass-border);
-  box-shadow: none;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
-.button.quiet:hover { border-color: rgba(255, 255, 255, 0.3); background: var(--glass-strong); }
-.button:disabled { opacity: 0.5; cursor: default; filter: none; transform: none; }
-.note { color: var(--mist); font-size: 13px; margin: 10px 0 0; max-width: 560px; }
-.offline { margin-top: 34px; }
-.offline label { display: block; margin-bottom: 8px; }
-.inline { display: flex; gap: 8px; }
-.empty { color: var(--mist); padding: 16px 2px; border-bottom: 1px solid var(--glass-border); }
+.button.quiet:hover { border-color: var(--border-hover); background: var(--surface-raised); }
+.button:disabled { opacity: 0.45; cursor: default; transform: none; }
+.note { color: var(--text-secondary); font-size: 13px; margin: var(--space-3) 0 0; max-width: 560px; }
+.offline { margin-top: var(--space-6); }
+.offline label { display: block; margin-bottom: var(--space-2); }
+.inline { display: flex; gap: var(--space-2); }
+.empty { color: var(--text-secondary); padding: var(--space-4) 2px; border-bottom: 1px solid var(--border); }
 
 #view-logs { height: 100%; display: flex; flex-direction: column; }
 #view-logs h1 { flex: none; }
 .log {
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  backdrop-filter: blur(10px) saturate(140%);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   margin: 0;
-  padding: 16px;
+  padding: var(--space-4);
   flex: 1;
   min-height: 0;
   overflow: auto;
   font: 12px/1.6 ui-monospace, "JetBrains Mono", monospace;
-  color: var(--mist);
+  color: var(--text-secondary);
   user-select: text;
   white-space: pre-wrap;
   word-break: break-all;
@@ -556,40 +337,32 @@ input:not([type]), input[type="text"] {
 .log .err { color: var(--danger); }
 
 dialog {
-  background: var(--glass-strong);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
-  color: var(--paper);
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  padding: 32px 36px;
+  background: var(--surface-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-6);
   width: 420px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
-  animation: dialogIn 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--shadow-sm);
+  animation: dialogIn 120ms ease;
 }
 @keyframes dialogIn {
-  from { opacity: 0; transform: scale(0.96) translateY(6px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 dialog::backdrop {
-  background: rgba(5, 4, 12, 0.68);
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
-  animation: backdropIn 240ms ease;
+  background: rgba(0, 0, 0, 0.5);
+  animation: backdropIn 120ms ease;
 }
 @keyframes backdropIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 .code {
-  font: 700 36px/1.2 ui-monospace, "JetBrains Mono", monospace;
-  letter-spacing: 0.13em;
-  margin: 16px 0 6px;
-  background: var(--gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.5));
+  font: 700 32px/1.2 ui-monospace, "JetBrains Mono", monospace;
+  letter-spacing: 0.12em;
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--text);
   user-select: text;
 }
 
@@ -598,45 +371,42 @@ dialog::backdrop {
 }
 
 /* Mods */
-.search { margin-bottom: 12px; }
+.search { margin-bottom: var(--space-3); }
 .mod-row { align-items: flex-start; padding: 10px 2px; }
-.mod-row img, .mod-row .no-icon { width: 38px; height: 38px; flex: none; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 8px; object-fit: cover; }
-.mod-main { display: flex; gap: 14px; min-width: 0; flex: 1; }
+.mod-row img, .mod-row .no-icon { width: 38px; height: 38px; flex: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); object-fit: cover; }
+.mod-main { display: flex; gap: var(--space-4); min-width: 0; flex: 1; }
 .mod-text { min-width: 0; }
 .mod-text strong { font-weight: 600; }
-.mod-text small { color: var(--mist); margin-left: 6px; }
-.mod-text p { margin: 2px 0 0; color: var(--mist); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 420px; }
+.mod-text small { color: var(--text-secondary); margin-left: var(--space-2); }
+.mod-text p { margin: 2px 0 0; color: var(--text-secondary); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 420px; }
 .mod-row .control { align-self: center; }
-.tag { color: var(--mist); font-size: 12px; }
-.categories { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+.tag { color: var(--text-secondary); font-size: 11.5px; }
+.categories { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 4px 0 var(--space-3); }
 .category {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 5px 14px;
-  color: var(--mist);
+  color: var(--text-secondary);
   font-size: 13px;
-  transition: background 120ms, color 120ms, border-color 120ms, transform 120ms;
+  transition: color 120ms, border-color 120ms, background 120ms, transform 120ms;
 }
-.category:hover { color: var(--paper); border-color: rgba(255, 255, 255, 0.28); }
-.category:active { transform: scale(0.94); }
-.category.active { background: var(--gradient); color: #fff; border-color: transparent; box-shadow: 0 0 12px rgba(139, 92, 246, 0.45); }
-.result-count { margin: 4px 0 8px; }
-.list-note { margin: -4px 0 10px; }
-.missing { color: var(--warn); font-size: 12px; margin-left: 6px; }
+.category:hover { color: var(--text); border-color: var(--border-hover); }
+.category:active { transform: scale(0.97); }
+.category.active { background: var(--accent); color: #fff; border-color: transparent; }
+.result-count { margin: 4px 0 var(--space-2); }
+.list-note { margin: -4px 0 var(--space-3); }
+.missing { color: var(--warn); font-size: 11.5px; margin-left: var(--space-2); }
 
 /* Launcher update notice, next to the version text in the top bar's status group. */
 .update {
   padding: 7px 11px;
-  font-size: 12px;
+  font-size: 11.5px;
   line-height: 1.4;
-  color: var(--paper);
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border-left: 2px solid;
-  border-image: var(--gradient) 1;
-  border-radius: 0 8px 8px 0;
+  color: var(--text);
+  background: var(--surface);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   white-space: nowrap;
 }
-.update a { color: var(--cyan); }
+.update a { color: var(--accent); }
