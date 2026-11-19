@@ -160,5 +160,6 @@
 	"module.lucentclient.waypoints.desc": "위치를 빛줄기로 표시하고 근처에서 확인",
 	"setting.lucentclient.waypoint_show_beam": "빛줄기 표시",
 	"setting.lucentclient.waypoint_render_distance": "표시 거리",
-	"screen.lucentclient.waypoints.add": "+ 여기에 웨이포인트 추가"
+	"screen.lucentclient.waypoints.add": "+ 여기에 웨이포인트 추가",
+	"message.lucentclient.unbound_key_event": "[Lucent Client] 키 입력이 인식되지 않았어요 (한국어 IME 등이 켜져 있을 때 생길 수 있어요). 오른쪽 Shift로 메뉴가 안 열리면 IME를 꺼 보세요."
 }

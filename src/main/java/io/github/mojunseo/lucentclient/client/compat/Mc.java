@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
@@ -114,6 +115,19 @@ public final class Mc {
 		return level.dimension().identifier().toString();
 		//?} else {
 		/*return level.dimension().location().toString();
+		*///?}
+	}
+
+	/** A plain system message in chat, not tied to any player or server. */
+	public static void systemMessage(Minecraft minecraft, Component message) {
+		//? if >=26.1 {
+		//? if >=26.2 {
+		minecraft.gui.hud.getChat().addClientSystemMessage(message);
+		//?} else {
+		/*minecraft.gui.getChat().addClientSystemMessage(message);
+		*///?}
+		//?} else {
+		/*minecraft.gui.getChat().addMessage(message);
 		*///?}
 	}
 }
