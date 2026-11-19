@@ -3,6 +3,10 @@
 Lucent Client는 Minecraft: Java Edition용 Fabric 클라이언트 모드와 데스크톱 런처입니다. 기능은 [README](https://github.com/mojunseo/Lucentclient#readme)를 참고하세요.
 
 ### 이번 버전에서 바뀐 것
+- **런처 디자인을 다시 새로 그렸습니다**: 화려한 글래스모피즘·오로라 배경을 걷어내고, 더 차분하고 절제된 톤으로 바꿨습니다.
+- **Windows IME 키 입력 버그 수정**: 한국어·일본어 입력기가 켜진 상태에서 오른쪽 Shift 등을 누르면 설정하지 않은 다른 키들이 같이 눌리던 문제를 고쳤습니다. 영향이 남아있으면 설정에서 다른 키로 바꿔보라는 안내가 뜹니다.
+
+v0.1.6에서 바뀐 것:
 - **웨이포인트 모듈 추가**: 원하는 위치에 이름 붙은 지점을 찍으면 월드에 색깔 빛줄기와 이름표로 표시되고, HUD에 가까운 순서로 목록이 뜹니다.
 - **모드 종속성 검사**: 게임을 켜기 전에 설치된 모드가 필요로 하는 다른 모드가 빠져 있는지 확인하고 알려줍니다.
 - **로그인 실패 로그**: Microsoft 로그인이 안 되면 자세한 내용을 로그 파일에 남겨서, 제보할 때 첨부할 수 있어요.
@@ -49,7 +53,9 @@ Windows: `*_x64-setup.exe` 또는 `.msi` · macOS(Apple Silicon과 Intel): `*_un
 
 Lucent Client is a Fabric client mod for Minecraft: Java Edition, with a desktop launcher. See the [README](https://github.com/mojunseo/Lucentclient/blob/main/README.en.md) for features.
 
-**What's new**: a Waypoints module — mark named spots in the world, shown as a colored beam and a floating name, plus a nearby list on the HUD; a dependency check before launch that warns about an installed mod missing one it needs; and a log file for failed Microsoft sign-ins to attach when reporting one.
+**What's new**: the launcher has a new look — the glassmorphic panels and drifting aurora background are gone, replaced with a calmer, flatter, more restrained tone; fixed a Windows IME bug where, with Korean/Japanese input active, pressing Right Shift (or other keys) could also trigger other keybinds you never set — if it still happens, the launcher now suggests rebinding to a different key.
+
+**From v0.1.6**: a Waypoints module — mark named spots in the world, shown as a colored beam and a floating name, plus a nearby list on the HUD; a dependency check before launch that warns about an installed mod missing one it needs; and a log file for failed Microsoft sign-ins to attach when reporting one.
 
 **From v0.1.5**: added support for Minecraft 1.21.4, alongside the newer versions.
 
@@ -73,7 +79,9 @@ The launcher signs in with your Microsoft account and starts the game. It isn't 
 
 Lucent Client は Minecraft: Java Edition 向けの Fabric クライアント MOD とデスクトップランチャーです。機能は [README](https://github.com/mojunseo/Lucentclient/blob/main/README.ja.md) をご覧ください。
 
-**今回の変更**: ウェイポイントモジュールを追加しました。ワールドに名前付きの地点を置くと、色付きの光の柱と名前で表示され、HUD には近い順のリストが出ます。また、起動前に導入済み MOD が必要とする MOD が欠けていないか確認して警告するようになりました。さらに、Microsoft サインインに失敗した際は詳細をログファイルに残すので、不具合報告のときに添付できます。
+**今回の変更**: ランチャーのデザインを一新しました。ガラス風(グラスモーフィズム)のパネルと漂うオーロラの背景をやめて、より落ち着いたフラットなトーンにしました。また、韓国語・日本語入力(IME)を使っている状態で右 Shift などを押すと、設定していない別のキーも一緒に反応してしまう Windows の不具合を修正しました。症状が残る場合は、設定で別のキーに変更するよう案内が表示されます。
+
+**v0.1.6 の変更**: ウェイポイントモジュールを追加しました。ワールドに名前付きの地点を置くと、色付きの光の柱と名前で表示され、HUD には近い順のリストが出ます。また、起動前に導入済み MOD が必要とする MOD が欠けていないか確認して警告するようになりました。さらに、Microsoft サインインに失敗した際は詳細をログファイルに残すので、不具合報告のときに添付できます。
 
 **v0.1.5 の変更**: 最新バージョンに加えて、Minecraft 1.21.4 にも対応しました。
 
